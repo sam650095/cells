@@ -3,6 +3,5 @@ dump.rdb
 media/
 data/
 .pytype/
-cells/settings.py
 db.sqlite3
 dump.rdb
