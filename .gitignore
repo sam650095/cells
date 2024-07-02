@@ -1,0 +1,8 @@
+db.sqlite3
+dump.rdb
+media/
+data/
+.pytype/
+local_settings.py
+db.sqlite3
+dump.rdb
