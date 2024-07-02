@@ -19,3 +19,8 @@
    pip install -r requirements.txt
    # 只能執行到00 Preprocessing
    ```
+
+3. 執行:
+   ```sh
+   python manage.py runserver
+   ```
