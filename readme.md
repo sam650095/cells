@@ -38,27 +38,27 @@
 
       快速指南 - https://learn.microsoft.com/en-us/windows/wsl/install
 
-   ```sh
-   WSL # 進入Linux環境
-   WSL --install # 下載Linux
-   ```
+      ```sh
+      WSL # 進入Linux環境
+      WSL --install # 下載Linux
+      ```
 
    2. 下載 Rendis
 
       快速指南 - https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/
 
-   ```sh
-   curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-   echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-   sudo apt-get update
-   sudo apt-get install redis
-   ```
+      ```sh
+      curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+      sudo apt-get update
+      sudo apt-get install redis
+      ```
 
    3. 啟動 redis
 
-   ```sh
-   sudo service redis-server start # 沒有報錯應該就沒問題
-   ```
+      ```sh
+      sudo service redis-server start # 沒有報錯應該就沒問題
+      ```
 
 4. 執行專案
 
@@ -68,7 +68,7 @@
 
 - 這兩個必須同時啟動
 
-```
-sudo service redis-server start
-python manage.py runserver
-```
+  ```
+  sudo service redis-server start
+  python manage.py runserver
+  ```
