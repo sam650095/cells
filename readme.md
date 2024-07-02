@@ -45,7 +45,7 @@
 
    2. 下載 Rendis
 
-      快速指南 - https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/
+      快速指南 - https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/
 
       ```sh
       curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
