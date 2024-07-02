@@ -22,7 +22,8 @@
    ```
 
 3. Redis:
-   -MacOS
+
+   - MacOS
 
    ### 如果先前 install requiremnents.txt 是正常，那這邊就不會有意外。
 
@@ -30,7 +31,7 @@
    redis-server
    ```
 
-   -Windows
+   - Windows
 
    ### redis 不支援 Windows，因此只能在 Linux 執行
 
