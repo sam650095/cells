@@ -35,6 +35,7 @@
    ### redis 不支援 Windows，因此只能在 Linux 執行
 
    1. 進入 Linux
+
       快速指南 - https://learn.microsoft.com/en-us/windows/wsl/install
 
    ```sh
@@ -43,6 +44,7 @@
    ```
 
    2. 下載 Rendis
+
       快速指南 - https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/
 
    ```sh
@@ -64,7 +66,7 @@
    python manage.py runserver # 開啟 http://localhost:8000
    ```
 
-##### 這兩個必須同時啟動
+- 這兩個必須同時啟動
 
 ```
 sudo service redis-server start
