@@ -1,0 +1,14 @@
+{%extends "base.html"%} {% load static %} {%block content%}
+<!-- main -->
+<div class="mb-3 text-gray-900">Please select the data to do phenotyping:</div>
+<!-- button -->
+<div class="text-end py-5">
+  <a
+    href="{% url 'page' process='phenotyping' method='phenotyping' %}"
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+  >
+    Next:Phenotyping
+  </a>
+</div>
+
+{%endblock%}

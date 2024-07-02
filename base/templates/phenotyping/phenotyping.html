@@ -1,0 +1,27 @@
+{%extends "base.html"%} {% load static %} {%block content%}
+<!-- main -->
+<div class="mb-3 text-gray-900">
+  Please upload your phenotyping workflow
+  <input type="file" name="" id="" />
+</div>
+<div lass="mb-3 text-gray-900">
+  Note:
+  <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
+    <li>
+      Rescales the data based on the gates from the previous step, or
+      automatically finds the optimal gates via Gaussian Mixture Models(GMM) if
+      none are provided.
+    </li>
+  </ul>
+</div>
+<!-- button -->
+<div class="text-end py-5">
+  <a
+    href="{% url 'page' process='cellsinteraction' method='spatialanalysis' %}"
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+  >
+    Next:Spatial Analysis
+  </a>
+</div>
+
+{%endblock%}
