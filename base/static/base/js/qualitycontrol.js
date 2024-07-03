@@ -1,11 +1,13 @@
 const f_sampleSelect = document.getElementById("f_sampleSelect");
+let nowimage_result;
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
   const csrftoken = getCookie("csrftoken");
 
   const process_result = await fetchAPI("/api/qualitycontrol", 0, csrftoken);
-  console.log(process_result);
+  nowimage_result = process_result;
+  console.log(nowimage_result);
   //   show btn
   const btnbox = document.getElementById("btnbox");
   btnbox.classList.remove("hidden");
@@ -98,11 +100,25 @@ async function preview() {
 }
 async function confirm() {
   const csrftoken = getCookie("csrftoken");
-  const confirm_result = await fetchAPI("/api/confirm", 0, csrftoken);
-  console.log(confirm_result);
-  showimage(confirm_result);
+  const replaceimg_result = await fetchAPI("/api/replaceimg", 0, csrftoken);
+  console.log(replaceimg_result);
+  const prefix = replaceimg_result.adata.split(":")[0];
+
+  nowimage_result.adata_result = nowimage_result.adata_result.map((item) => {
+    if (item.startsWith(prefix)) {
+      return replaceimg_result.adata;
+    }
+    return item;
+  });
+  console.log(nowimage_result);
+  showimage(nowimage_result);
   // next page btn
   document.getElementById("nextbtn").classList.remove("hidden");
+}
+// before next page
+async function presubmit(event) {
+  event.preventDefault();
+  // window.location.href = event.target.href;
 }
 // fetch api
 async function fetchAPI(url, formData, csrftoken) {

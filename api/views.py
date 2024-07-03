@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import FileUploadSerializer
-from .imaging import produce_and_save_img
+from .imaging import *
 from .redis import *
 
 def sort_key(filename):
@@ -88,6 +88,7 @@ class QualityControlView(APIView):
         adata_objects, qc_adata_objects, adata_result, save_image_names = self.post_reset_adata()
         save_adata_objects(adata_objects, 'adata_objects')
         save_adata_objects(qc_adata_objects, 'qc_adata_objects')
+        save_adata_objects(qc_adata_objects, 'preview_adata_objects')
         return Response({'adata_result': adata_result,'save_image_names': save_image_names}, status=status.HTTP_201_CREATED)
     
     def post_reset_adata(self):
@@ -120,7 +121,7 @@ class PreviewView(APIView):
         user_inputs['outlier_lims'] = self.input_outliers(user_inputs['chosen_adata'], filter_method, lowerlimit, upperlimit)
 
         preview_adata, preview_adata_result, preview_image_name = self.preview_filter(user_inputs)
-        # chosen adata to preview
+        # chose adata to preview
         save_adata_objects(preview_adata, 'preview_adata')
         return Response({'adata_result': preview_adata_result,'save_image_names': preview_image_name}, status=status.HTTP_201_CREATED)
     
@@ -165,25 +166,28 @@ class PreviewView(APIView):
         n_obs, n_vars = chosen_adata.shape
         chosen_adata_result = f"{chosen_adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
         return chosen_adata, chosen_adata_result, imgname
-class ConfirmView(APIView):
-    def post(self, request):
-        adata_objects = load_adata_objects('qc_adata_objects')
+class ReplaceView(APIView):
+    def post(self,request):
+        image_names = replaceimage()
         preview_adata = load_adata_objects('preview_adata')
+        preview_adata_objects = load_adata_objects('preview_adata_objects')
+        update_adata_objects, filtered_adata_objects, updated_adata_result = self.perform_filter(preview_adata_objects, preview_adata)
 
-        update_adata_objects, filtered_adata_objects, updated_adata_result = self.perform_filter(adata_objects, preview_adata)
         save_adata_objects(update_adata_objects, 'adata_objects')
-        save_adata_objects(filtered_adata_objects, 'filtered_adata_objects')
-        image_names = self.replaceimage()
-        return Response({'adata_result': updated_adata_result,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
+        save_adata_objects(filtered_adata_objects, 'preview_adata_objects')
+
+        n_obs, n_vars = preview_adata.shape
+        preview_adata_result = f"{preview_adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
+        return Response({'adata':preview_adata_result,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
     
-    def perform_filter(self, adata_objects, filtered_adata):
+    def perform_filter(self, preview_adata_objects, preview_adata):
         updated_adata_objects = []
         filtered_adata_objects = []
         updated_adata_result = []
-        for adata in adata_objects:
-            if adata.uns['prefix'] == filtered_adata.uns['prefix']:
-                updated_adata_objects.append(filtered_adata)
-                filtered_adata_objects.append(filtered_adata.copy())
+        for adata in preview_adata_objects:
+            if adata.uns['prefix'] == preview_adata.uns['prefix']:
+                updated_adata_objects.append(preview_adata)
+                filtered_adata_objects.append(preview_adata.copy())
             else:
                 updated_adata_objects.append(adata)
                 filtered_adata_objects.append(adata.copy())
@@ -193,26 +197,10 @@ class ConfirmView(APIView):
             sc.pl.violin(adata, ['n_genes_by_counts', 'total_counts'], jitter=0.4, multi_panel=True)
 
         return updated_adata_objects, filtered_adata_objects, updated_adata_result
-    def replaceimage(self):
-        origin_dir = os.path.join(settings.MEDIA_ROOT, 'tempimage', 'origin')
-        preview_dir = os.path.join(settings.MEDIA_ROOT, 'tempimage', 'preview')
-        
-        replaced = []
-        
-        for preview_file in os.listdir(preview_dir):
-            prefix = preview_file.split('_')[0]
-            preview_path = os.path.join(preview_dir, preview_file)
-            
-            for origin_file in os.listdir(origin_dir):
-                if origin_file.startswith(prefix + '_'):
-                    origin_path = os.path.join(origin_dir, origin_file)
-                    os.replace(preview_path, origin_path)
-                    replaced.append(f"Replaced {origin_file}")
-                    break
-        
-        image_files = sorted(os.listdir(origin_dir))
-        image_names = [file for file in image_files if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
-        return image_names
+class ConfirmView(APIView):
+    def post(self, request):
+        return Response({}, status=status.HTTP_201_CREATED)
+    
 class NormalizationView(APIView):
     def post(self, request):
         adata_objects = load_adata_objects('filtered_adata_objects')
