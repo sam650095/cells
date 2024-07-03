@@ -15,3 +15,23 @@ def produce_and_save_img(adata, saveplace, name):
     plt.savefig(save_path)
     plt.close()
     return adata, save_name
+def replaceimage():
+    origin_dir = os.path.join(settings.MEDIA_ROOT, 'tempimage', 'origin')
+    preview_dir = os.path.join(settings.MEDIA_ROOT, 'tempimage', 'preview')
+    
+    replaced = []
+    
+    for preview_file in os.listdir(preview_dir):
+        prefix = preview_file.split('_')[0]
+        preview_path = os.path.join(preview_dir, preview_file)
+        
+        for origin_file in os.listdir(origin_dir):
+            if origin_file.startswith(prefix + '_'):
+                origin_path = os.path.join(origin_dir, origin_file)
+                os.replace(preview_path, origin_path)
+                replaced.append(f"Replaced {origin_file}")
+                break
+    
+    image_files = sorted(os.listdir(origin_dir))
+    image_names = [file for file in image_files if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+    return image_names
