@@ -2,7 +2,7 @@ db.sqlite3
 dump.rdb
 media/
 data/
-db.sqlite3
 dump.rdb
 __pycache__/
 *.pyc
+h5ad_folders/
