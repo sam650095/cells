@@ -20,8 +20,8 @@ async function processbtn(event) {
   }
   const csrftoken = getCookie("csrftoken");
   const result = await fetchAPI("/api/upload", formData, csrftoken);
-  let adata_result = document.getElementById("adata_result");
-  adata_result.innerHTML = "";
+  let adata_results = document.getElementById("adata_results");
+  adata_results.innerHTML = "";
   let ul = document.createElement("ul");
   ul.classList.add(
     "max-w-md",
@@ -30,12 +30,12 @@ async function processbtn(event) {
     "list-disc",
     "list-inside"
   );
-  result["adata_result"].forEach((item) => {
+  result["adata_results"].forEach((item) => {
     let li = document.createElement("li");
     li.textContent = item;
     ul.appendChild(li);
   });
-  adata_result.appendChild(ul);
+  adata_results.appendChild(ul);
   let nextbtn = document.getElementById("nextbtn");
   nextbtn.classList.remove("hidden");
 }

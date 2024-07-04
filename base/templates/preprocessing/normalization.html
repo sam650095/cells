@@ -1,29 +1,45 @@
 {%extends "base.html"%} {% load static %} {%block content%}
 <!-- main -->
-<div class="mb-3 text-gray-900">
-  Note:
-  <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
-    <li>
-      CPM(Counts Per Million) Normalization: This method normalizes the total
-      counts of each cell to a fixed value (1,000,000 UMIs) and applies a
-      log-transformation to approximate a normal distribution.
-    </li>
-    <li>
-      CLR(Centered Log-Ratio) Normalization: This method divides each element by
-      the geometric mean of non-zero values, takes the log, and removes the
-      unit-sum constraint, approximating normality.
-    </li>
-  </ul>
-</div>
-<div class="w-3/4 text-end">
-  <button
-    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
-  >
-    process
-  </button>
-</div>
+<form id="normalform">
+  <div class="mb-3 text-gray-900">
+    <div class="flex items-center my-2 gap-5">
+      <label for="normal_method" class="text-base leading-relaxed"
+        >Please select one normalize method:</label
+      >
+      <select
+        name="normal_method"
+        id="normal_method"
+        class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+      >
+        <option value="cpm">CPM</option>
+        <option value="clr">CLR</option>
+      </select>
+    </div>
+    <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
+      <li>
+        CPM(Counts Per Million) Normalization: This method normalizes the total
+        counts of each cell to a fixed value (1,000,000 UMIs) and applies a
+        log-transformation to approximate a normal distribution.
+      </li>
+      <li>
+        CLR(Centered Log-Ratio) Normalization: This method divides each element
+        by the geometric mean of non-zero values, takes the log, and removes the
+        unit-sum constraint, approximating normality.
+      </li>
+    </ul>
+  </div>
+  <div class="text-end">
+    <button
+      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+      onclick="processbtn(event)"
+    >
+      process
+    </button>
+  </div>
+</form>
+<div id="adata_results"></div>
 <!-- button -->
-<div class="text-end py-5">
+<div id="nextbtn" class="text-end py-5 hidden">
   <a
     href="{% url 'page' process='preprocessing' method='mergeddata' %}"
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
@@ -32,4 +48,5 @@
   </a>
 </div>
 
+<script src="{% static 'base/js/normalization.js'%}"></script>
 {%endblock%}

@@ -1,6 +1,17 @@
 {%extends "base.html"%} {% load static %} {%block content%}
 <!-- main -->
-<div class="mb-3 text-gray-900">Select the markers you want to do PCA:</div>
+<div class="mb-3 text-gray-900">
+  <div class="flex items-center my-2 gap-5">
+    <label for="normal_method" class="text-base leading-relaxed"
+      >Please select one normalize method:</label
+    >
+    <select
+      name="normal_method"
+      id="normal_method"
+      class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+    ></select>
+  </div>
+</div>
 <!-- button -->
 <div class="text-end py-5">
   <a

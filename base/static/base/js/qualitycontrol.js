@@ -1,18 +1,26 @@
 const f_sampleSelect = document.getElementById("f_sampleSelect");
-let nowimage_result;
+
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
   const csrftoken = getCookie("csrftoken");
 
   const process_result = await fetchAPI("/api/qualitycontrol", 0, csrftoken);
-  nowimage_result = process_result;
-  console.log(nowimage_result);
+  // init modal
+  initmodal();
   //   show btn
   const btnbox = document.getElementById("btnbox");
   btnbox.classList.remove("hidden");
   //   show image
   showimage(process_result);
+  // next page btn
+  document.getElementById("nextbtn").classList.remove("hidden");
+}
+
+function initmodal() {
+  document.getElementById("filterform").reset();
+  document.getElementById("previewimagebox").innerHTML = "";
+  document.getElementById("confirmbtn").classList.add("hidden");
 }
 // filter method change
 function showimage(result) {
@@ -27,9 +35,9 @@ function showimage(result) {
     "list-inside",
     "w-fit"
   );
-  for (let i = 0; i < result.adata_result.length; i++) {
+  for (let i = 0; i < result.adata_results.length; i++) {
     const li = document.createElement("li");
-    li.textContent = result["adata_result"][i];
+    li.textContent = result["adata_results"][i];
     const img = document.createElement("img");
     img.src = `/media/tempimage/origin/${result["save_image_names"][i]}`;
     img.classList.add("m-5", "size-3/4");
@@ -37,9 +45,9 @@ function showimage(result) {
     ul.appendChild(li);
 
     // selection add data
-    var sample = result["adata_result"][i].substring(
+    var sample = result["adata_results"][i].substring(
       0,
-      result["adata_result"][i].indexOf(":")
+      result["adata_results"][i].indexOf(":")
     );
     var f_sampleoption = document.createElement("option");
     f_sampleoption.value = sample;
@@ -100,25 +108,18 @@ async function preview() {
 }
 async function confirm() {
   const csrftoken = getCookie("csrftoken");
-  const replaceimg_result = await fetchAPI("/api/replaceimg", 0, csrftoken);
+  const replaceimg_result = await fetchAPI("/api/replace", 0, csrftoken);
   console.log(replaceimg_result);
-  const prefix = replaceimg_result.adata.split(":")[0];
 
-  nowimage_result.adata_result = nowimage_result.adata_result.map((item) => {
-    if (item.startsWith(prefix)) {
-      return replaceimg_result.adata;
-    }
-    return item;
-  });
-  console.log(nowimage_result);
-  showimage(nowimage_result);
-  // next page btn
-  document.getElementById("nextbtn").classList.remove("hidden");
+  showimage(replaceimg_result);
 }
 // before next page
 async function presubmit(event) {
+  const csrftoken = getCookie("csrftoken");
   event.preventDefault();
-  // window.location.href = event.target.href;
+  confirm_result = await fetchAPI("/api/confirm", 0, csrftoken);
+  console.log(confirm_result);
+  window.location.href = event.target.href;
 }
 // fetch api
 async function fetchAPI(url, formData, csrftoken) {

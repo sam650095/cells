@@ -6,15 +6,17 @@
     <li>Do not apply for single data set.</li>
   </ul>
 </div>
-<div class="w-3/4 text-end">
+<div class="text-end">
   <button
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+    onclick="processbtn(event)"
   >
     process
   </button>
 </div>
+<div id="adata_results"></div>
 <!-- button -->
-<div class="text-end py-5">
+<div id="nextbtn" class="text-end py-5 hidden">
   <a
     href="{% url 'page' process='clustering' method='pca' %}"
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
@@ -23,4 +25,5 @@
   </a>
 </div>
 
+<script src="{% static 'base/js/mergeddata.js'%}"></script>
 {%endblock%}

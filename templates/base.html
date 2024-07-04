@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-slate-100 overflow-x-hidden">
+  <body class="bg-slate-100 overflow-x-hidden overflow-y-auto">
     <main class="h-screen w-screen">
       <div class="flex md:flex-row flex-col-reverse">
         <div class="basis-3/4 p-16">
@@ -28,7 +28,28 @@
     </main>
 
     <script src="{% static 'base/js/main.js' %}"></script>
+    <!-- tailwind plugin -->
+    <style type="text/tailwindcss">
+      @layer utilities {
+        /* Default scrollbar */
+        ::-webkit-scrollbar {
+          visibility: hidden;
+          width: 7px;
+        }
 
+        /* Scrollbar thumb */
+        ::-webkit-scrollbar-thumb {
+          background: theme("colors.gray.400");
+          border-radius: theme("borderRadius.full");
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          transition: width 0.3s ease;
+          background: theme("colors.sky.900");
+          cursor: pointer;
+        }
+      }
+    </style>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

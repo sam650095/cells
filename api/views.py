@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import FileUploadSerializer
 from .imaging import *
-from .redis import *
+from .saved import *
 
 def sort_key(filename):
     return int(filename.split('_')[0][1:]) 
@@ -39,7 +39,6 @@ def clearmediafiles(temp):
 class FileUploadView(APIView):
     def post(self, request):
         clear_media = clearmediafiles('tempfile')
-        # print(clear_media)
         files = request.FILES.getlist('files')
         file_serializers = []
 
@@ -52,15 +51,15 @@ class FileUploadView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         signal_value_files = sorted(os.listdir(os.path.join(settings.MEDIA_ROOT, 'tempfile', 'signal_value')), key=sort_key)
         metadata_files = sorted(os.listdir(os.path.join(settings.MEDIA_ROOT, 'tempfile', 'metadata')), key=sort_key)
-        adata_objects, original_adata_objects, adata_result = self.create_adata(signal_value_files, metadata_files)
+        adata_objects, original_adata_objects, adata_results = self.create_adata(signal_value_files, metadata_files)
         save_adata_objects(adata_objects, 'adata_objects')
         save_adata_objects(original_adata_objects, 'original_adata_objects')
-        return Response({"adata_result": adata_result}, status=status.HTTP_201_CREATED)
+        return Response({"adata_results": adata_results}, status=status.HTTP_201_CREATED)
     
     def create_adata(self, signal_value_files, metadata_files):
         adata_objects = []
         original_adata_objects = []
-        adata_result = []
+        adata_results = []
         signal_value_dir = os.path.join(settings.MEDIA_ROOT, 'tempfile', 'signal_value')
         metadata_dir = os.path.join(settings.MEDIA_ROOT, 'tempfile', 'metadata')
 
@@ -75,36 +74,35 @@ class FileUploadView(APIView):
                 adata.raw = adata
                 adata.uns['prefix'] = prefix
                 n_obs, n_vars = adata.shape
-                adata_result.append(f"{prefix}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+                adata_results.append(f"{prefix}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
                 adata_objects.append(adata)
                 original_adata_objects.append(adata.copy())
-        return adata_objects, original_adata_objects, adata_result
+        return adata_objects, original_adata_objects, adata_results
     
     
 class QualityControlView(APIView):
     def post(self, request):
         clear_media = clearmediafiles('tempimage')
-        # print(clear_media)
-        adata_objects, qc_adata_objects, adata_result, save_image_names = self.post_reset_adata()
+        adata_objects, qc_adata_objects, adata_results, save_image_names = self.post_reset_adata()
         save_adata_objects(adata_objects, 'adata_objects')
         save_adata_objects(qc_adata_objects, 'qc_adata_objects')
         save_adata_objects(qc_adata_objects, 'preview_adata_objects')
-        return Response({'adata_result': adata_result,'save_image_names': save_image_names}, status=status.HTTP_201_CREATED)
+        return Response({'adata_results': adata_results,'save_image_names': save_image_names}, status=status.HTTP_201_CREATED)
     
     def post_reset_adata(self):
         adata_objects = load_adata_objects('original_adata_objects')
         qc_adata_objects = []
-        adata_result = []
+        adata_results = []
         save_image_names = []
         for adata in adata_objects:
             n_obs, n_vars = adata.shape
-            adata_result.append(f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+            adata_results.append(f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
             sc.pp.calculate_qc_metrics(adata, percent_top=None, log1p=False, inplace=True)
             adata, imgname = produce_and_save_img(adata, "origin", 'violin_plot')
             qc_adata_objects.append(adata)
             save_image_names.append(imgname)
         
-        return adata_objects, qc_adata_objects, adata_result, save_image_names
+        return adata_objects, qc_adata_objects, adata_results, save_image_names
     
 class PreviewView(APIView):
     def post(self, request):
@@ -130,7 +128,6 @@ class PreviewView(APIView):
             if adata.uns['prefix'] == sample_select:
                 chosen_adata = adata
                 return chosen_adata
-
     def input_outliers(self, chosen_adata, filtermethod, lowerLimit, upperLimit):   
         choice = filtermethod
         if choice == 'manual':
@@ -169,21 +166,19 @@ class PreviewView(APIView):
 class ReplaceView(APIView):
     def post(self,request):
         image_names = replaceimage()
-        preview_adata = load_adata_objects('preview_adata')
-        preview_adata_objects = load_adata_objects('preview_adata_objects')
-        update_adata_objects, filtered_adata_objects, updated_adata_result = self.perform_filter(preview_adata_objects, preview_adata)
+        update_adata_objects, filtered_adata_objects, adata_results = self.perform_filter()
 
         save_adata_objects(update_adata_objects, 'adata_objects')
         save_adata_objects(filtered_adata_objects, 'preview_adata_objects')
 
-        n_obs, n_vars = preview_adata.shape
-        preview_adata_result = f"{preview_adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
-        return Response({'adata':preview_adata_result,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
+        return Response({'adata_results':adata_results,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
     
-    def perform_filter(self, preview_adata_objects, preview_adata):
+    def perform_filter(self):
+        preview_adata = load_adata_objects('preview_adata')
+        preview_adata_objects = load_adata_objects('preview_adata_objects')
         updated_adata_objects = []
         filtered_adata_objects = []
-        updated_adata_result = []
+        adata_results = []
         for adata in preview_adata_objects:
             if adata.uns['prefix'] == preview_adata.uns['prefix']:
                 updated_adata_objects.append(preview_adata)
@@ -193,36 +188,65 @@ class ReplaceView(APIView):
                 filtered_adata_objects.append(adata.copy())
         for adata in updated_adata_objects:
             n_obs, n_vars = adata.shape
-            updated_adata_result.append(f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
-            sc.pl.violin(adata, ['n_genes_by_counts', 'total_counts'], jitter=0.4, multi_panel=True)
+            adata_results.append(f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+            
 
-        return updated_adata_objects, filtered_adata_objects, updated_adata_result
+        return updated_adata_objects, filtered_adata_objects, adata_results
 class ConfirmView(APIView):
     def post(self, request):
+        adata_objects = load_adata_objects('preview_adata_objects')
+        filtered_adata_objects = adata_objects.copy()
+        
+        save_adata_objects(adata_objects, 'adata_objects')
+        save_adata_objects(filtered_adata_objects, 'filtered_adata_objects')
         return Response({}, status=status.HTTP_201_CREATED)
     
 class NormalizationView(APIView):
     def post(self, request):
-        adata_objects = load_adata_objects('filtered_adata_objects')
         chosen_method = request.data.get('normal_method')
-        adata_objects, norm_adata_objects, norm_adata_result = self.perform_normalization(adata_objects, chosen_method)
+        adata_objects, norm_adata_objects, norm_adata_results = self.perform_normalization(chosen_method)
+        save_adata_objects(adata_objects, 'adata_objects')
         save_adata_objects(norm_adata_objects, 'norm_adata_objects')
-        return Response({'message': 'Succeed', 'normal_result':norm_adata_result})
-    def perform_normalization(self, adata_objects, chosen_method):
+        return Response({"adata_results": norm_adata_results}, status=status.HTTP_201_CREATED)
+    
+    def perform_normalization(self, chosen_method):
+        adata_objects = load_adata_objects('filtered_adata_objects')
         norm_adata_objects = []
         norm_adata_result = []
-        if chosen_method == 'CPM':
+        if chosen_method == 'cpm':
             for adata in adata_objects:
                 sc.pp.normalize_total(adata, target_sum=1e6)
                 sc.pp.log1p(adata)
                 norm_adata_result.append(f"Normalization completed for {adata.uns['prefix']}")
                 norm_adata_objects.append(adata.copy())
-        elif chosen_method == 'CLR':
+        elif chosen_method == 'clr':
             for adata in adata_objects:
-                x_pos = adata.X[adata.X > 0]  # 提取非零元素 
-                geo_mean = np.exp(np.sum(np.log1p(x_pos)) / len(x_pos))  # 計算幾何平均值: exp(非零元素的對數和/元素個數)
-                clr_x = np.log1p(x_pos / geo_mean)  # log(x / geo_mean),得到標準化後的值
-                adata.X[adata.X > 0] = clr_x # 將clr_x放回原矩陣相應的位置
+                x_pos = adata.X[adata.X > 0] 
+                geo_mean = np.exp(np.sum(np.log1p(x_pos)) / len(x_pos))  
+                clr_x = np.log1p(x_pos / geo_mean) 
+                adata.X[adata.X > 0] = clr_x 
                 norm_adata_result.append(f"Normalization completed for {adata.uns['prefix']}")
                 norm_adata_objects.append(adata.copy())
         return adata_objects, norm_adata_objects, norm_adata_result
+class MergeView(APIView):
+    def post(self, request):
+        adata_merged_results = self.perform_merged()
+        return Response({'adata_results':adata_merged_results}, status=status.HTTP_201_CREATED)
+    def perform_merged(self):
+        adata_objects = load_adata_objects('norm_adata_objects')
+        adata_merged_results = []
+        
+        if len(adata_objects) == 1:
+            adata = adata_objects[0]
+            adata.uns['is_merged'] = False
+        else:
+            adata = sc.concat(adata_objects, axis=0)
+            adata.obs_names_make_unique()
+            adata.uns['is_merged'] = True
+        
+        for data in [*adata_objects, adata]:
+            prefix = data.uns.get('prefix', 'Merged Data')
+            adata_merged_results.append(f"{prefix}: AnnData object after filter and normalization = {data.shape[0]} × {data.shape[1]}")
+        
+        save_h5ad_file(adata, 'adata_preprocessing.h5ad')
+        return adata_merged_results

@@ -47,7 +47,7 @@
   id="filter-modal"
   tabindex="-1"
   aria-hidden="true"
-  class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+  class="hidden overflow-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
 >
   <div class="relative p-4 w-full max-w-2xl max-h-full">
     <div class="relative bg-white rounded-lg shadow">
@@ -79,7 +79,9 @@
         </button>
       </div>
       <!-- Modal body -->
-      <div class="p-4 md:p-5 space-y-4">
+      <div
+        class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
+      >
         <form id="filterform">
           <div>
             <div class="flex items-center my-2 gap-5">
@@ -89,7 +91,7 @@
               <select
                 name="f_sampleSelect"
                 id="f_sampleSelect"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
               ></select>
             </div>
             <span class="font-bold">Filter Cells:</span>
@@ -103,7 +105,7 @@
                 type="number"
                 name="minGenes"
                 id="minGenes"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
               />
             </div>
             <span class="font-bold">Filter Outliers:</span>
@@ -116,7 +118,7 @@
               <select
                 name="filter_method"
                 id="filter_method"
-                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
               >
                 <option value="manual">Manual</option>
                 <option value="quantile">Quantile</option>
@@ -143,7 +145,7 @@
                   type="number"
                   id="lowerlimit"
                   name="lowerlimit"
-                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
                 />
               </div>
               <div class="flex items-center my-2 gap-5 px-5">
@@ -157,7 +159,7 @@
                   type="number"
                   id="upperlimit"
                   name="upperlimit"
-                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
                 />
               </div>
             </div>
