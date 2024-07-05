@@ -2,18 +2,59 @@
 <!-- main -->
 <div class="mb-3 text-gray-900">
   <div class="flex items-center my-2 gap-5">
-    <label for="normal_method" class="text-base leading-relaxed"
-      >Please select one normalize method:</label
+    <label for="pca_markers" class="text-base leading-relaxed"
+      >Please select a marker you want to PCA:</label
     >
-    <select
-      name="normal_method"
-      id="normal_method"
-      class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-    ></select>
+    <button
+      name="pca_markers"
+      id="pca_markers"
+      data-dropdown-toggle="dropdownmarkers"
+      class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+    >
+      Select All
+      <svg
+        class="w-2.5 h-2.5 ms-3"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 10 6"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m1 1 4 4 4-4"
+        />
+      </svg>
+    </button>
+
+    <!-- Dropdown menu -->
+    <div
+      id="dropdownmarkers"
+      class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 h-96 overflow-y-auto"
+    >
+      <form id="markerform">
+        <ul
+          class="p-3 space-y-1 text-sm text-gray-700"
+          aria-labelledby="dropdownmarkersButton"
+        ></ul>
+      </form>
+    </div>
   </div>
 </div>
+<div id="selectedbox"></div>
+<div class="text-end">
+  <button
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+    onclick="processbtn(event)"
+  >
+    Process
+  </button>
+</div>
+<div id="pca_box"></div>
 <!-- button -->
-<div class="text-end py-5">
+<div id="nextbtn" class="text-end py-5 hidden">
   <a
     href="{% url 'page' process='clustering' method='clustering' %}"
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
@@ -22,4 +63,5 @@
   </a>
 </div>
 
+<script src="{% static 'base/js/pca.js'%}"></script>
 {%endblock%}

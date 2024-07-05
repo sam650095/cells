@@ -14,7 +14,6 @@ from .saved import *
 
 def sort_key(filename):
     return int(filename.split('_')[0][1:]) 
-
 def clearmediafiles(temp):
     media_root = settings.MEDIA_ROOT
     temp_dir = os.path.join(media_root, temp)
@@ -34,11 +33,11 @@ def clearmediafiles(temp):
     else:
         messages.append(f'Directory {temp_dir} does not exist')
 
-    return '\n'.join(messages)
-            
+    return '\n'.join(messages)    
+# Preprocessing     
 class FileUploadView(APIView):
     def post(self, request):
-        clear_media = clearmediafiles('tempfile')
+        clearmediafiles('tempfile')
         files = request.FILES.getlist('files')
         file_serializers = []
 
@@ -78,8 +77,6 @@ class FileUploadView(APIView):
                 adata_objects.append(adata)
                 original_adata_objects.append(adata.copy())
         return adata_objects, original_adata_objects, adata_results
-    
-    
 class QualityControlView(APIView):
     def post(self, request):
         clear_media = clearmediafiles('tempimage')
@@ -102,8 +99,7 @@ class QualityControlView(APIView):
             qc_adata_objects.append(adata)
             save_image_names.append(imgname)
         
-        return adata_objects, qc_adata_objects, adata_results, save_image_names
-    
+        return adata_objects, qc_adata_objects, adata_results, save_image_names  
 class PreviewView(APIView):
     def post(self, request):
         adata_objects = load_adata_objects('qc_adata_objects')
@@ -200,7 +196,6 @@ class ConfirmView(APIView):
         save_adata_objects(adata_objects, 'adata_objects')
         save_adata_objects(filtered_adata_objects, 'filtered_adata_objects')
         return Response({}, status=status.HTTP_201_CREATED)
-    
 class NormalizationView(APIView):
     def post(self, request):
         chosen_method = request.data.get('normal_method')
@@ -250,3 +245,44 @@ class MergeView(APIView):
         
         save_h5ad_file(adata, 'adata_preprocessing.h5ad')
         return adata_merged_results
+
+# Clustering
+def load_info(input_file): 
+    adata = read_h5ad_file(input_file)
+    n_obs, n_vars = adata.shape
+    if adata.uns.get('is_merged', False):
+        return adata, f"Merged Data: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
+    else:
+        return adata, f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
+    
+class PreloadView(APIView):
+    def post(self, request):
+        adata = read_h5ad_file('adata_preprocessing.h5ad')
+        marker_list = adata.var_names.tolist()
+        marker_list.insert(0,"Select All") 
+        print(marker_list)
+        return Response({'marker_list': marker_list}, status=status.HTTP_201_CREATED)
+class PCAView(APIView):
+    def post(self, request):
+        chosen_markers = request.POST.getlist('markers')
+        print("Received markers:", chosen_markers)
+        merged_results, n_pcs_results, save_img_name = self.perform_pca(chosen_markers)
+        return Response({"merged_results":merged_results,"n_pcs_results": n_pcs_results,"save_img_name":save_img_name}, status=status.HTTP_201_CREATED)
+
+    def perform_pca(self, chosen_markers):
+        adata, merged_results = load_info('adata_preprocessing.h5ad')
+        adata = adata[:, chosen_markers]
+        
+        # /imaging/plot_clustering_pca
+        clearmediafiles('pca_img')
+        save_img_name = plot_clustering_pca(adata)
+
+        variance_ratio = adata.uns['pca']['variance_ratio']
+        cumulative_variance_ratio = np.cumsum(variance_ratio)
+        n_pcs = np.where(cumulative_variance_ratio >= 0.95)[0][0] + 1
+        n_pcs_results = f'Selected number of PCs: {n_pcs}(cumulative_variance_ratio >= 0.95)'
+
+        save_h5ad_file(adata, 'adata_pca.h5ad')
+        return merged_results, n_pcs_results, save_img_name
+    
+   

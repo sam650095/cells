@@ -39,7 +39,9 @@ function showimage(result) {
     const li = document.createElement("li");
     li.textContent = result["adata_results"][i];
     const img = document.createElement("img");
-    img.src = `/media/tempimage/origin/${result["save_image_names"][i]}?t=${Date.now()}`;
+    img.src = `/media/tempimage/origin/${
+      result["save_image_names"][i]
+    }?t=${Date.now()}`;
     img.classList.add("m-5", "size-3/4");
     li.appendChild(img);
     ul.appendChild(li);
@@ -97,7 +99,9 @@ async function preview() {
   const li = document.createElement("li");
   li.textContent = preview_result["adata_result"];
   const img = document.createElement("img");
-  img.src = `/media/tempimage/preview/${preview_result["save_image_names"]}?t=${Date.now()}`;
+  img.src = `/media/tempimage/preview/${
+    preview_result["save_image_names"]
+  }?t=${Date.now()}`;
   img.classList.add("m-5", "size-3/4");
   li.appendChild(img);
   ul.appendChild(li);
