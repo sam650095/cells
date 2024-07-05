@@ -26,7 +26,7 @@ function initmodal() {
 function showimage(result) {
   f_sampleSelect.textContent = "";
   const imgbox = document.getElementById("imgbox");
-  imgbox.innerHTML = "";
+  imgbox.textContent = "";
   const ul = document.createElement("ul");
   ul.classList.add(
     "space-y-1",
@@ -39,7 +39,7 @@ function showimage(result) {
     const li = document.createElement("li");
     li.textContent = result["adata_results"][i];
     const img = document.createElement("img");
-    img.src = `/media/tempimage/origin/${result["save_image_names"][i]}`;
+    img.src = `/media/tempimage/origin/${result["save_image_names"][i]}?t=${Date.now()}`;
     img.classList.add("m-5", "size-3/4");
     li.appendChild(img);
     ul.appendChild(li);
@@ -78,14 +78,14 @@ document
 
 // preview
 async function preview() {
+  const previewimagebox = document.getElementById("previewimagebox");
+  previewimagebox.textContent = "";
   const form = document.getElementById("filterform");
   const formData = new FormData(form);
   const csrftoken = getCookie("csrftoken");
-
   const preview_result = await fetchAPI("/api/preview", formData, csrftoken);
   // show preview image
-  const previewimagebox = document.getElementById("previewimagebox");
-  previewimagebox.innerHTML = "";
+
   const ul = document.createElement("ul");
   ul.classList.add(
     "space-y-1",
@@ -97,7 +97,7 @@ async function preview() {
   const li = document.createElement("li");
   li.textContent = preview_result["adata_result"];
   const img = document.createElement("img");
-  img.src = `/media/tempimage/preview/${preview_result["save_image_names"]}`;
+  img.src = `/media/tempimage/preview/${preview_result["save_image_names"]}?t=${Date.now()}`;
   img.classList.add("m-5", "size-3/4");
   li.appendChild(img);
   ul.appendChild(li);
