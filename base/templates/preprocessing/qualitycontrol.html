@@ -85,14 +85,43 @@
         <form id="filterform">
           <div>
             <div class="flex items-center my-2 gap-5">
+              <input type="hidden" name="sample" id="sample" />
               <label for="f_sampleSelect" class="font-bold"
-                >Please choose the sample you want to filter:</label
-              >
-              <select
+                >Please choose the sample you want to filter:
+              </label>
+              <button
                 name="f_sampleSelect"
                 id="f_sampleSelect"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-              ></select>
+                data-dropdown-toggle="dropdown"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                type="button"
+              >
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="dropdown"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+              >
+                <ul
+                  class="py-2 text-sm text-gray-700"
+                  id="sampleul"
+                  aria-labelledby="f_sampleSelect"
+                ></ul>
+              </div>
             </div>
             <span class="font-bold">Filter Cells:</span>
             <div class="flex items-center my-2 gap-5 px-5">
@@ -110,20 +139,69 @@
             </div>
             <span class="font-bold">Filter Outliers:</span>
             <div class="flex items-center my-2 gap-5 px-5">
+              <input type="hidden" name="fmethod" id="fmethod" value="Manual" />
               <label
                 for="filter_method"
                 class="text-base leading-relaxed text-gray-500"
                 >Please choose your filter method:</label
               >
-              <select
+
+              <button
                 name="filter_method"
                 id="filter_method"
-                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+                data-dropdown-toggle="mdropdown"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                type="button"
               >
-                <option value="manual">Manual</option>
-                <option value="quantile">Quantile</option>
-                <option value="1.5IQR">1.5IQR</option>
-              </select>
+                <span id="methodtext">Manual</span>
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="mdropdown"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+              >
+                <ul
+                  class="py-2 text-sm text-gray-700"
+                  id="methodul"
+                  aria-labelledby="filter_method"
+                >
+                  <li>
+                    <a
+                      onclick="methodtextnodefix('Manual')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      >Manual</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      onclick="methodtextnodefix('Quantile')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      >Quantile</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      onclick="methodtextnodefix('1.5IQR')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      >1.5IQR</a
+                    >
+                  </li>
+                </ul>
+              </div>
             </div>
             <div class="text-gray-500 my-2 px-5">
               Note:

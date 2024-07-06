@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
-  const markerlist_results = await fetchAPI("/api/preload", 0, csrftoken);
+  const markerlist_results = await fetchAPI("/api/preloadpca", 0, csrftoken);
   console.log(markerlist_results);
   insert_marker_options(markerlist_results.marker_list);
 });
@@ -81,12 +81,12 @@ function logSelectedCount() {
   selectedbox.textContent = "";
   const ul = document.createElement("ul");
   ul.classList.add(
-    "space-y-2", // 增加了垂直間距
+    "space-y-2",
     "text-gray-500",
     "list-disc",
     "list-inside",
-    "w-full", // 改為 full width
-    "break-words" // 添加自動換行
+    "w-full", 
+    "break-words"
   );
 
   const li = document.createElement("li");

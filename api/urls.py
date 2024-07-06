@@ -10,6 +10,7 @@ urlpatterns = [
     path('normal', views.NormalizationView.as_view(), name="normalize"),
     path('merge', views.MergeView.as_view(), name="merged-data"),
 
-    path('preload', views.PreloadView.as_view(), name="Preload"),
-    path('pca', views.PCAView.as_view(), name="PCA")
+    path('preloadpca', views.PreloadPCAView.as_view(), name="PreloadPCA"),
+    path('pca', views.PCAView.as_view(), name="PCA"),
+    path('preloadclustering', views.PreloadCLusteringView.as_view(), name="PreloadClustering")
 ]

@@ -1,5 +1,5 @@
 const f_sampleSelect = document.getElementById("f_sampleSelect");
-
+let sampletextnode;
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
@@ -24,7 +24,6 @@ function initmodal() {
 }
 // filter method change
 function showimage(result) {
-  f_sampleSelect.textContent = "";
   const imgbox = document.getElementById("imgbox");
   imgbox.textContent = "";
   const ul = document.createElement("ul");
@@ -35,6 +34,13 @@ function showimage(result) {
     "list-inside",
     "w-fit"
   );
+  
+  defaultsample = result["adata_results"][0].substring(0,result["adata_results"][0].indexOf(":"));
+  sampletextnode = document.createTextNode(defaultsample);
+  const svalue = document.getElementById('sample');
+  svalue.value = defaultsample;
+  f_sampleSelect.insertBefore(sampletextnode, f_sampleSelect.firstChild);
+
   for (let i = 0; i < result.adata_results.length; i++) {
     const li = document.createElement("li");
     li.textContent = result["adata_results"][i];
@@ -46,37 +52,49 @@ function showimage(result) {
     li.appendChild(img);
     ul.appendChild(li);
 
+    const sample_ul = document.getElementById('sampleul');
     // selection add data
     var sample = result["adata_results"][i].substring(
       0,
       result["adata_results"][i].indexOf(":")
     );
-    var f_sampleoption = document.createElement("option");
-    f_sampleoption.value = sample;
-    f_sampleoption.textContent = sample;
-    f_sampleSelect.appendChild(f_sampleoption);
+    
+    const sample_li = document.createElement('li');
+    sample_li.innerHTML = `
+                <a onclick="sampletextnodefix('${sample}')"
+                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+            >${sample}</a>
+        `;
+        sample_ul.appendChild(sample_li);
   }
   imgbox.appendChild(ul);
 }
-document
-  .getElementById("filter_method")
-  .addEventListener("change", function () {
-    console.log(this.value);
-    let upandlow = document.getElementById("upandlow");
+function sampletextnodefix(newText){
+  sampletextnode.nodeValue = newText;
+  const sample = document.getElementById('sample');
+  sample.value = newText;
+}
+function methodtextnodefix(newText){
+  const methodtext = document.getElementById('methodtext');
+  methodtext.textContent = newText;
+  const fmethod = document.getElementById('fmethod');
+  fmethod.value = newText;
+  let upandlow = document.getElementById("upandlow");
     let lo_limit_label = document.getElementById("lo_limit_label");
     let up_limit_label = document.getElementById("up_limit_label");
-    if (this.value === "manual") {
+    if (newText === "Manual") {
       upandlow.classList.remove("hidden");
       lo_limit_label.textContent = "Please enter lower limit:";
       up_limit_label.textContent = "Please enter upper limit:";
-    } else if (this.value === "quantile") {
+    } else if (newText === "Quantile") {
       upandlow.classList.remove("hidden");
       lo_limit_label.textContent = "Please enter quantile of lower limit:";
       up_limit_label.textContent = "Please enter quantile of upper limit:";
     } else {
       upandlow.classList.add("hidden");
     }
-  });
+}
+
 
 // preview
 async function preview() {

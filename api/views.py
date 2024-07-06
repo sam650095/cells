@@ -104,9 +104,9 @@ class PreviewView(APIView):
     def post(self, request):
         adata_objects = load_adata_objects('qc_adata_objects')
         # get data from frontend
-        f_sampleSelect = request.data.get('f_sampleSelect')
+        f_sampleSelect = request.data.get('sample')
         minGenes = int(request.data.get('minGenes'))
-        filter_method = request.data.get('filter_method')
+        filter_method = request.data.get('fmethod')
         lowerlimit = float(request.data.get('lowerlimit')) if request.data.get('lowerlimit') else None
         upperlimit = float(request.data.get('upperlimit')) if request.data.get('upperlimit') else None
         user_inputs = {}
@@ -126,12 +126,12 @@ class PreviewView(APIView):
                 return chosen_adata
     def input_outliers(self, chosen_adata, filtermethod, lowerLimit, upperLimit):   
         choice = filtermethod
-        if choice == 'manual':
+        if choice == 'Manual':
             lower_lim = lowerLimit
             upper_lim = upperLimit
             return lower_lim, upper_lim
         
-        elif choice == 'quantile':
+        elif choice == 'Quantile':
             lower_lim_quantile = lowerLimit
             upper_lim_quantile = upperLimit
             lower_lim = np.quantile(chosen_adata.X.sum(axis=1), lower_lim_quantile)
@@ -255,7 +255,7 @@ def load_info(input_file):
     else:
         return adata, f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
     
-class PreloadView(APIView):
+class PreloadPCAView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_preprocessing.h5ad')
         marker_list = adata.var_names.tolist()
@@ -265,7 +265,6 @@ class PreloadView(APIView):
 class PCAView(APIView):
     def post(self, request):
         chosen_markers = request.POST.getlist('markers')
-        print("Received markers:", chosen_markers)
         merged_results, n_pcs_results, save_img_name = self.perform_pca(chosen_markers)
         return Response({"merged_results":merged_results,"n_pcs_results": n_pcs_results,"save_img_name":save_img_name}, status=status.HTTP_201_CREATED)
 
@@ -284,5 +283,12 @@ class PCAView(APIView):
 
         save_h5ad_file(adata, 'adata_pca.h5ad')
         return merged_results, n_pcs_results, save_img_name
-    
-   
+class PreloadCLusteringView(APIView):
+    def post(self, request):
+        adata = read_h5ad_file('adata_preprocessing.h5ad')
+        if adata.uns.get('is_merged'):
+            methods = ['none','harmony', 'combat', 'bbknn']
+            return Response({'methods': methods}, status=status.HTTP_201_CREATED)
+        else:
+            methods = ['none']
+            return Response({'methods': methods}, status=status.HTTP_201_CREATED)
