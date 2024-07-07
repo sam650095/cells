@@ -1,71 +1,79 @@
 {%extends "base.html"%} {% load static %} {%block content%}
 <!-- main -->
-<div class="mb-3 text-gray-900">
-  <div class="flex items-center my-2">
-    <input type="hidden" name="metod" id="method" value="none" />
-    <label for="clustering_method" class="w-96 mr-2"
-      >Please choose one batch correct method:</label
-    >
-    <button
-      name="clustering_method"
-      id="clustering_method"
-      data-dropdown-toggle="dropdown"
-      class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
-      type="button"
-    >
-      <svg
-        class="w-2.5 h-2.5 ms-3"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
+<form id="clusterform">
+  <div class="mb-3 text-gray-900">
+    <div class="flex items-center my-2">
+      <input type="hidden" name="method" id="method" value="none" />
+      <label for="clustering_method" class="w-96 mr-2"
+        >Please choose one batch correct method:</label
       >
-        <path
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="m1 1 4 4 4-4"
-        />
-      </svg>
-    </button>
+      <button
+        name="clustering_method"
+        id="clustering_method"
+        data-dropdown-toggle="dropdown"
+        class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        type="button"
+      >
+        <svg
+          class="w-2.5 h-2.5 ms-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 6"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 1 4 4 4-4"
+          />
+        </svg>
+      </button>
 
-    <!-- Dropdown menu -->
-    <div
-      id="dropdown"
-      class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
-    >
-      <ul
-        class="py-2 text-sm text-gray-700 dark:text-gray-200"
-        id="preloadul"
-        aria-labelledby="clustering_method"
-      ></ul>
+      <!-- Dropdown menu -->
+      <div
+        id="dropdown"
+        class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+      >
+        <ul
+          class="py-2 text-sm text-gray-700 dark:text-gray-200"
+          id="preloadul"
+          aria-labelledby="clustering_method"
+        ></ul>
+      </div>
     </div>
+    <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
+      <li>
+        Harmony: Integrates single-cell data by adjusting principal components.
+      </li>
+      <li>Combat: Corrects for batch effects by fitting linear models</li>
+      <li>bbknn: Identifying top neighbors separately within each batch</li>
+    </ul>
   </div>
-  <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
-    <li>
-      Harmony: Integrates single-cell data by adjusting principal components.
-    </li>
-    <li>Combat: Corrects for batch effects by fitting linear models</li>
-    <li>bbknn: Identifying top neighbors separately within each batch</li>
-  </ul>
-</div>
-<div class="flex items-center my-2">
-  <label for="n_neighbor" class="w-60 mr-2">Please enter the n_neighbor:</label>
-  <input
-    type="number"
-    id="n_neighbor"
-    class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-  />
-</div>
-<div class="flex items-center my-2">
-  <label for="resolution" class="w-60 mr-2">Please enter the resolution:</label>
-  <input
-    type="number"
-    id="resolution"
-    class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-  />
-</div>
+  <div class="flex items-center my-2">
+    <label for="n_neighbor" class="w-60 mr-2"
+      >Please enter the n_neighbor:</label
+    >
+    <input
+      type="number"
+      id="n_neighbors"
+      name="n_neighbors"
+      class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+    />
+  </div>
+  <div class="flex items-center my-2">
+    <label for="resolution" class="w-60 mr-2"
+      >Please enter the resolution:</label
+    >
+    <input
+      type="number"
+      id="resolution"
+      name="resolution"
+      class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+    />
+  </div>
+</form>
 <div class="text-end">
   <button
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"

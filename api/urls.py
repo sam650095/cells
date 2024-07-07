@@ -12,5 +12,6 @@ urlpatterns = [
 
     path('preloadpca', views.PreloadPCAView.as_view(), name="PreloadPCA"),
     path('pca', views.PCAView.as_view(), name="PCA"),
-    path('preloadclustering', views.PreloadCLusteringView.as_view(), name="PreloadClustering")
+    path('preloadclustering', views.PreloadCLusteringView.as_view(), name="PreloadClustering"),
+    path('clustering', views.CLusteringView.as_view(), name="Clustering")
 ]

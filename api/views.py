@@ -3,6 +3,8 @@ import pandas as pd
 import scanpy as sc
 import numpy as np
 import shutil
+import bbknn
+import logging
 
 from django.conf import settings
 from rest_framework.views import APIView
@@ -11,7 +13,7 @@ from rest_framework import status
 from .serializers import FileUploadSerializer
 from .imaging import *
 from .saved import *
-
+logger = logging.getLogger(__name__)
 def sort_key(filename):
     return int(filename.split('_')[0][1:]) 
 def clearmediafiles(temp):
@@ -51,8 +53,8 @@ class FileUploadView(APIView):
         signal_value_files = sorted(os.listdir(os.path.join(settings.MEDIA_ROOT, 'tempfile', 'signal_value')), key=sort_key)
         metadata_files = sorted(os.listdir(os.path.join(settings.MEDIA_ROOT, 'tempfile', 'metadata')), key=sort_key)
         adata_objects, original_adata_objects, adata_results = self.create_adata(signal_value_files, metadata_files)
-        save_adata_objects(adata_objects, 'adata_objects')
-        save_adata_objects(original_adata_objects, 'original_adata_objects')
+        save_data(adata_objects, 'adata_objects')
+        save_data(original_adata_objects, 'original_adata_objects')
         return Response({"adata_results": adata_results}, status=status.HTTP_201_CREATED)
     
     def create_adata(self, signal_value_files, metadata_files):
@@ -81,13 +83,13 @@ class QualityControlView(APIView):
     def post(self, request):
         clear_media = clearmediafiles('tempimage')
         adata_objects, qc_adata_objects, adata_results, save_image_names = self.post_reset_adata()
-        save_adata_objects(adata_objects, 'adata_objects')
-        save_adata_objects(qc_adata_objects, 'qc_adata_objects')
-        save_adata_objects(qc_adata_objects, 'preview_adata_objects')
+        save_data(adata_objects, 'adata_objects')
+        save_data(qc_adata_objects, 'qc_adata_objects')
+        save_data(qc_adata_objects, 'preview_adata_objects')
         return Response({'adata_results': adata_results,'save_image_names': save_image_names}, status=status.HTTP_201_CREATED)
     
     def post_reset_adata(self):
-        adata_objects = load_adata_objects('original_adata_objects')
+        adata_objects = load_data('original_adata_objects')
         qc_adata_objects = []
         adata_results = []
         save_image_names = []
@@ -102,7 +104,7 @@ class QualityControlView(APIView):
         return adata_objects, qc_adata_objects, adata_results, save_image_names  
 class PreviewView(APIView):
     def post(self, request):
-        adata_objects = load_adata_objects('qc_adata_objects')
+        adata_objects = load_data('qc_adata_objects')
         # get data from frontend
         f_sampleSelect = request.data.get('sample')
         minGenes = int(request.data.get('minGenes'))
@@ -116,7 +118,7 @@ class PreviewView(APIView):
 
         preview_adata, preview_adata_result, preview_image_name = self.preview_filter(user_inputs)
         # chose adata to preview
-        save_adata_objects(preview_adata, 'preview_adata')
+        save_data(preview_adata, 'preview_adata')
         return Response({'adata_result': preview_adata_result,'save_image_names': preview_image_name}, status=status.HTTP_201_CREATED)
     
     def choose_sample(self,adata_objects, sample_select):
@@ -164,14 +166,14 @@ class ReplaceView(APIView):
         image_names = replaceimage()
         update_adata_objects, filtered_adata_objects, adata_results = self.perform_filter()
 
-        save_adata_objects(update_adata_objects, 'adata_objects')
-        save_adata_objects(filtered_adata_objects, 'preview_adata_objects')
+        save_data(update_adata_objects, 'adata_objects')
+        save_data(filtered_adata_objects, 'preview_adata_objects')
 
         return Response({'adata_results':adata_results,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
     
     def perform_filter(self):
-        preview_adata = load_adata_objects('preview_adata')
-        preview_adata_objects = load_adata_objects('preview_adata_objects')
+        preview_adata = load_data('preview_adata')
+        preview_adata_objects = load_data('preview_adata_objects')
         updated_adata_objects = []
         filtered_adata_objects = []
         adata_results = []
@@ -190,22 +192,22 @@ class ReplaceView(APIView):
         return updated_adata_objects, filtered_adata_objects, adata_results
 class ConfirmView(APIView):
     def post(self, request):
-        adata_objects = load_adata_objects('preview_adata_objects')
+        adata_objects = load_data('preview_adata_objects')
         filtered_adata_objects = adata_objects.copy()
         
-        save_adata_objects(adata_objects, 'adata_objects')
-        save_adata_objects(filtered_adata_objects, 'filtered_adata_objects')
+        save_data(adata_objects, 'adata_objects')
+        save_data(filtered_adata_objects, 'filtered_adata_objects')
         return Response({}, status=status.HTTP_201_CREATED)
 class NormalizationView(APIView):
     def post(self, request):
         chosen_method = request.data.get('normal_method')
         adata_objects, norm_adata_objects, norm_adata_results = self.perform_normalization(chosen_method)
-        save_adata_objects(adata_objects, 'adata_objects')
-        save_adata_objects(norm_adata_objects, 'norm_adata_objects')
+        save_data(adata_objects, 'adata_objects')
+        save_data(norm_adata_objects, 'norm_adata_objects')
         return Response({"adata_results": norm_adata_results}, status=status.HTTP_201_CREATED)
     
     def perform_normalization(self, chosen_method):
-        adata_objects = load_adata_objects('filtered_adata_objects')
+        adata_objects = load_data('filtered_adata_objects')
         norm_adata_objects = []
         norm_adata_result = []
         if chosen_method == 'cpm':
@@ -228,7 +230,7 @@ class MergeView(APIView):
         adata_merged_results = self.perform_merged()
         return Response({'adata_results':adata_merged_results}, status=status.HTTP_201_CREATED)
     def perform_merged(self):
-        adata_objects = load_adata_objects('norm_adata_objects')
+        adata_objects = load_data('norm_adata_objects')
         adata_merged_results = []
         
         if len(adata_objects) == 1:
@@ -282,6 +284,7 @@ class PCAView(APIView):
         n_pcs_results = f'Selected number of PCs: {n_pcs}(cumulative_variance_ratio >= 0.95)'
 
         save_h5ad_file(adata, 'adata_pca.h5ad')
+        save_data(n_pcs, 'n_pcs')
         return merged_results, n_pcs_results, save_img_name
 class PreloadCLusteringView(APIView):
     def post(self, request):
@@ -292,3 +295,31 @@ class PreloadCLusteringView(APIView):
         else:
             methods = ['none']
             return Response({'methods': methods}, status=status.HTTP_201_CREATED)
+class CLusteringView(APIView):
+    def post(self, request):
+        chosen_method = request.data.get('method')
+        n_neighbors = int(request.data.get('n_neighbors'))
+        resolution = float(request.data.get('resolution'))
+        n_pcs = load_data('n_pcs')
+        self.perform_clustering(chosen_method, n_neighbors, resolution, n_pcs) 
+        return Response({}, status=status.HTTP_201_CREATED)
+        
+    def perform_clustering(self, chosen_method, n_neighbors, resolution, n_pcs):
+        adata = read_h5ad_file('adata_pca.h5ad') 
+        if chosen_method == 'none':
+            sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, random_state=42)
+        elif chosen_method == 'bbknn':
+            sc.external.pp.bbknn(adata, batch_key='Sample', computation='fast')
+        elif chosen_method == 'harmony':
+            sc.external.pp.harmony_integrate(adata, key='Sample', random_state=42)
+            sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, use_rep='X_pca_harmony', random_state=42)
+        elif chosen_method == 'combat':
+            sc.pp.combat(adata, key='Sample')
+            sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, random_state=42)
+            
+        sc.tl.umap(adata, random_state=42)
+        sc.tl.leiden(adata, resolution=resolution, random_state=42)        
+        # clustering_result(adata) # cluster總結果: Summary, Umap*1, Ranking, Heatmap
+        
+        save_h5ad_file(adata, 'adata_clustering.h5ad')
+        return adata

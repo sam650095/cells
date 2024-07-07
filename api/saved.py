@@ -14,19 +14,19 @@ def get_redis_connection():
             print("連線 Redis 發生錯誤:", e)
     return r
 
-def save_adata_objects(adata_objects, key):
-    print(key, ':\n', adata_objects)
+def save_data(data, key):
+    print(key, ':\n', data)
     r = get_redis_connection()
     if r:
-        adata_bytes = pickle.dumps(adata_objects)
+        adata_bytes = pickle.dumps(data)
         r.set(key, adata_bytes)
 
-def load_adata_objects(key):
+def load_data(key):
     r = get_redis_connection()
     if r:
-        adata_bytes = r.get(key)
-        if adata_bytes:
-            return pickle.loads(adata_bytes)
+        data_bytes = r.get(key)
+        if data_bytes:
+            return pickle.loads(data_bytes)
     return None
 
 
