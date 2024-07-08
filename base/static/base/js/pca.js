@@ -85,7 +85,7 @@ function logSelectedCount() {
     "text-gray-500",
     "list-disc",
     "list-inside",
-    "w-full", 
+    "w-full",
     "break-words"
   );
 
@@ -102,6 +102,7 @@ function logSelectedCount() {
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
+  toggleLoading(true);
   const csrftoken = getCookie("csrftoken");
 
   const form = document.getElementById("markerform");
@@ -145,6 +146,7 @@ async function processbtn(event) {
   pca_box.appendChild(ul);
 
   // next page btn
+  toggleLoading(false);
   document.getElementById("nextbtn").classList.remove("hidden");
 }
 

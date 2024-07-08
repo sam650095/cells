@@ -1,6 +1,7 @@
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
+  toggleLoading(true);
   const csrftoken = getCookie("csrftoken");
   const form = document.getElementById("normalform");
   const formData = new FormData(form);
@@ -18,6 +19,7 @@ async function processbtn(event) {
   });
   adata_results.appendChild(ul);
   // next page btn
+  toggleLoading(false);
   document.getElementById("nextbtn").classList.remove("hidden");
 }
 // fetch api

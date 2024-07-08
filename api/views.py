@@ -297,6 +297,7 @@ class PreloadCLusteringView(APIView):
             return Response({'methods': methods}, status=status.HTTP_201_CREATED)
 class CLusteringView(APIView):
     def post(self, request):
+        clearmediafiles('cluster_result')
         chosen_method = request.data.get('method')
         n_neighbors = int(request.data.get('n_neighbors'))
         resolution = float(request.data.get('resolution'))
@@ -319,7 +320,7 @@ class CLusteringView(APIView):
             
         sc.tl.umap(adata, random_state=42)
         sc.tl.leiden(adata, resolution=resolution, random_state=42)        
-        # clustering_result(adata) # cluster總結果: Summary, Umap*1, Ranking, Heatmap
+        adata = clustering_result(adata, n_pcs) # cluster總結果: Summary, Umap*1, Ranking, Heatmap
         
         save_h5ad_file(adata, 'adata_clustering.h5ad')
         return adata

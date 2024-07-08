@@ -35,12 +35,16 @@ function methodtextnodefix(newText) {
 // preocess btn click
 async function processbtn(event) {
   event.preventDefault();
+  toggleLoading(true);
   const form = document.getElementById("clusterform");
   const formData = new FormData(form);
   console.log(formData);
   const csrftoken = getCookie("csrftoken");
   const clusterresult = await fetchAPI("/api/clustering", formData, csrftoken);
   console.log(clusterresult);
+
+  toggleLoading(false);
+  document.getElementById("btnbox").classList.remove("hidden");
 }
 // fetch api
 async function fetchAPI(url, formData, csrftoken) {
@@ -53,6 +57,7 @@ async function fetchAPI(url, formData, csrftoken) {
   });
 
   if (!response.ok) {
+    toggleLoading(false);
     throw new Error("Network response was not ok");
   }
 

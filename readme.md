@@ -21,6 +21,20 @@
    pip install -r requirements.txt
    ```
 
+   ### 如果下載有誤，請先打上
+
+   - MacOS
+
+   ```sh
+   export PYTHONUTF8=1
+   ```
+
+   - Windows
+
+   ```sh
+   $env:PYTHONUTF8 = 1
+   ```
+
 3. Redis:
 
    - MacOS

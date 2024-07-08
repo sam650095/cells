@@ -49,3 +49,36 @@ def plot_clustering_pca(adata):
     plt.savefig(pca_plot_path, bbox_inches='tight')
     plt.close() 
     return 'clustering_pca.jpg'
+
+def clustering_result(adata, npcs):
+    if 'leiden_R' not in adata.obs.columns:
+        adata.obs['leiden_R'] = adata.obs['leiden']
+    
+    # 創建儲存目錄
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'cluster_result')
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # Summary表格
+    # summary_df_cluster = summary_cluster(adata)
+    # dataframe_to_image(summary_df_cluster, filename='clustering_summary.pdf')
+    
+    # Umap
+    sc.pl.umap(adata, color=['leiden_R','Sample'], show=False)
+    plt.savefig(os.path.join(save_dir, 'clustering_leidens.png'), bbox_inches='tight', dpi=300)
+    plt.close()
+    
+    # Ranking
+    sc.tl.rank_genes_groups(adata, 'leiden_R')
+    sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False)
+    plt.savefig(os.path.join(save_dir, 'clustering_ranking.png'), bbox_inches='tight', dpi=300)
+    plt.close()
+    
+    # Heatmap
+    all_markers = adata.var_names.tolist()
+    sc.tl.dendrogram(adata, groupby='leiden_R', n_pcs=npcs)
+    sc.pl.matrixplot(adata, all_markers, groupby='leiden_R', dendrogram=True, show=False, 
+                     use_raw=False, cmap="vlag", standard_scale=None, title='leiden')
+    plt.savefig(os.path.join(save_dir, 'clustering_heatmap.png'), bbox_inches='tight', dpi=300)
+    plt.close()
+    
+    return adata
