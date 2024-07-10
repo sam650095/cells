@@ -39,11 +39,18 @@
 
    - MacOS
 
-   ##### 如果先前 install requiremnents.txt 是正常，那這邊就不會有意外。
+     ##### 如果先前 install requiremnents.txt 是正常，那這邊就不會有意外。
 
-   ```sh
-   redis-server
-   ```
+     ```sh
+     redis-server
+     ```
+
+     ##### 如果看到這個 port 有被使用
+
+     ```sh
+     lsof -i :6379 # 查看port 6379的使用情形
+     kill -9 <PID> # 將上面指令看到的PID一欄的數字填上
+     ```
 
    - Windows
 
@@ -81,9 +88,12 @@
    python manage.py runserver # 開啟 http://localhost:8000
    ```
 
+````
+
 - 這兩個必須同時啟動
 
   ```
   sudo service redis-server start
   python manage.py runserver
   ```
+````
