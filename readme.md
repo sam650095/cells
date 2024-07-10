@@ -39,13 +39,13 @@
 
    - MacOS
 
-     ##### 如果先前 install requiremnents.txt 是正常，那這邊就不會有意外。
+     ##### 如果先前 install requiremnents.txt 是正常，那只要執行以下就不會有意外。
 
      ```sh
      redis-server
      ```
 
-     ##### 如果看到這個 port 有被使用
+     ##### # 如果看到這個 port 有被使用
 
      ```sh
      lsof -i :6379 # 查看port 6379的使用情形
@@ -54,33 +54,33 @@
 
    - Windows
 
-   ##### redis 不支援 Windows，因此只能在 Linux 執行
+     ##### redis 不支援 Windows，因此只能在 Linux 執行
 
-   1. 進入 Linux
+     1. 進入 Linux
 
-      快速指南 - https://learn.microsoft.com/en-us/windows/wsl/install
+        快速指南 - https://learn.microsoft.com/en-us/windows/wsl/install
 
-      ```sh
-      WSL # 進入Linux環境
-      WSL --install # 下載Linux
-      ```
+        ```sh
+        WSL # 進入Linux環境
+        WSL --install # 下載Linux
+        ```
 
-   2. 下載 Rendis
+     2. 下載 Rendis
 
-      快速指南 - https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/
+        快速指南 - https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/
 
-      ```sh
-      curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-      echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-      sudo apt-get update
-      sudo apt-get install redis
-      ```
+        ```sh
+        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+        sudo apt-get update
+        sudo apt-get install redis
+        ```
 
-   3. 啟動 redis
+     3. 啟動 redis
 
-      ```sh
-      sudo service redis-server start # 沒有報錯應該就沒問題
-      ```
+        ```sh
+        sudo service redis-server start # 沒有報錯應該就沒問題
+        ```
 
 4. 執行專案
 
