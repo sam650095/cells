@@ -88,12 +88,9 @@
    python manage.py runserver # 開啟 http://localhost:8000
    ```
 
-````
-
 - 這兩個必須同時啟動
 
   ```
   sudo service redis-server start
   python manage.py runserver
   ```
-````
