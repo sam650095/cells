@@ -45,21 +45,9 @@ async function processbtn(event) {
 
   toggleLoading(false);
   document.getElementById("btnbox").classList.remove("hidden");
-}
-// fetch api
-async function fetchAPI(url, formData, csrftoken) {
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData,
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-  });
-
-  if (!response.ok) {
-    toggleLoading(false);
-    throw new Error("Network response was not ok");
-  }
-
-  return response.json();
+  document.getElementById("imgbox").classList.remove("hidden");
+  loadImage("cluster_result", "clustering_summary.png", "summary-container");
+  loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
+  loadImage("cluster_result", "clustering_leidens.png", "umap-container");
+  loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
 }

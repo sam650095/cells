@@ -1,23 +1,21 @@
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-
+// navbar styling
 let pathSegments = window.location.pathname.split("/");
+let firstSegment = pathSegments[1] || "";
 let secondSegment = pathSegments[2] || "";
 
+let navdot = document.getElementsByName("nav-dot");
+let navul = document.getElementsByName("nav-ul");
 let navContents = document.getElementsByName("nav-content");
 
+let color = "bg-sky-700";
+for (let i = 0; i < navul.length; i++) {
+  let element = navul[i];
+  let content = element.textContent.replace(/\s+/g, "").toLowerCase();
+  navdot[i].classList.add(color);
+  if (content === firstSegment) {
+    color = "bg-gray-200";
+  }
+}
 for (let i = 0; i < navContents.length; i++) {
   let element = navContents[i];
   let content = element.textContent.replace(/\s+/g, "").toLowerCase();
@@ -28,7 +26,7 @@ for (let i = 0; i < navContents.length; i++) {
   }
   element.classList.add("text-sky-700");
 }
-
+// toggle loadding animation
 function toggleLoading(isLoading) {
   const btn = document.getElementById("processbutton");
   const btntext = btn.textContent;

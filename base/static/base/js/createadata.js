@@ -106,18 +106,3 @@ function formatFileSize(bytes) {
   else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + " MB";
   else return (bytes / 1073741824).toFixed(2) + " GB";
 }
-// fetchapi
-async function fetchAPI(url, formData, csrftoken) {
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData,
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  return response.json();
-}

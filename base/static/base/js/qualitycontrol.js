@@ -147,19 +147,3 @@ async function presubmit(event) {
   console.log(confirm_result);
   window.location.href = event.target.href;
 }
-// fetch api
-async function fetchAPI(url, formData, csrftoken) {
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData,
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  return response.json();
-}

@@ -22,19 +22,3 @@ async function processbtn(event) {
   toggleLoading(false);
   document.getElementById("nextbtn").classList.remove("hidden");
 }
-// fetch api
-async function fetchAPI(url, formData, csrftoken) {
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData,
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  return response.json();
-}

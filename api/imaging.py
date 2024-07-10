@@ -1,5 +1,6 @@
 from django.conf import settings
 
+import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import scanpy as sc
@@ -54,13 +55,12 @@ def clustering_result(adata, npcs):
     if 'leiden_R' not in adata.obs.columns:
         adata.obs['leiden_R'] = adata.obs['leiden']
     
-    # 創建儲存目錄
     save_dir = os.path.join(settings.MEDIA_ROOT, 'cluster_result')
     os.makedirs(save_dir, exist_ok=True)
     
     # Summary表格
-    # summary_df_cluster = summary_cluster(adata)
-    # dataframe_to_image(summary_df_cluster, filename='clustering_summary.pdf')
+    summary_df_cluster = summary_cluster(adata)
+    dataframe_to_image(summary_df_cluster, os.path.join(save_dir, 'clustering_summary.png'))
     
     # Umap
     sc.pl.umap(adata, color=['leiden_R','Sample'], show=False)
@@ -74,11 +74,67 @@ def clustering_result(adata, npcs):
     plt.close()
     
     # Heatmap
+    available_cmaps = plt.colormaps()
+    cmap_choice = 'vlag' if 'vlag' in available_cmaps else 'coolwarm'
+    # 判斷是否有vlag
+
     all_markers = adata.var_names.tolist()
     sc.tl.dendrogram(adata, groupby='leiden_R', n_pcs=npcs)
     sc.pl.matrixplot(adata, all_markers, groupby='leiden_R', dendrogram=True, show=False, 
-                     use_raw=False, cmap="vlag", standard_scale=None, title='leiden')
+                     use_raw=False, cmap=cmap_choice, standard_scale=None, title='leiden')
     plt.savefig(os.path.join(save_dir, 'clustering_heatmap.png'), bbox_inches='tight', dpi=300)
     plt.close()
     
     return adata
+def dataframe_to_image(df, filename):
+    fig, ax = plt.subplots(figsize=(10, 8))
+    ax.axis('off')
+    table = pd.plotting.table(ax, df, loc='center', cellLoc='center') 
+    table.set_fontsize(60)
+    table.scale(3, 3) 
+    plt.savefig(filename, bbox_inches='tight')
+    plt.close()
+def summary_cluster(adata):
+    if adata.uns.get('is_merged', False): 
+        n_obs, n_vars = adata.shape
+        print(f"Merged Data: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        
+        for sample in adata.obs['Sample'].cat.categories:
+            sample_adata = adata[adata.obs['Sample'] == sample]
+            n_obs, n_vars = sample_adata.shape
+            print(f"{sample}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        
+        if 'leiden_R' not in adata.obs.columns:
+            adata.obs['leiden_R'] = adata.obs['leiden']
+        
+        summary_df = pd.DataFrame(columns=['Leidens', 'Count', 'Merged_Proportion'])
+        counts = adata.obs['leiden_R'].value_counts()
+        proportions = (counts / counts.sum()).round(2)
+        summary_df['Leidens'] = counts.index
+        summary_df['Count'] = counts.values
+        summary_df['Merged_Proportion'] = proportions.values
+
+        for sample in adata.obs['Sample'].cat.categories:
+            sample_adata = adata[adata.obs['Sample'] == sample]
+            sample_counts = sample_adata.obs['leiden_R'].value_counts()
+            sample_proportions = (sample_counts / sample_counts.sum()).round(2) 
+            summary_df[f'{sample}_Proportion'] = sample_proportions.reindex(summary_df['Leidens']).fillna(0.0).values
+        print(summary_df)
+        
+    else: 
+        n_obs, n_vars = adata.shape 
+        sample_name = adata.obs['Sample'].unique()[0]
+        print(f"{sample_name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        
+        if 'leiden_R' not in adata.obs.columns:
+            adata.obs['leiden_R'] = adata.obs['leiden']
+        
+        summary_df = pd.DataFrame(columns=['Leidens', 'Count', f'{sample_name}_Proportion'])
+        counts = adata.obs['leiden_R'].value_counts()
+        proportions = (counts / counts.sum()).round(2)
+        summary_df['Leidens'] = counts.index
+        summary_df['Count'] = counts.values
+        summary_df[f'{sample_name}_Proportion'] = proportions.values
+        print(summary_df)
+    
+    return summary_df

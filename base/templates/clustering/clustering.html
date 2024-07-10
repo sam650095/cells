@@ -83,6 +83,7 @@
     Process
   </button>
 </div>
+<!-- btnbox -->
 <div id="btnbox" class="hidden">
   <button
     class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
@@ -105,7 +106,108 @@
     Subset
   </button>
 </div>
-<!-- button -->
+<!-- imgbox -->
+<div id="imgbox" class="hidden">
+  <div class="mb-4 border-b border-gray-200 mt-5">
+    <ul
+      class="flex flex-wrap -mb-px text-sm font-medium text-center"
+      id="default-styled-tab"
+      data-tabs-toggle="#default-styled-tab-content"
+      data-tabs-active-classes="text-sky-700 hover:text-sky-700 border-sky-700"
+      data-tabs-inactive-classes="text-gray-500 hover:text-gray-600 border-gray-100 hover:border-gray-300"
+      role="tablist"
+    >
+      <li class="me-2" role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base"
+          id="summary-styled-tab"
+          data-tabs-target="#styled-summary"
+          type="button"
+          role="tab"
+          aria-controls="summary"
+          aria-selected="false"
+        >
+          Summary
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
+          id="umap-styled-tab"
+          data-tabs-target="#styled-umap"
+          type="button"
+          role="tab"
+          aria-controls="umap"
+          aria-selected="false"
+        >
+          Umap
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
+          id="ranking-styled-tab"
+          data-tabs-target="#styled-ranking"
+          type="button"
+          role="tab"
+          aria-controls="ranking"
+          aria-selected="false"
+        >
+          Ranking
+        </button>
+      </li>
+      <li role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
+          id="heatmap-styled-tab"
+          data-tabs-target="#styled-heatmap"
+          type="button"
+          role="tab"
+          aria-controls="heatmap"
+          aria-selected="false"
+        >
+          Heatmap
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div id="default-styled-tab-content">
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-summary"
+      role="tabpanel"
+      aria-labelledby="summary-tab"
+    >
+      <div id="summary-container"></div>
+    </div>
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-umap"
+      role="tabpanel"
+      aria-labelledby="umap-tab"
+    >
+      <div id="umap-container"></div>
+    </div>
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-ranking"
+      role="tabpanel"
+      aria-labelledby="ranking-tab"
+    >
+      <div id="ranking-container"></div>
+    </div>
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-heatmap"
+      role="tabpanel"
+      aria-labelledby="heatmap-tab"
+    >
+      <div id="heatmap-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- nextbutton -->
 <div id="nextbtn" class="text-end py-5 hidden">
   <a
     href="{% url 'page' process='phenotyping' method='identifythegates' %}"
