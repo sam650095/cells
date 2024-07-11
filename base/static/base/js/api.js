@@ -24,6 +24,7 @@ async function fetchAPI(url, formData, csrftoken) {
   });
 
   if (!response.ok) {
+    toggleLoading(false);
     throw new Error("Network response was not ok");
   }
   return response.json();
@@ -52,7 +53,6 @@ function loadImage(folder, filename, containerId) {
           img.src = data.image_path;
           img.alt = filename;
           img.classList.add("h-auto", "max-w-full", "mx-auto");
-          container.innerHTML = "";
           container.appendChild(img);
         } else {
           container.innerHTML = "No image found. Might be something got wrong.";

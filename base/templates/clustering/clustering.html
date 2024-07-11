@@ -186,7 +186,84 @@
       role="tabpanel"
       aria-labelledby="umap-tab"
     >
-      <div id="umap-container"></div>
+      <div id="umap-container">
+        <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
+          <li>
+            <div class="flex items-center my-2">
+              <label for="Addleidens" class="w-1/2 mr-2"
+                >Add leidens distribution grouped by sample
+              </label>
+              <button
+                type="button"
+                id="Addleidens"
+                name="Addleidens"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                onclick="addleidens()"
+              >
+                Add
+              </button>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center my-2">
+              <label for="Addmarkers" class="w-1/2 mr-2">Add Markers </label>
+              <button
+                name="pca_markers"
+                id="pca_markers"
+                data-dropdown-toggle="dropdownmarkers"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              >
+                Select All
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+
+              <!-- Dropdown menu -->
+              <div
+                id="dropdownmarkers"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 h-72 overflow-y-auto"
+              >
+                <form id="markerform">
+                  <ul
+                    class="p-3 space-y-1 text-sm text-gray-700"
+                    aria-labelledby="dropdownmarkersButton"
+                  ></ul>
+                </form>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center my-2">
+              <label for="Addedmarkers" class="w-1/2 mr-2" id="selectedbox">
+              </label>
+
+              <button
+                type="button"
+                id="Addedmarkers"
+                name="Addedmarkers"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+              >
+                Add
+              </button>
+            </div>
+          </li>
+        </ul>
+        <div id="addleidens-container"></div>
+        <div id="addmarkers-container"></div>
+      </div>
     </div>
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
@@ -216,6 +293,5 @@
     Next:Identify the Gates
   </a>
 </div>
-
 <script src="{% static 'base/js/clustering.js'%}"></script>
 {%endblock%}

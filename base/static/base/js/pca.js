@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
   const markerlist_results = await fetchAPI("/api/preloadpca", 0, csrftoken);
-  console.log(markerlist_results);
   insert_marker_options(markerlist_results.marker_list);
 });
 

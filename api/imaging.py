@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import pandas as pd
+import numpy as np
 import os
 import matplotlib.pyplot as plt
 import scanpy as sc
@@ -138,3 +139,48 @@ def summary_cluster(adata):
         print(summary_df)
     
     return summary_df
+def adding_umap(adata, chosen_markers=None):
+    num_cols = 3
+    
+    if chosen_markers:
+        plot_data = chosen_markers
+        color_key = lambda x: x
+        title_key = lambda x: x
+        filename = 'clustering_markers.png'
+    else:
+        plot_data = adata.obs['Sample'].cat.categories
+        color_key = lambda x: 'leiden_R'
+        title_key = lambda x: x
+        filename = 'clustering_leidens_bysample.png'
+    
+    num_plots = len(plot_data)
+    num_rows = int(np.ceil(num_plots / num_cols))
+    
+    fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, 4.5 * num_rows))
+    axs = axs.flatten() if num_plots > 1 else [axs]
+    
+    for i, item in enumerate(plot_data):
+        if chosen_markers:
+            sc.pl.umap(adata, color=color_key(item), title=title_key(item), ax=axs[i], show=False)
+        else:
+            sample_adata = adata[adata.obs['Sample'] == item]
+            sc.pl.umap(sample_adata, color=color_key(item), title=title_key(item), ax=axs[i], show=False)
+    
+    for j in range(num_plots, len(axs)):
+        fig.delaxes(axs[j])
+    
+    plt.tight_layout()
+    
+    # 創建儲存目錄
+    if settings and hasattr(settings, 'MEDIA_ROOT'):
+        save_dir = os.path.join(settings.MEDIA_ROOT, 'umap_cluster')
+    else:
+        save_dir = 'umap_cluster'
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # 儲存文件
+    save_path = os.path.join(save_dir, filename)
+    plt.savefig(save_path)
+    plt.close(fig)
+    
+    return save_path  # 返回保存的文件路徑

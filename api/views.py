@@ -262,7 +262,6 @@ class PreloadPCAView(APIView):
         adata = read_h5ad_file('adata_preprocessing.h5ad')
         marker_list = adata.var_names.tolist()
         marker_list.insert(0,"Select All") 
-        print(marker_list)
         return Response({'marker_list': marker_list}, status=status.HTTP_201_CREATED)
 class PCAView(APIView):
     def post(self, request):
@@ -324,3 +323,28 @@ class CLusteringView(APIView):
         
         save_h5ad_file(adata, 'adata_clustering.h5ad')
         return adata
+class PreloadMarkersView(APIView):
+    def post(self, request):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        marker_list = adata.var_names.tolist()
+        marker_list.insert(0,"Select All") 
+        return Response({'marker_list': marker_list}, status=status.HTTP_201_CREATED)
+class AddUmapClusterView(APIView):
+    def post(self, request, met):
+        if met == 'leidens':
+            return self.post_leidens(request)
+        elif met == 'markers':
+            return self.post_markers(request)
+        else:
+            return Response({"error": "Invalid method"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post_leidens(self, request):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        adding_umap(adata)
+        # 處理 leidens 邏輯
+        return Response({"message": "Leidens processed"}, status=status.HTTP_201_CREATED)
+
+    def post_markers(self, request):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        # 處理 markers 邏輯
+        return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)
