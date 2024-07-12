@@ -346,5 +346,8 @@ class AddUmapClusterView(APIView):
 
     def post_markers(self, request):
         adata = read_h5ad_file('adata_clustering.h5ad')
+        chosen_method = request.data.getlist('markers')
+        print(chosen_method)
+        adding_umap(adata, chosen_method)
         # 處理 markers 邏輯
         return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)

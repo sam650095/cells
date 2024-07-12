@@ -49,9 +49,13 @@ function loadImage(folder, filename, containerId) {
       let container = document.getElementById(containerId);
       if (container) {
         if (data.image_path) {
+          if (document.getElementById(filename)) {
+            document.getElementById(filename).remove();
+          }
           let img = document.createElement("img");
           img.src = data.image_path;
           img.alt = filename;
+          img.id = filename;
           img.classList.add("h-auto", "max-w-full", "mx-auto");
           container.appendChild(img);
         } else {

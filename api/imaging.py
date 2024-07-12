@@ -171,16 +171,14 @@ def adding_umap(adata, chosen_markers=None):
     
     plt.tight_layout()
     
-    # 創建儲存目錄
     if settings and hasattr(settings, 'MEDIA_ROOT'):
         save_dir = os.path.join(settings.MEDIA_ROOT, 'umap_cluster')
     else:
         save_dir = 'umap_cluster'
     os.makedirs(save_dir, exist_ok=True)
     
-    # 儲存文件
     save_path = os.path.join(save_dir, filename)
     plt.savefig(save_path)
     plt.close(fig)
     
-    return save_path  # 返回保存的文件路徑
+    return save_path  

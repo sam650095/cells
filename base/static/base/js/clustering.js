@@ -149,6 +149,12 @@ async function addleidens() {
     csrftoken
   );
   console.log(addleidensresult);
+  // add to container
+  loadImage(
+    "umap_cluster",
+    "clustering_leidens_bysample.png",
+    "addleidens-container"
+  );
 }
 async function addmarkers() {
   const csrftoken = getCookie("csrftoken");
@@ -169,8 +175,9 @@ async function addmarkers() {
   });
   const addleidensresult = await fetchAPI(
     "/api/addumapcluster/markers",
-    0,
+    formData,
     csrftoken
   );
   console.log(addleidensresult);
+  loadImage("umap_cluster", "clustering_markers.png", "addmarkers-container");
 }

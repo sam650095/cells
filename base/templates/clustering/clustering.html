@@ -84,27 +84,42 @@
   </button>
 </div>
 <!-- btnbox -->
-<div id="btnbox" class="hidden">
-  <button
-    class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
-  >
-    View Clusters in GUI
-  </button>
-  <button
-    class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
-  >
-    Rename Clusters
-  </button>
-  <button
-    class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
-  >
-    Subcluster
-  </button>
-  <button
-    class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
-  >
-    Subset
-  </button>
+<div id="btnbox" class="flex justify-between">
+  <div>
+    <button
+      class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
+    >
+      View Clusters in GUI
+    </button>
+    <button
+      class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
+      data-modal-target="rename-modal"
+      data-modal-toggle="rename-modal"
+    >
+      Rename Clusters
+    </button>
+    <button
+      class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
+      data-modal-target="subcluster-modal"
+      data-modal-toggle="subcluster-modal"
+    >
+      Subcluster
+    </button>
+    <button
+      class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
+      data-modal-target="subset-modal"
+      data-modal-toggle="subset-modal"
+    >
+      Subset
+    </button>
+  </div>
+  <div>
+    <button
+      class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
+    >
+      Dounload
+    </button>
+  </div>
 </div>
 <!-- imgbox -->
 <div id="imgbox" class="hidden">
@@ -255,15 +270,16 @@
                 id="Addedmarkers"
                 name="Addedmarkers"
                 class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                onclick="addmarkers()"
               >
                 Add
               </button>
             </div>
           </li>
         </ul>
-        <div id="addleidens-container"></div>
-        <div id="addmarkers-container"></div>
       </div>
+      <div id="addleidens-container"></div>
+      <div id="addmarkers-container"></div>
     </div>
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
@@ -293,5 +309,335 @@
     Next:Identify the Gates
   </a>
 </div>
+
+<!-- modals -->
+<!-- rename -->
+<div
+  id="rename-modal"
+  tabindex="-1"
+  aria-hidden="true"
+  class="hidden overflow-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+>
+  <div class="relative p-4 w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow">
+      <div
+        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
+      >
+        <h3 class="text-xl font-semibold text-gray-900">Rename Clusters</h3>
+        <button
+          type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+          data-modal-hide="rename-modal"
+        >
+          <svg
+            class="w-3 h-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 14 14"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+            />
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div
+        class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
+      >
+        <form id="renameform">
+          <div>
+            <div class="flex items-center my-2 gap-5">
+              <span class="font-bold text-gray-500"
+                >Please rename clusters by editing the 'New Name' columns below:
+              </span>
+            </div>
+
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+              <table
+                class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+              >
+                <thead
+                  class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+                >
+                  <tr>
+                    <th scope="col" class="px-6 py-3">Current Name</th>
+                    <th scope="col" class="px-6 py-3">New Name</th>
+                    <th scope="col" class="px-6 py-3">
+                      <span class="sr-only">Edit</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
+                    <th
+                      scope="row"
+                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      Apple MacBook Pro 17"
+                    </th>
+                    <td class="px-6 py-4">Silver</td>
+                    <td class="px-6 py-4 text-right">
+                      <a
+                        href="#"
+                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >Edit</a
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+        <div class="text-right my-2">
+          <button
+            type="button"
+            onclick="confirm()"
+            id="confirmbtn"
+            data-modal-hide="rename-modal"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- subcluster -->
+<div
+  id="subcluster-modal"
+  tabindex="-1"
+  aria-hidden="true"
+  class="hidden overflow-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+>
+  <div class="relative p-4 w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow">
+      <div
+        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
+      >
+        <h3 class="text-xl font-semibold text-gray-900">Subclusters</h3>
+        <button
+          type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+          data-modal-hide="subcluster-modal"
+        >
+          <svg
+            class="w-3 h-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 14 14"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+            />
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div
+        class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
+      >
+        <form id="subclusterform">
+          <div>
+            <div class="flex items-center my-2 gap-5">
+              <label
+                for="divide_subclusters"
+                class="text-base leading-relaxed text-gray-500"
+                >Please select the clusters you want to divide into smaller
+                subclusters:
+              </label>
+              <button
+                name="divide_subclusters"
+                id="divide_subclusters"
+                data-dropdown-toggle="dropdown"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                type="button"
+              >
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="dropdown"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+              >
+                <ul
+                  class="py-2 text-sm text-gray-700"
+                  id="sampleul"
+                  aria-labelledby="divide_subclusters"
+                ></ul>
+              </div>
+            </div>
+            <div class="flex items-center my-2 gap-5">
+              <label
+                for="minGenes"
+                class="text-base leading-relaxed text-gray-500"
+                >Please enter the resolution:</label
+              >
+              <input
+                type="number"
+                name="minGenes"
+                id="minGenes"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              />
+            </div>
+          </div>
+        </form>
+        <div class="text-right my-2">
+          <button
+            type="button"
+            onclick="confirm()"
+            id="confirmbtn"
+            data-modal-hide="subcluster-modal"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- subset -->
+<div
+  id="subset-modal"
+  tabindex="-1"
+  aria-hidden="true"
+  class="hidden overflow-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+>
+  <div class="relative p-4 w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow">
+      <div
+        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
+      >
+        <h3 class="text-xl font-semibold text-gray-900">subset Clusters</h3>
+        <button
+          type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+          data-modal-hide="subset-modal"
+        >
+          <svg
+            class="w-3 h-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 14 14"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+            />
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div
+        class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
+      >
+        <form id="subsetform">
+          <div>
+            <div class="flex items-center my-2 gap-5">
+              <label
+                for="minGenes"
+                class="text-base leading-relaxed text-gray-500"
+                >Please select the sample to view:</label
+              >
+              <input
+                type="number"
+                name="minGenes"
+                id="minGenes"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              />
+            </div>
+            <div class="flex items-center my-2 gap-5">
+              <label
+                for="minGenes"
+                class="text-base leading-relaxed text-gray-500"
+                >Please upload your sample image:
+              </label>
+              <input
+                type="number"
+                name="minGenes"
+                id="minGenes"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              />
+            </div>
+            <div class="flex items-center my-2 gap-5">
+              <label
+                for="minGenes"
+                class="text-base leading-relaxed text-gray-500"
+                >Please select the clusters you want to view:
+              </label>
+              <input
+                type="number"
+                name="minGenes"
+                id="minGenes"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              />
+            </div>
+            <div class="flex items-center my-2 gap-5">
+              <label
+                for="minGenes"
+                class="text-base leading-relaxed text-gray-500"
+                >Please select the markers you want to view:</label
+              >
+              <input
+                type="number"
+                name="minGenes"
+                id="minGenes"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              />
+            </div>
+          </div>
+        </form>
+        <div class="text-right my-2">
+          <button
+            type="button"
+            onclick="confirm()"
+            id="confirmbtn"
+            data-modal-hide="subset-modal"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modals end -->
 <script src="{% static 'base/js/clustering.js'%}"></script>
+<script src="{% static 'base/js/clustering_modal.js'%}"></script>
 {%endblock%}
