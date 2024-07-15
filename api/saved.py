@@ -28,7 +28,28 @@ def load_data(key):
         if data_bytes:
             return pickle.loads(data_bytes)
     return None
+def get_all_keys():
+    r = get_redis_connection()
+    if r:
+        keys = r.keys('*')
+        result = {}
+        for key in keys:
+            decoded_key = key.decode('utf-8')
+            data = load_data(decoded_key)
+            result[decoded_key] = data
+            print(f"Key: {decoded_key}")
+            print(f"Value: {data}")
+            print("-" * 50)  
 
+def clear_all_data():
+    r = get_redis_connection()
+    if r:
+        keys = r.keys('*')
+        for key in keys:
+            r.delete(key)
+        print("所有資料已清除")
+    else:
+        print("無法連接到 Redis")
 
 
 def save_h5ad_file(adata, filename):

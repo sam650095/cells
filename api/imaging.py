@@ -55,7 +55,7 @@ def plot_clustering_pca(adata):
 def clustering_result(adata, npcs):
     if 'leiden_R' not in adata.obs.columns:
         adata.obs['leiden_R'] = adata.obs['leiden']
-    
+    print(adata.obs)
     save_dir = os.path.join(settings.MEDIA_ROOT, 'cluster_result')
     os.makedirs(save_dir, exist_ok=True)
     

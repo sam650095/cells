@@ -73,8 +73,6 @@ function logSelectedCount() {
     .filter((value) => value !== "Select All");
 
   const selectedCount = selectedMarkers.length;
-  console.log(`Currently selected: ${selectedCount} marker(s)`);
-  console.log("Selected markers:", selectedMarkers);
 
   const selectedbox = document.getElementById("selectedbox");
   selectedbox.textContent = "";

@@ -16,8 +16,194 @@
     </li>
   </ul>
 </div>
-<!-- button -->
 <div class="text-end py-5">
+  <button
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+    id="processbutton"
+    onclick="processbtn(event)"
+  >
+    Process
+  </button>
+</div>
+<!-- imgbox -->
+<div id="imgbox">
+  <div class="mb-4 border-b border-gray-200 mt-5">
+    <ul
+      class="flex flex-wrap -mb-px text-sm font-medium text-center"
+      id="default-styled-tab"
+      data-tabs-toggle="#default-styled-tab-content"
+      data-tabs-active-classes="text-sky-700 hover:text-sky-700 border-sky-700"
+      data-tabs-inactive-classes="text-gray-500 hover:text-gray-600 border-gray-100 hover:border-gray-300"
+      role="tablist"
+    >
+      <li class="me-2" role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base"
+          id="summary-styled-tab"
+          data-tabs-target="#styled-summary"
+          type="button"
+          role="tab"
+          aria-controls="summary"
+          aria-selected="false"
+        >
+          Summary
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
+          id="numeric_plot-styled-tab"
+          data-tabs-target="#styled-numeric_plot"
+          type="button"
+          role="tab"
+          aria-controls="numeric_plot"
+          aria-selected="false"
+        >
+          Numeric Plot
+        </button>
+      </li>
+
+      <li role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
+          id="heatmap-styled-tab"
+          data-tabs-target="#styled-heatmap"
+          type="button"
+          role="tab"
+          aria-controls="heatmap"
+          aria-selected="false"
+        >
+          Heatmap
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button
+          class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
+          id="voronoi_plot-styled-tab"
+          data-tabs-target="#styled-voronoi_plot"
+          type="button"
+          role="tab"
+          aria-controls="voronoi_plot"
+          aria-selected="false"
+        >
+          Voronoi Plot
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div id="default-styled-tab-content">
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-summary"
+      role="tabpanel"
+      aria-labelledby="summary-tab"
+    >
+      <div id="summary-container"></div>
+    </div>
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-numeric_plot"
+      role="tabpanel"
+      aria-labelledby="numeric_plot-tab"
+    >
+      <div id="numeric_plot-container">
+        <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
+          <li>
+            <div class="flex items-center my-2">
+              <label for="Addleidens" class="w-1/2 mr-2"
+                >Add leidens distribution grouped by sample
+              </label>
+              <button
+                type="button"
+                id="Addleidens"
+                name="Addleidens"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                onclick="addleidens()"
+              >
+                Add
+              </button>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center my-2">
+              <label for="Addmarkers" class="w-1/2 mr-2">Add Markers </label>
+              <button
+                name="pca_markers"
+                id="pca_markers"
+                data-dropdown-toggle="dropdownmarkers"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              >
+                Select All
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+
+              <!-- Dropdown menu -->
+              <div
+                id="dropdownmarkers"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 h-72 overflow-y-auto"
+              >
+                <form id="markerform">
+                  <ul
+                    class="p-3 space-y-1 text-sm text-gray-700"
+                    aria-labelledby="dropdownmarkersButton"
+                  ></ul>
+                </form>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center my-2">
+              <label for="Addedmarkers" class="w-1/2 mr-2" id="selectedbox">
+              </label>
+
+              <button
+                type="button"
+                id="Addedmarkers"
+                name="Addedmarkers"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                onclick="addmarkers()"
+              >
+                Add
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-heatmap"
+      role="tabpanel"
+      aria-labelledby="heatmap-tab"
+    >
+      <div id="heatmap-container"></div>
+    </div>
+    <div
+      class="hidden p-4 rounded-lg bg-gray-50"
+      id="styled-voronoi_plot"
+      role="tabpanel"
+      aria-labelledby="voronoi_plot-tab"
+    >
+      <div id="voronoi_plot-container"></div>
+    </div>
+  </div>
+</div>
+<!-- button -->
+<div class="text-end py-5 hidden">
   <a
     href="{% url 'page' process='neighbor' method='neighborhood' %}"
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"

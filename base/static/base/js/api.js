@@ -46,7 +46,9 @@ function loadImage(folder, filename, containerId) {
   })
     .then((response) => response.json())
     .then((data) => {
+      console.log(data);
       let container = document.getElementById(containerId);
+      containerId.textContent = "";
       if (container) {
         if (data.image_path) {
           if (document.getElementById(filename)) {
@@ -73,11 +75,3 @@ function loadImage(folder, filename, containerId) {
       }
     });
 }
-
-// // 使用示例
-// document.addEventListener("DOMContentLoaded", function () {
-//   loadImage('clustering_result', 'heatmap.png', 'heatmap-container');
-
-//   // 你可以多次調用 loadImage 來加載不同的圖片
-//   // loadImage('another_folder', 'another_image.jpg');
-// });

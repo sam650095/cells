@@ -15,5 +15,12 @@ urlpatterns = [
     path('preloadclustering', views.PreloadCLusteringView.as_view(), name="PreloadClustering"),
     path('clustering', views.CLusteringView.as_view(), name="Clustering"),
     path('preloadmarkers', views.PreloadMarkersView.as_view(), name="PreloadMarkers"),
-    path('addumapcluster/<str:met>', views.AddUmapClusterView.as_view(), name="addingmet")
+    path('addumapcluster/<str:met>', views.AddUmapClusterView.as_view(), name="addingmet"),
+    path('grabnames', views.GrabClusterNameView.as_view(), name="grabname"),
+    path('rename', views.RenameClusterView.as_view(), name="rename"),
+    path('grabclusters', views.GrabClustersView.as_view(), name="grabclusters"),
+    path('subclusters', views.SubclusterView.as_view(), name="subclusters"),
+    path('preloadsubset', views.PreloadSubsetView.as_view(), name="preloadsubset"),
+    path('grabclustersubset', views.GrabClusterSubsetView.as_view(), name="grabclustersubset"),
+    path('subset', views.SubsetView.as_view(), name="subset")
 ]

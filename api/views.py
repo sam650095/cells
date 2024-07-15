@@ -5,7 +5,7 @@ import numpy as np
 import shutil
 import bbknn
 import logging
-
+import json
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -341,13 +341,109 @@ class AddUmapClusterView(APIView):
     def post_leidens(self, request):
         adata = read_h5ad_file('adata_clustering.h5ad')
         adding_umap(adata)
-        # 處理 leidens 邏輯
         return Response({"message": "Leidens processed"}, status=status.HTTP_201_CREATED)
 
     def post_markers(self, request):
         adata = read_h5ad_file('adata_clustering.h5ad')
         chosen_method = request.data.getlist('markers')
-        print(chosen_method)
         adding_umap(adata, chosen_method)
-        # 處理 markers 邏輯
         return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)
+class GrabClusterNameView(APIView):
+    def post(self, request):
+        rename_df = self.grabnames()
+        return Response({'rename_df': rename_df}, status=status.HTTP_201_CREATED)
+    def grabnames(self):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        columns = ['CurrentName', 'NewName']
+        rename_df = pd.DataFrame(columns=columns)
+        rename_df['CurrentName'] = adata.obs['leiden_R'].cat.categories.tolist()
+        rename_df['NewName'] = adata.obs['leiden_R'].cat.categories.tolist()
+        return rename_df
+class RenameClusterView(APIView):
+    def post(self, request):
+        data = json.loads(request.body)
+        self.perform_rename_cluster(pd.DataFrame(data))
+        return Response({}, status=status.HTTP_201_CREATED)
+    def perform_rename_cluster(self, rename_df):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        n_pcs = load_data('n_pcs')
+        rename_dict = {}
+        for index, row in rename_df.iterrows(): 
+            current_name = row['CurrentName']
+            new_name = row['NewName']
+            if current_name in rename_dict:
+                rename_dict[current_name].append(new_name)
+            else:
+                rename_dict[current_name] = new_name  
+
+        adata.obs['leiden_R'] = adata.obs['leiden_R'].cat.rename_categories(rename_dict)
+        adata.obs['leiden'] = adata.obs['leiden_R'] 
+        clustering_result(adata, n_pcs)
+        save_h5ad_file(adata, 'adata_clustering.h5ad') 
+        return adata
+class GrabClustersView(APIView):
+    def post(self, request):
+        clusters_list = self.grabclusters()
+        return Response({'clusters_list': clusters_list}, status=status.HTTP_201_CREATED)
+    def grabclusters(self):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        cluster_list = adata.obs['leiden'].cat.categories
+        return cluster_list
+class SubclusterView(APIView):
+    def post(self, request):
+        chosen_clusters = request.data.getlist('clusters') 
+        resolution = float(request.data.get('resolution'))
+        self.perform_subclustering(resolution, chosen_clusters)
+        return Response({}, status=status.HTTP_201_CREATED)
+    def perform_subclustering(self, resolution, chosen_clusters):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        n_pcs = load_data('n_pcs')
+        sc.tl.leiden(adata, resolution=resolution, restrict_to=('leiden', chosen_clusters))
+        clustering_result(adata, n_pcs) 
+        save_h5ad_file(adata, 'adata_clustering.h5ad') 
+        return adata
+class PreloadSubsetView(APIView):
+    def post(self, request):
+        available_files_result, clustering_columns = self.available_adata()
+        return Response({'available_files_result':available_files_result,'clustering_columns':clustering_columns}, status=status.HTTP_201_CREATED)
+    def available_adata(self):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        clustering_columns = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype", "Sample"))]
+        
+        available_files = {}
+        available_files_result = []
+        if adata.uns.get('is_merged', False):
+            available_files['Merged Data'] = adata.copy()
+        else:
+            available_files[adata.uns['prefix']] = adata.copy()
+
+        for name, adata_item in available_files.items():
+            n_obs, n_vars = adata_item.shape
+            available_files_result.append(f"{name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        save_data(available_files, 'available_files') 
+        return available_files_result, clustering_columns
+class GrabClusterSubsetView(APIView):
+    def post(self, request):
+        chosen_cluster = request.data.get('sample')
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        cluster = adata.obs[chosen_cluster].cat.categories
+        print(cluster)
+        return Response({'cluster':cluster}, status=status.HTTP_201_CREATED)
+class SubsetView(APIView):
+    def post(self, request):
+        chosen_cluster = request.data.get('sample')
+        chosen_cluster_names = request.data.getlist('clusters')
+        subset_name = request.data.get('naming_cluster')
+        available_files_result = self.add_subset_cluster(chosen_cluster, chosen_cluster_names, subset_name)
+        return Response({'available_files_result':available_files_result}, status=status.HTTP_201_CREATED)
+    def add_subset_cluster(self, chosen_cluster, chosen_cluster_names, subset_name):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        available_files = load_data(available_files)
+        available_files_result = []
+        subset_adata = adata[adata.obs[chosen_cluster].isin(chosen_cluster_names)].copy()
+        available_files[subset_name] = subset_adata
+        for name, adata in available_files.items(): # 列出可用的數據集
+            n_obs, n_vars = adata.shape
+            available_files_result.append(f"{name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        save_data(available_files, 'available_files') 
+        return available_files_result    

@@ -51,7 +51,7 @@
       <li>bbknn: Identifying top neighbors separately within each batch</li>
     </ul>
   </div>
-  <div class="flex items-center my-2">
+  <div class="flex items-center my-2 text-gray-900">
     <label for="n_neighbor" class="w-60 mr-2"
       >Please enter the n_neighbor:</label
     >
@@ -62,7 +62,7 @@
       class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
     />
   </div>
-  <div class="flex items-center my-2">
+  <div class="flex items-center my-2 text-gray-900">
     <label for="resolution" class="w-60 mr-2"
       >Please enter the resolution:</label
     >
@@ -95,6 +95,7 @@
       class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
       data-modal-target="rename-modal"
       data-modal-toggle="rename-modal"
+      onclick="grabnames()"
     >
       Rename Clusters
     </button>
@@ -102,6 +103,7 @@
       class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
       data-modal-target="subcluster-modal"
       data-modal-toggle="subcluster-modal"
+      onclick="grabclusters()"
     >
       Subcluster
     </button>
@@ -109,6 +111,7 @@
       class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
       data-modal-target="subset-modal"
       data-modal-toggle="subset-modal"
+      onclick="preload_subset()"
     >
       Subset
     </button>
@@ -362,11 +365,13 @@
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
               <table
                 class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+                id="nametable"
               >
                 <thead
                   class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
                 >
                   <tr>
+                    <th scope="col" class="px-6 py-3">#</th>
                     <th scope="col" class="px-6 py-3">Current Name</th>
                     <th scope="col" class="px-6 py-3">New Name</th>
                     <th scope="col" class="px-6 py-3">
@@ -374,26 +379,7 @@
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr
-                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  >
-                    <th
-                      scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                    >
-                      Apple MacBook Pro 17"
-                    </th>
-                    <td class="px-6 py-4">Silver</td>
-                    <td class="px-6 py-4 text-right">
-                      <a
-                        href="#"
-                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                        >Edit</a
-                      >
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="nametbody"></tbody>
               </table>
             </div>
           </div>
@@ -401,7 +387,7 @@
         <div class="text-right my-2">
           <button
             type="button"
-            onclick="confirm()"
+            onclick="reanme_confirmbtn()"
             id="confirmbtn"
             data-modal-hide="rename-modal"
             class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
@@ -454,67 +440,67 @@
         class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
       >
         <form id="subclusterform">
-          <div>
-            <div class="flex items-center my-2 gap-5">
-              <label
-                for="divide_subclusters"
-                class="text-base leading-relaxed text-gray-500"
-                >Please select the clusters you want to divide into smaller
-                subclusters:
-              </label>
-              <button
-                name="divide_subclusters"
-                id="divide_subclusters"
-                data-dropdown-toggle="dropdown"
-                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
-                type="button"
+          <div class="flex items-center my-2 gap-5">
+            <label
+              for="divide_subcluster"
+              class="text-base leading-relaxed text-gray-500"
+              >Please select the clusters you want to divide into smaller
+              subclusters:
+            </label>
+            <button
+              name="divide_subcluster"
+              id="divide_subcluster"
+              data-dropdown-toggle="divide_subcluster_dropdown"
+              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              type="button"
+            >
+              <span id="_"></span>
+              <svg
+                class="w-2.5 h-2.5 ms-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
               >
-                <svg
-                  class="w-2.5 h-2.5 ms-3"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 10 6"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="m1 1 4 4 4-4"
-                  />
-                </svg>
-              </button>
-              <div
-                id="dropdown"
-                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
-              >
-                <ul
-                  class="py-2 text-sm text-gray-700"
-                  id="sampleul"
-                  aria-labelledby="divide_subclusters"
-                ></ul>
-              </div>
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </button>
+            <div
+              id="divide_subcluster_dropdown"
+              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+            >
+              <ul
+                class="py-2 text-sm text-gray-700"
+                id="subclusterul"
+                aria-labelledby="divide_subcluster"
+              ></ul>
             </div>
-            <div class="flex items-center my-2 gap-5">
-              <label
-                for="minGenes"
-                class="text-base leading-relaxed text-gray-500"
-                >Please enter the resolution:</label
-              >
-              <input
-                type="number"
-                name="minGenes"
-                id="minGenes"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-              />
-            </div>
+          </div>
+
+          <div class="flex items-center my-2 gap-5">
+            <label
+              for="resolution"
+              class="text-base leading-relaxed text-gray-500"
+              >Please enter the resolution:</label
+            >
+            <input
+              type="number"
+              name="resolution"
+              id="resolution"
+              class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+            />
           </div>
         </form>
         <div class="text-right my-2">
           <button
             type="button"
-            onclick="confirm()"
+            onclick="subcluster_confirmbtn()"
             id="confirmbtn"
             data-modal-hide="subcluster-modal"
             class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
@@ -566,66 +552,122 @@
       <div
         class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
       >
+        <div id="available_files_result"></div>
         <form id="subsetform">
-          <div>
-            <div class="flex items-center my-2 gap-5">
-              <label
-                for="minGenes"
-                class="text-base leading-relaxed text-gray-500"
-                >Please select the sample to view:</label
+          <!-- select sample -->
+          <div class="flex items-center my-2 text-gray-500">
+            <input
+              type="hidden"
+              name="samplemethod"
+              id="samplemethod"
+              value="Sample"
+            />
+            <label
+              for="subset_sample"
+              class="text-base leading-relaxed text-gray-500 w-96 mr-2"
+              >Please select the sample you want to view:</label
+            >
+            <button
+              name="subset_sample"
+              id="subset_sample"
+              data-dropdown-toggle="sample_dropdown"
+              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              type="button"
+            >
+              <svg
+                class="w-2.5 h-2.5 ms-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
               >
-              <input
-                type="number"
-                name="minGenes"
-                id="minGenes"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-              />
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div
+              id="sample_dropdown"
+              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+            >
+              <ul
+                class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                aria-labelledby="subset_sample"
+                id="sampleul"
+              ></ul>
             </div>
-            <div class="flex items-center my-2 gap-5">
-              <label
-                for="minGenes"
-                class="text-base leading-relaxed text-gray-500"
-                >Please upload your sample image:
-              </label>
-              <input
-                type="number"
-                name="minGenes"
-                id="minGenes"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-              />
-            </div>
-            <div class="flex items-center my-2 gap-5">
-              <label
-                for="minGenes"
-                class="text-base leading-relaxed text-gray-500"
-                >Please select the clusters you want to view:
-              </label>
-              <input
-                type="number"
-                name="minGenes"
-                id="minGenes"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-              />
-            </div>
-            <div class="flex items-center my-2 gap-5">
-              <label
-                for="minGenes"
-                class="text-base leading-relaxed text-gray-500"
-                >Please select the markers you want to view:</label
+          </div>
+          <!-- select the cluster -->
+          <div class="flex items-center my-2">
+            <label
+              for="subset"
+              class="text-base leading-relaxed text-gray-500 w-96 mr-2"
+              >Please select the cluster you want to subset:
+            </label>
+            <button
+              name="subset"
+              id="subset"
+              data-dropdown-toggle="subset_dropdown"
+              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              type="button"
+            >
+              <span id="__">-</span>
+              <svg
+                class="w-2.5 h-2.5 ms-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
               >
-              <input
-                type="number"
-                name="minGenes"
-                id="minGenes"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-              />
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </button>
+            <div
+              id="subset_dropdown"
+              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+            >
+              <ul
+                class="py-2 text-sm text-gray-700"
+                id="subsetul"
+                aria-labelledby="subset"
+              ></ul>
             </div>
+          </div>
+          <div class="text-base leading-relaxed text-gray-500 w-96 mr-2">
+            [<span id="subset_rslt"></span>]
+          </div>
+
+          <!-- naming -->
+          <div class="flex items-center my-2 gap-5">
+            <label
+              for="name_cluster"
+              class="text-base leading-relaxed text-gray-500 w-96 mr-2"
+              >Please enter the name for your subset data:</label
+            >
+            <input
+              type="number"
+              name="name_cluster"
+              id="name_cluster"
+              class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+            />
           </div>
         </form>
         <div class="text-right my-2">
           <button
             type="button"
-            onclick="confirm()"
+            onclick="subset_confirmbtn()"
             id="confirmbtn"
             data-modal-hide="subset-modal"
             class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"

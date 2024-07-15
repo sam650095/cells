@@ -1,8 +1,83 @@
 {%extends "base.html"%} {% load static %} {%block content%}
 <!-- main -->
-<div class="mb-3 text-gray-900">Please select the data to do phenotyping:</div>
+<form id="identifythegatesform">
+  <div class="flex items-center my-2 text-gray-900">
+    <input type="hidden" name="data" id="data" value="" />
+    <label for="phenotyping_data" class="w-96 mr-2"
+      >Please select the data to do phenotyping:</label
+    >
+    <button
+      name="phenotyping_data"
+      id="phenotyping_data"
+      data-dropdown-toggle="dropdown"
+      class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+      type="button"
+    >
+      D20
+      <svg
+        class="w-2.5 h-2.5 ms-3"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 10 6"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m1 1 4 4 4-4"
+        />
+      </svg>
+    </button>
+    <!-- Dropdown menu -->
+    <div
+      id="dropdown"
+      class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+    >
+      <ul
+        class="py-2 text-sm text-gray-700 dark:text-gray-200"
+        id="preloadul"
+        aria-labelledby="phenotyping_data"
+      ></ul>
+    </div>
+  </div>
+  <div class="text-end py-5">
+    <button
+      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+      id="processbutton"
+      onclick="processbtn(event)"
+    >
+      Process
+    </button>
+  </div>
+</form>
+<!-- btnbox -->
+<div id="btnbox">
+  <button
+    class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
+  >
+    Gate Finder
+  </button>
+</div>
+<!-- table  -->
+<table
+  class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+  id="nametable"
+>
+  <thead
+    class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+  >
+    <tr>
+      <th scope="col" class="px-6 py-3">#</th>
+      <th scope="col" class="px-6 py-3">Current Name</th>
+      <th scope="col" class="px-6 py-3">New Name</th>
+    </tr>
+  </thead>
+  <tbody id="nametbody"></tbody>
+</table>
 <!-- button -->
-<div class="text-end py-5">
+<div id="nextbtn" class="text-end py-5 hidden">
   <a
     href="{% url 'page' process='phenotyping' method='phenotyping' %}"
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
