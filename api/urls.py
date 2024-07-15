@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('clear', views.ClearAllDataView.as_view(),name='clear data'),
+
     path('upload', views.FileUploadView.as_view(), name='file-upload'),
     path('qualitycontrol', views.QualityControlView.as_view(), name='qualicty-control'),
     path('preview', views.PreviewView.as_view(), name="preview-filter"),
@@ -22,5 +24,10 @@ urlpatterns = [
     path('subclusters', views.SubclusterView.as_view(), name="subclusters"),
     path('preloadsubset', views.PreloadSubsetView.as_view(), name="preloadsubset"),
     path('grabclustersubset', views.GrabClusterSubsetView.as_view(), name="grabclustersubset"),
-    path('subset', views.SubsetView.as_view(), name="subset")
+    path('subset', views.SubsetView.as_view(), name="subset"),
+
+    path('preloadidentifythegates', views.PreloadIdentifytheGatesView.as_view(), name="preloadidentifythegates"),
+    path('choseadata', views.ChosenAdataResultView.as_view(),name="choseadata"),
+    path('identifythegates', views.IdentifytheGatesView.as_view(), name="identifythegates"),
+    path('phenotyping', views.PhenotypingView.as_view(), name="phenotyping")
 ]

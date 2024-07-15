@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import scanpy as sc
+import scimap as sm 
 import numpy as np
 import shutil
 import bbknn
@@ -36,6 +37,13 @@ def clearmediafiles(temp):
         messages.append(f'Directory {temp_dir} does not exist')
 
     return '\n'.join(messages)    
+# cleardata
+class ClearAllDataView(APIView):
+    def post(self, request):
+        clear_all_data()
+        clearmediafiles('')
+        clear_all_h5ad_files()
+        return Response({'message':'data are all killed'}, status=status.HTTP_200_OK)
 # Preprocessing     
 class FileUploadView(APIView):
     def post(self, request):
@@ -438,12 +446,100 @@ class SubsetView(APIView):
         return Response({'available_files_result':available_files_result}, status=status.HTTP_201_CREATED)
     def add_subset_cluster(self, chosen_cluster, chosen_cluster_names, subset_name):
         adata = read_h5ad_file('adata_clustering.h5ad')
-        available_files = load_data(available_files)
+        available_files = load_data('available_files')
         available_files_result = []
         subset_adata = adata[adata.obs[chosen_cluster].isin(chosen_cluster_names)].copy()
         available_files[subset_name] = subset_adata
-        for name, adata in available_files.items(): # 列出可用的數據集
+        for name, adata in available_files.items(): 
             n_obs, n_vars = adata.shape
             available_files_result.append(f"{name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
         save_data(available_files, 'available_files') 
         return available_files_result    
+
+# Identify the gates
+class PreloadIdentifytheGatesView(APIView):
+    def post(self, request):
+        available_files = load_data('available_files')
+        adata_list = list(available_files.keys())
+        print(adata_list)
+        return Response({'adata_list': adata_list}, status=status.HTTP_201_CREATED)
+    
+class ChosenAdataResultView(APIView):
+    def post(self, request):
+        chosen_adata = request.data.get('chosen_adata')
+        available_files = load_data('available_files')
+        adata = available_files[chosen_adata]
+        n_obs, n_vars = adata.shape
+        result = f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
+        save_h5ad_file(adata, 'adata_identify_gate.h5ad')
+        save_data(chosen_adata, 'chosen_adata') 
+        return Response({'result': result}, status=status.HTTP_201_CREATED)
+    
+
+class IdentifytheGatesView(APIView):
+    def post(self, request):
+        adata = read_h5ad_file('adata_identify_gate.h5ad')
+        columns = ['Marker'] + list(adata.obs['Sample'].cat.categories)
+        gate_df = pd.DataFrame(columns=columns)
+        gate_df['Marker'] = adata.var_names
+        save_data(gate_df, 'gate_df') 
+        gate_dict = gate_df.applymap(self.clean_value).to_dict(orient='records')
+        
+        return Response({'gate_df': gate_dict}, status=status.HTTP_201_CREATED)
+    def clean_value(self, x):
+        if pd.isna(x):
+            return None
+        if isinstance(x, (int, float)):
+            if np.isinf(x):
+                return None
+            return x
+        return str(x) 
+class AddValueView(APIView):
+    def post(self, request):
+        return Response({}, status=status.HTTP_201_CREATED)
+    
+# Phenotyping
+class PhenotypingView(APIView):
+    def post(self, request):
+        uploaded_file = request.FILES['file']
+        phenotype_dir = os.path.join(settings.MEDIA_ROOT, 'phenotypefile')
+        os.makedirs(phenotype_dir, exist_ok=True)
+        file_name = uploaded_file.name
+        file_path = os.path.join(phenotype_dir, file_name)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        with open(file_path, 'wb+') as destination:
+            for chunk in uploaded_file.chunks():
+                destination.write(chunk)
+        self.perform_phenotyping(file_path)
+        return Response({'file_name': file_name}, status=status.HTTP_201_CREATED)
+
+    def perform_phenotyping(self, file_path):
+        adata = read_h5ad_file('adata_identify_gate.h5ad')
+        gate_df = load_data('gate_df')
+        chosen_adata = load_data('chosen_adata')
+        n_pcs = load_data('n_pcs')
+        adata = sm.pp.rescale(adata, gate = gate_df, imageid = 'Sample', method = 'by_image')
+        phenotype = pd.read_csv(file_path)
+        adata = sm.tl.phenotype_cells (adata, phenotype=phenotype,
+                                    label="phenotype", imageid = 'Sample')
+        phenotype_result(adata, chosen_adata, n_pcs) 
+        return adata
+    
+
+
+# Spatial Analysis
+class PreloadSpatialAnalysisView(APIView):
+    def post(self, request):
+        return Response({}, status=status.HTTP_201_CREATED)
+class SpatialAnalysisView(APIView):
+    def post(self, request):
+        return Response({}, status=status.HTTP_201_CREATED)
+    
+# Neighborhood
+class PreloadNeighborView(APIView):
+    def post(self, request):
+        return Response({}, status=status.HTTP_201_CREATED)
+class NeighborView(APIView):
+    def post(self, request):
+        return Response({}, status=status.HTTP_201_CREATED)

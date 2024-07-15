@@ -60,3 +60,6 @@ def save_h5ad_file(adata, filename):
 def read_h5ad_file(filename):
     file_path = os.path.join(settings.H5AD_STORAGE_PATH, filename)
     return ad.read_h5ad(file_path)
+def clear_all_h5ad_files():
+    h5ad_files = [f for f in os.listdir(settings.H5AD_STORAGE_PATH) if f.endswith('.h5ad')]
+    [os.remove(os.path.join(settings.H5AD_STORAGE_PATH, file)) for file in h5ad_files]

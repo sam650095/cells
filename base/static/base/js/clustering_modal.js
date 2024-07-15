@@ -224,7 +224,8 @@ function logCheckedValues() {
   const selectedBox = document.getElementById("subset_rslt");
   selectedBox.textContent = checkedValues.join(", ");
 }
-async function subset_confirmbtn() {
+async function subset_confirmbtn(event) {
+  event.preventDefault();
   const csrftoken = getCookie("csrftoken");
   const form = document.getElementById("subsetform");
 
@@ -246,4 +247,6 @@ async function subset_confirmbtn() {
   );
   const subset_results = await fetchAPI("/api/subset", formData, csrftoken);
   console.log(subset_results);
+  document.getElementById("subsetresult").textContent =
+    subset_results.available_files_result;
 }

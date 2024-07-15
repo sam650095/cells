@@ -55,7 +55,6 @@ def plot_clustering_pca(adata):
 def clustering_result(adata, npcs):
     if 'leiden_R' not in adata.obs.columns:
         adata.obs['leiden_R'] = adata.obs['leiden']
-    print(adata.obs)
     save_dir = os.path.join(settings.MEDIA_ROOT, 'cluster_result')
     os.makedirs(save_dir, exist_ok=True)
     
@@ -182,3 +181,72 @@ def adding_umap(adata, chosen_markers=None):
     plt.close(fig)
     
     return save_path  
+
+# phenotyping
+def summary_phenotype(adata, chosen_adata):
+    if len(adata.obs['Sample'].cat.categories) > 1: 
+        n_obs, n_vars = adata.shape
+        print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}") 
+        
+        for sample in adata.obs['Sample'].cat.categories:
+            sample_adata = adata[adata.obs['Sample'] == sample]
+            n_obs, n_vars = sample_adata.shape
+            print(f"{sample}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+
+        summary_df = pd.DataFrame(columns=['Phenotypes', 'Count', 'Merged_Proportion'])
+        counts = adata.obs['phenotype'].value_counts()
+        proportions = (counts / counts.sum()).round(2)
+        summary_df['Phenotypes'] = counts.index
+        summary_df['Count'] = counts.values
+        summary_df['Merged_Proportion'] = proportions.values
+
+        for sample in adata.obs['Sample'].cat.categories:
+            sample_adata = adata[adata.obs['Sample'] == sample]
+            sample_counts = sample_adata.obs['phenotype'].value_counts()
+            sample_proportions = (sample_counts / sample_counts.sum()).round(2)
+            summary_df[f'{sample}_Proportion'] = sample_proportions.reindex(summary_df['Phenotypes']).fillna(0.0).values
+        print(summary_df)
+        
+    else: 
+        n_obs, n_vars = adata.shape 
+        sample_name = adata.obs['Sample'].unique()[0]
+        print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        
+        summary_df = pd.DataFrame(columns=['Phenotypes', 'Count', f'{sample_name}_Proportion'])
+        counts = adata.obs['phenotype'].value_counts()
+        proportions = (counts / counts.sum()).round(2)
+        summary_df['Phenotypes'] = counts.index
+        summary_df['Count'] = counts.values
+        summary_df[f'{sample_name}_Proportion'] = proportions.values
+        print(summary_df)
+    
+    return summary_df
+def phenotype_result(adata,chosen_adata, n_pcs):
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'phenotype_result')
+    os.makedirs(save_dir, exist_ok=True)
+    # Summary表格
+    summary_df_phenotype = summary_phenotype(adata,chosen_adata)
+    dataframe_to_image(summary_df_phenotype, os.path.join(save_dir, 'phenotyping_summary.png'))
+
+    # Umap
+    fig, axs = plt.subplots(2, 1, figsize=(10, 20)) 
+    sc.pl.umap(adata, color='phenotype', ax=axs[0], show=False)
+    sc.pl.umap(adata, color='Sample', ax=axs[1], show=False)
+    plt.savefig(os.path.join(save_dir, 'phenotyping_leidens.png'), bbox_inches='tight') 
+    
+    # Ranking
+    sc.tl.rank_genes_groups(adata, 'phenotype')
+    sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False)
+    plt.savefig(os.path.join(save_dir, 'phenotyping_ranking.png'), bbox_inches='tight')
+    
+    # Heatmap
+    all_markers = adata.var_names.tolist()
+    sc.tl.dendrogram(adata, groupby='phenotype', n_pcs=n_pcs)
+    sc.pl.matrixplot(adata, all_markers, groupby='phenotype', dendrogram=True, show=False, 
+                     use_raw=False, cmap="vlag", standard_scale=None, title='phenotype')
+    plt.savefig(os.path.join(save_dir, 'phenotyping_heatmap.png'), bbox_inches='tight')
+    
+    # Save the results
+    adata.write('adata_phenotyping.h5ad') 
+    
+    return adata

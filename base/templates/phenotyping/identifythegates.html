@@ -9,11 +9,11 @@
     <button
       name="phenotyping_data"
       id="phenotyping_data"
-      data-dropdown-toggle="dropdown"
+      data-dropdown-toggle="data_dropdown"
       class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
       type="button"
     >
-      D20
+      <span id="selected"></span>
       <svg
         class="w-2.5 h-2.5 ms-3"
         aria-hidden="true"
@@ -32,7 +32,7 @@
     </button>
     <!-- Dropdown menu -->
     <div
-      id="dropdown"
+      id="data_dropdown"
       class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
     >
       <ul
@@ -42,9 +42,10 @@
       ></ul>
     </div>
   </div>
+  <div id="chosen_results" class="text-gray-500 text-bold"></div>
   <div class="text-end py-5">
     <button
-      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hidden"
       id="processbutton"
       onclick="processbtn(event)"
     >
@@ -53,7 +54,7 @@
   </div>
 </form>
 <!-- btnbox -->
-<div id="btnbox">
+<div id="btnbox" class="hidden">
   <button
     class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
   >
@@ -68,11 +69,7 @@
   <thead
     class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
   >
-    <tr>
-      <th scope="col" class="px-6 py-3">#</th>
-      <th scope="col" class="px-6 py-3">Current Name</th>
-      <th scope="col" class="px-6 py-3">New Name</th>
-    </tr>
+    <tr></tr>
   </thead>
   <tbody id="nametbody"></tbody>
 </table>
@@ -86,4 +83,5 @@
   </a>
 </div>
 
+<script src="{% static 'base/js/identifythegates.js'%}"></script>
 {%endblock%}

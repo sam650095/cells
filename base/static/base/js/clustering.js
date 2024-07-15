@@ -59,6 +59,7 @@ async function processbtn(event) {
   );
   console.log(preloadmerkersresult);
   insert_marker_options(preloadmerkersresult.marker_list);
+  document.getElementById("nextbtn").classList.remove("hidden");
 }
 
 // marker option
