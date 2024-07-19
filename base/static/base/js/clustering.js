@@ -35,7 +35,7 @@ function methodtextnodefix(newText) {
 // preocess btn click
 async function processbtn(event) {
   event.preventDefault();
-  toggleLoading(true);
+  toggleLoading(true, "processbutton");
   const form = document.getElementById("clusterform");
   const formData = new FormData(form);
   console.log(formData);
@@ -43,7 +43,7 @@ async function processbtn(event) {
   const clusterresult = await fetchAPI("/api/clustering", formData, csrftoken);
   console.log(clusterresult);
 
-  toggleLoading(false);
+  toggleLoading(false, "processbutton");
   document.getElementById("btnbox").classList.remove("hidden");
   document.getElementById("imgbox").classList.remove("hidden");
   loadImage("cluster_result", "clustering_summary.png", "summary-container");

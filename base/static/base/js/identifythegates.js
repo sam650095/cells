@@ -38,7 +38,7 @@ async function changeselect(newText) {
 async function processbtn(event) {
   event.preventDefault();
   const csrftoken = getCookie("csrftoken");
-  toggleLoading(true);
+  toggleLoading(true, "processbutton");
   const identifythegates_result = await fetchAPI(
     "/api/identifythegates",
     0,
@@ -46,7 +46,7 @@ async function processbtn(event) {
   );
   console.log(identifythegates_result);
   createTable(identifythegates_result.gate_df);
-  toggleLoading(false);
+  toggleLoading(false, "processbutton");
 
   document.getElementById("btnbox").classList.remove("hidden");
   document.getElementById("nextbtn").classList.remove("hidden");

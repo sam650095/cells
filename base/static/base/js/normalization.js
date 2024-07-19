@@ -1,7 +1,7 @@
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
-  toggleLoading(true);
+  toggleLoading(true, "processbutton");
   const csrftoken = getCookie("csrftoken");
   const form = document.getElementById("normalform");
   const formData = new FormData(form);
@@ -19,6 +19,6 @@ async function processbtn(event) {
   });
   adata_results.appendChild(ul);
   // next page btn
-  toggleLoading(false);
+  toggleLoading(false, "processbutton");
   document.getElementById("nextbtn").classList.remove("hidden");
 }

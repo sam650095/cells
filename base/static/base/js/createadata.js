@@ -4,13 +4,13 @@ filename_showplace.classList.add("max-h-60", "overflow-y-auto");
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
-  toggleLoading(true);
+  toggleLoading(true, "processbutton");
   const file_upload = document.getElementById("file_upload");
   const files = file_upload.files;
 
   if (files.length === 0) {
     alert("Please Upload Unless one File");
-    toggleLoading(false);
+    toggleLoading(false, "processbutton");
     return;
   }
 
@@ -37,7 +37,7 @@ async function processbtn(event) {
     ul.appendChild(li);
   });
   adata_results.appendChild(ul);
-  toggleLoading(false);
+  toggleLoading(false, "processbutton");
   let nextbtn = document.getElementById("nextbtn");
   nextbtn.classList.remove("hidden");
 }

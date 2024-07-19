@@ -3,7 +3,7 @@ let sampletextnode;
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
-  toggleLoading(true);
+  toggleLoading(true, "processbutton");
   const csrftoken = getCookie("csrftoken");
 
   const process_result = await fetchAPI("/api/qualitycontrol", 0, csrftoken);
@@ -14,7 +14,7 @@ async function processbtn(event) {
   btnbox.classList.remove("hidden");
   //   show image
   showimage(process_result);
-  toggleLoading(false);
+  toggleLoading(false, "processbutton");
   // next page btn
   document.getElementById("nextbtn").classList.remove("hidden");
 }

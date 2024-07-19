@@ -229,7 +229,7 @@
                 name="pca_markers"
                 id="pca_markers"
                 data-dropdown-toggle="dropdownmarkers"
-                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
               >
                 Select All
                 <svg
@@ -248,7 +248,15 @@
                   />
                 </svg>
               </button>
-
+              <button
+                type="button"
+                id="Addedmarkers"
+                name="Addedmarkers"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                onclick="addmarkers()"
+              >
+                Add
+              </button>
               <!-- Dropdown menu -->
               <div
                 id="dropdownmarkers"
@@ -264,20 +272,8 @@
             </div>
           </li>
           <li>
-            <div class="flex items-center my-2">
-              <label for="Addedmarkers" class="w-1/2 mr-2" id="selectedbox">
-              </label>
-
-              <button
-                type="button"
-                id="Addedmarkers"
-                name="Addedmarkers"
-                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
-                onclick="addmarkers()"
-              >
-                Add
-              </button>
-            </div>
+            <label for="Addedmarkers" class="w-1/2 mr-2" id="selectedbox">
+            </label>
           </li>
         </ul>
       </div>

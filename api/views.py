@@ -296,11 +296,16 @@ class PCAView(APIView):
 class PreloadCLusteringView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_preprocessing.h5ad')
+        available_files = {}
         if adata.uns.get('is_merged'):
+            available_files['Merged Data'] = adata.copy()
             methods = ['none','harmony', 'combat', 'bbknn']
+            save_data(available_files, 'available_files') 
             return Response({'methods': methods}, status=status.HTTP_201_CREATED)
         else:
             methods = ['none']
+            available_files[adata.uns['prefix']] = adata.copy()
+            save_data(available_files, 'available_files') 
             return Response({'methods': methods}, status=status.HTTP_201_CREATED)
 class CLusteringView(APIView):
     def post(self, request):
@@ -417,8 +422,7 @@ class PreloadSubsetView(APIView):
     def available_adata(self):
         adata = read_h5ad_file('adata_clustering.h5ad')
         clustering_columns = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype", "Sample"))]
-        
-        available_files = {}
+        available_files = load_data('available_files')
         available_files_result = []
         if adata.uns.get('is_merged', False):
             available_files['Merged Data'] = adata.copy()
@@ -428,14 +432,12 @@ class PreloadSubsetView(APIView):
         for name, adata_item in available_files.items():
             n_obs, n_vars = adata_item.shape
             available_files_result.append(f"{name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
-        save_data(available_files, 'available_files') 
         return available_files_result, clustering_columns
 class GrabClusterSubsetView(APIView):
     def post(self, request):
         chosen_cluster = request.data.get('sample')
         adata = read_h5ad_file('adata_clustering.h5ad')
         cluster = adata.obs[chosen_cluster].cat.categories
-        print(cluster)
         return Response({'cluster':cluster}, status=status.HTTP_201_CREATED)
 class SubsetView(APIView):
     def post(self, request):

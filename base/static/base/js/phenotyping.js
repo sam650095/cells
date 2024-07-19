@@ -14,7 +14,7 @@ fileInput.addEventListener("change", function (event) {
 async function processbtn(event) {
   event.preventDefault();
   const csrftoken = getCookie("csrftoken");
-  toggleLoading(true);
+  toggleLoading(true, "processbutton");
   const formData = new FormData();
   formData.append("file", selectedFile);
 
@@ -24,7 +24,7 @@ async function processbtn(event) {
     csrftoken
   );
   console.log(identifythegates_result);
-  toggleLoading(false);
+  toggleLoading(false, "processbutton");
 
   //   document.getElementById("btnbox").classList.remove("hidden");
   //   document.getElementById("nextbtn").classList.remove("hidden");

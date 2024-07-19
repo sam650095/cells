@@ -27,8 +27,8 @@ for (let i = 0; i < navContents.length; i++) {
   element.classList.add("text-sky-700");
 }
 // toggle loadding animation
-function toggleLoading(isLoading) {
-  const btn = document.getElementById("processbutton");
+function toggleLoading(isLoading, btnid) {
+  const btn = document.getElementById(btnid);
   const btntext = btn.textContent;
   if (isLoading) {
     btn.innerHTML =

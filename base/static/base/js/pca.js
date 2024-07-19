@@ -99,7 +99,7 @@ function logSelectedCount() {
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
-  toggleLoading(true);
+  toggleLoading(true, "processbutton");
   const csrftoken = getCookie("csrftoken");
 
   const form = document.getElementById("markerform");
@@ -143,6 +143,6 @@ async function processbtn(event) {
   pca_box.appendChild(ul);
 
   // next page btn
-  toggleLoading(false);
+  toggleLoading(false, "processbutton");
   document.getElementById("nextbtn").classList.remove("hidden");
 }
