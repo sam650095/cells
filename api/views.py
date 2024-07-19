@@ -380,19 +380,18 @@ class RenameClusterView(APIView):
     def perform_rename_cluster(self, rename_df):
         adata = read_h5ad_file('adata_clustering.h5ad')
         n_pcs = load_data('n_pcs')
-        rename_dict = {}
-        for index, row in rename_df.iterrows(): 
-            current_name = row['CurrentName']
-            new_name = row['NewName']
-            if current_name in rename_dict:
-                rename_dict[current_name].append(new_name)
-            else:
-                rename_dict[current_name] = new_name  
 
-        adata.obs['leiden_R'] = adata.obs['leiden_R'].cat.rename_categories(rename_dict)
-        adata.obs['leiden'] = adata.obs['leiden_R'] 
+        rename_dict = {}
+        for _, row in rename_df.iterrows():
+            current_name = str(row['CurrentName'])
+            new_name = str(row['NewName'])
+            rename_dict[current_name] = new_name
+
+        adata.obs['leiden_R'] = adata.obs['leiden_R'].astype(str).map(rename_dict).astype('category')
+        adata.obs['leiden'] = adata.obs['leiden_R']
+
         clustering_result(adata, n_pcs)
-        save_h5ad_file(adata, 'adata_clustering.h5ad') 
+        save_h5ad_file(adata, 'adata_clustering.h5ad')
         return adata
 class GrabClustersView(APIView):
     def post(self, request):

@@ -97,12 +97,12 @@ def dataframe_to_image(df, filename):
 def summary_cluster(adata):
     if adata.uns.get('is_merged', False): 
         n_obs, n_vars = adata.shape
-        print(f"Merged Data: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        # print(f"Merged Data: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
         
         for sample in adata.obs['Sample'].cat.categories:
             sample_adata = adata[adata.obs['Sample'] == sample]
             n_obs, n_vars = sample_adata.shape
-            print(f"{sample}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+            # print(f"{sample}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
         
         if 'leiden_R' not in adata.obs.columns:
             adata.obs['leiden_R'] = adata.obs['leiden']
@@ -119,12 +119,12 @@ def summary_cluster(adata):
             sample_counts = sample_adata.obs['leiden_R'].value_counts()
             sample_proportions = (sample_counts / sample_counts.sum()).round(2) 
             summary_df[f'{sample}_Proportion'] = sample_proportions.reindex(summary_df['Leidens']).fillna(0.0).values
-        print(summary_df)
+        # print(summary_df)
         
     else: 
         n_obs, n_vars = adata.shape 
         sample_name = adata.obs['Sample'].unique()[0]
-        print(f"{sample_name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        # print(f"{sample_name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
         
         if 'leiden_R' not in adata.obs.columns:
             adata.obs['leiden_R'] = adata.obs['leiden']
@@ -135,7 +135,7 @@ def summary_cluster(adata):
         summary_df['Leidens'] = counts.index
         summary_df['Count'] = counts.values
         summary_df[f'{sample_name}_Proportion'] = proportions.values
-        print(summary_df)
+        # print(summary_df)
     
     return summary_df
 def adding_umap(adata, chosen_markers=None):
@@ -186,12 +186,12 @@ def adding_umap(adata, chosen_markers=None):
 def summary_phenotype(adata, chosen_adata):
     if len(adata.obs['Sample'].cat.categories) > 1: 
         n_obs, n_vars = adata.shape
-        print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}") 
+        # print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}") 
         
         for sample in adata.obs['Sample'].cat.categories:
             sample_adata = adata[adata.obs['Sample'] == sample]
             n_obs, n_vars = sample_adata.shape
-            print(f"{sample}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+            # print(f"{sample}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
 
         summary_df = pd.DataFrame(columns=['Phenotypes', 'Count', 'Merged_Proportion'])
         counts = adata.obs['phenotype'].value_counts()
@@ -205,12 +205,12 @@ def summary_phenotype(adata, chosen_adata):
             sample_counts = sample_adata.obs['phenotype'].value_counts()
             sample_proportions = (sample_counts / sample_counts.sum()).round(2)
             summary_df[f'{sample}_Proportion'] = sample_proportions.reindex(summary_df['Phenotypes']).fillna(0.0).values
-        print(summary_df)
+        # print(summary_df)
         
     else: 
         n_obs, n_vars = adata.shape 
         sample_name = adata.obs['Sample'].unique()[0]
-        print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
+        # print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
         
         summary_df = pd.DataFrame(columns=['Phenotypes', 'Count', f'{sample_name}_Proportion'])
         counts = adata.obs['phenotype'].value_counts()
@@ -218,7 +218,7 @@ def summary_phenotype(adata, chosen_adata):
         summary_df['Phenotypes'] = counts.index
         summary_df['Count'] = counts.values
         summary_df[f'{sample_name}_Proportion'] = proportions.values
-        print(summary_df)
+        # print(summary_df)
     
     return summary_df
 def phenotype_result(adata,chosen_adata, n_pcs):
