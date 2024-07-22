@@ -1,3 +1,4 @@
+let origindata = [];
 let editdata = [];
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
@@ -69,9 +70,8 @@ function createTable(data) {
     th.className = "px-6 py-3";
     thead.appendChild(th);
   });
-  console.log(data);
-  editedData = JSON.parse(JSON.stringify(data));
-
+  origindata = JSON.parse(JSON.stringify(data));
+  editdata = JSON.parse(JSON.stringify(data));
   data.forEach((row, index) => {
     const tr = document.createElement("tr");
     tr.className = "bg-white border-b hover:bg-gray-50 cursor-pointer";
@@ -81,18 +81,19 @@ function createTable(data) {
     tdIndex.className = "px-6 py-4";
     tr.appendChild(tdIndex);
 
-    Object.values(row).forEach((value) => {
+    Object.entries(row).forEach(([key, value]) => {
       const td = document.createElement("td");
       td.textContent = value !== null ? value : "N/A";
       td.className = "w-1/3 px-6 py-4";
-      td.onclick = () => handleClick(td, index);
+      td.onclick = () => handleClick(td, index, key);
       tr.appendChild(td);
     });
 
     tbody.appendChild(tr);
   });
 }
-function handleClick(td, index) {
+function handleClick(td, rowIndex, columnName) {
+  console.log("handleclick");
   if (td.querySelector("input")) {
     return;
   }
@@ -102,17 +103,26 @@ function handleClick(td, index) {
   td.textContent = "";
   const input = document.createElement("input");
   input.type = "text";
-  input.value = currentValue;
+  input.value = currentValue === "N/A" ? "" : currentValue;
   input.className =
-    "my-2 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900";
+    "my-2 w-3/4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900";
 
   div.appendChild(input);
   const btn = document.createElement("button");
-  btn.textContent = "confirm";
+  btn.textContent = "V";
   btn.className =
-    "rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3";
-
+    "text-cyan-700 border border-sky-700 rounded-md hover:bg-sky-700 hover:text-white py-2 px-4 text-white text-sm font-semibold my-3";
+  btn.onclick = function (event) {
+    event.stopPropagation();
+    saveEdit(rowIndex, columnName, input.value);
+    td.innerHTML = "";
+    td.textContent = input.value === "" ? "N/A" : input.value;
+  };
   div.appendChild(btn);
   td.appendChild(div);
   input.focus();
+}
+function saveEdit(rowIndex, columnName, newValue) {
+  editdata[rowIndex][columnName] = newValue;
+  console.log("Updated editdata:", editdata);
 }
