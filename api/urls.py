@@ -29,5 +29,6 @@ urlpatterns = [
     path('preloadidentifythegates', views.PreloadIdentifytheGatesView.as_view(), name="preloadidentifythegates"),
     path('choseadata', views.ChosenAdataResultView.as_view(),name="choseadata"),
     path('identifythegates', views.IdentifytheGatesView.as_view(), name="identifythegates"),
+    path('addvalue', views.AddValueView.as_view(), name="addvalue"),
     path('phenotyping', views.PhenotypingView.as_view(), name="phenotyping")
 ]

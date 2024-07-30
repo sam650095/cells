@@ -18,14 +18,30 @@ async function processbtn(event) {
   const formData = new FormData();
   formData.append("file", selectedFile);
 
-  const identifythegates_result = await fetchAPI(
+  const phenotype_result = await fetchAPI(
     "/api/phenotyping",
     formData,
     csrftoken
   );
-  console.log(identifythegates_result);
+  console.log(phenotype_result);
   toggleLoading(false, "processbutton");
-
-  //   document.getElementById("btnbox").classList.remove("hidden");
-  //   document.getElementById("nextbtn").classList.remove("hidden");
+  loadImage(
+    "phenotype_result",
+    "phenotyping_summary.png",
+    "p-summary-container"
+  );
+  loadImage(
+    "phenotype_result",
+    "phenotyping_heatmap.png",
+    "p-heatmap-container"
+  );
+  loadImage("phenotype_result", "phenotyping_leidens.png", "p-umap-container");
+  loadImage(
+    "phenotype_result",
+    "phenotyping_ranking.png",
+    "p-ranking-container"
+  );
+  document.getElementById("btnbox").classList.remove("hidden");
+  document.getElementById("imgbox").classList.remove("hidden");
+  document.getElementById("nextbtn").classList.remove("hidden");
 }

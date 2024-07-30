@@ -235,9 +235,13 @@ def phenotype_result(adata,chosen_adata, n_pcs):
     plt.savefig(os.path.join(save_dir, 'phenotyping_leidens.png'), bbox_inches='tight') 
     
     # Ranking
-    sc.tl.rank_genes_groups(adata, 'phenotype')
-    sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False)
-    plt.savefig(os.path.join(save_dir, 'phenotyping_ranking.png'), bbox_inches='tight')
+    group_sizes = adata.obs['phenotype'].value_counts()
+    valid_groups = group_sizes[group_sizes >= 2].index.tolist()
+    
+    if len(valid_groups) > 1:
+        sc.tl.rank_genes_groups(adata, 'phenotype', groups=valid_groups)
+        sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False)
+        plt.savefig(os.path.join(save_dir, 'phenotyping_ranking.png'), bbox_inches='tight')
     
     # Heatmap
     all_markers = adata.var_names.tolist()

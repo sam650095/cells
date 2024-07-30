@@ -79,7 +79,7 @@
      3. 啟動 redis
 
         ```sh
-        sudo service redis-server start # 沒有報錯應該就沒問題
+        sudo service redis-server start
         ```
 
 4. 執行專案

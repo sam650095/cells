@@ -85,7 +85,7 @@ function createTable(data) {
       const td = document.createElement("td");
       td.textContent = value !== null ? value : "N/A";
       td.className = "w-1/3 px-6 py-4";
-      td.onclick = () => handleClick(td, index, key);
+      if (key != "Marker") td.onclick = () => handleClick(td, index, key);
       tr.appendChild(td);
     });
 
@@ -125,4 +125,10 @@ function handleClick(td, rowIndex, columnName) {
 function saveEdit(rowIndex, columnName, newValue) {
   editdata[rowIndex][columnName] = newValue;
   console.log("Updated editdata:", editdata);
+}
+async function confirmbtn() {
+  const csrftoken = getCookie("csrftoken");
+  const formData = new FormData();
+  formData.append("editdata", JSON.stringify(editdata));
+  const addvalueresult = await fetchAPI("/api/addvalue", formData, csrftoken);
 }

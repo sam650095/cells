@@ -497,13 +497,30 @@ class IdentifytheGatesView(APIView):
         return str(x) 
 class AddValueView(APIView):
     def post(self, request):
+        editdata = json.loads(request.POST.get('editdata'))
+        gate_df = load_data('gate_df')
+        print(gate_df)
+        edit_df = pd.DataFrame(editdata)
+        
+        gate_df.set_index('Marker', inplace=True)
+        edit_df.set_index('Marker', inplace=True)
+        
+        for marker in edit_df.index:
+            for column in edit_df.columns:
+                if marker in gate_df.index and column in gate_df.columns:
+                    new_value = edit_df.loc[marker, column]
+                    if pd.notna(new_value):  
+                        gate_df.loc[marker, column] = new_value
+        
+        gate_df.reset_index(inplace=True)
+        print(gate_df)
         return Response({}, status=status.HTTP_201_CREATED)
     
 # Phenotyping
 class PhenotypingView(APIView):
     def post(self, request):
         uploaded_file = request.FILES['file']
-        phenotype_dir = os.path.join(settings.MEDIA_ROOT, 'phenotypefile')
+        phenotype_dir = os.path.join(settings.MEDIA_ROOT, 'tempfile', 'phenotypefile')
         os.makedirs(phenotype_dir, exist_ok=True)
         file_name = uploaded_file.name
         file_path = os.path.join(phenotype_dir, file_name)
@@ -522,7 +539,7 @@ class PhenotypingView(APIView):
         n_pcs = load_data('n_pcs')
         adata = sm.pp.rescale(adata, gate = gate_df, imageid = 'Sample', method = 'by_image')
         phenotype = pd.read_csv(file_path)
-        adata = sm.tl.phenotype_cells (adata, phenotype=phenotype,
+        adata = sm.tl.phenotype_cells(adata, phenotype=phenotype,
                                     label="phenotype", imageid = 'Sample')
         phenotype_result(adata, chosen_adata, n_pcs) 
         return adata
