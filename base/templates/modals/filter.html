@@ -1,0 +1,225 @@
+<div
+  id="filter-modal"
+  tabindex="-1"
+  aria-hidden="true"
+  class="hidden overflow-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+>
+  <div class="relative p-4 w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow">
+      <div
+        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
+      >
+        <h3 class="text-xl font-semibold text-gray-900">Filter</h3>
+        <button
+          type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+          data-modal-hide="filter-modal"
+        >
+          <svg
+            class="w-3 h-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 14 14"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+            />
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div
+        class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
+      >
+        <form id="filterform">
+          <div>
+            <div class="flex items-center my-2 gap-5">
+              <input type="hidden" name="sample" id="sample" />
+              <label for="f_sampleSelect" class="font-bold"
+                >Please choose the sample you want to filter:
+              </label>
+              <button
+                name="f_sampleSelect"
+                id="f_sampleSelect"
+                data-dropdown-toggle="f_dropdown"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                type="button"
+              >
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="f_dropdown"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+              >
+                <ul
+                  class="py-2 text-sm text-gray-700"
+                  id="sampleul"
+                  aria-labelledby="f_sampleSelect"
+                ></ul>
+              </div>
+            </div>
+            <span class="font-bold">Filter Cells:</span>
+            <div class="flex items-center my-2 gap-5 px-5">
+              <label
+                for="minGenes"
+                class="text-base leading-relaxed text-gray-500"
+                >Please enter the minimum number of genes:</label
+              >
+              <input
+                type="number"
+                name="minGenes"
+                id="minGenes"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              />
+            </div>
+            <span class="font-bold">Filter Outliers:</span>
+            <div class="flex items-center my-2 gap-5 px-5">
+              <input type="hidden" name="fmethod" id="fmethod" value="Manual" />
+              <label
+                for="filter_method"
+                class="text-base leading-relaxed text-gray-500"
+                >Please choose your filter method:</label
+              >
+
+              <button
+                name="filter_method"
+                id="filter_method"
+                data-dropdown-toggle="mdropdown"
+                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                type="button"
+              >
+                <span id="methodtext">Manual</span>
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="mdropdown"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+              >
+                <ul
+                  class="py-2 text-sm text-gray-700"
+                  id="methodul"
+                  aria-labelledby="filter_method"
+                >
+                  <li>
+                    <a
+                      onclick="methodtextnodefix('Manual')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      >Manual</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      onclick="methodtextnodefix('Quantile')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      >Quantile</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      onclick="methodtextnodefix('1.5IQR')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      >1.5IQR</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="text-gray-500 my-2 px-5">
+              Note:
+              <ul class="list-disc pl-5">
+                <li>Manual: Remove outliers by selecting upper and lower.</li>
+                <li>Quantile: Remove outliers by selecting upper and lower.</li>
+                <li>1.5IQR: Automatically remove values beyond 1.5 IQR.</li>
+              </ul>
+            </div>
+            <div id="upandlow">
+              <div class="flex items-center my-2 gap-5 px-5">
+                <label
+                  for="lowerlimit"
+                  class="text-base leading-relaxed text-gray-500"
+                  id="lo_limit_label"
+                  >Please enter lower limit:</label
+                >
+                <input
+                  type="number"
+                  id="lowerlimit"
+                  name="lowerlimit"
+                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+                />
+              </div>
+              <div class="flex items-center my-2 gap-5 px-5">
+                <label
+                  for="upperlimit"
+                  class="text-base leading-relaxed text-gray-500"
+                  id="up_limit_label"
+                  >Please enter upper limit:</label
+                >
+                <input
+                  type="number"
+                  id="upperlimit"
+                  name="upperlimit"
+                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+                />
+              </div>
+            </div>
+            <div class="text-right my-2">
+              <button
+                type="button"
+                onclick="preview()"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+              >
+                Preview
+              </button>
+            </div>
+            <div id="previewimagebox"></div>
+          </div>
+        </form>
+        <div class="text-right my-2">
+          <button
+            type="button"
+            onclick="confirm()"
+            id="confirmbtn"
+            data-modal-hide="filter-modal"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hidden"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
