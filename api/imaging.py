@@ -247,3 +247,13 @@ def phenotype_result(adata,chosen_adata, n_pcs):
     plt.savefig(os.path.join(save_dir, 'phenotyping_heatmap.png'), bbox_inches='tight')
     
     return adata, result_text
+def add_phenotypes_bysample(adata):
+    num_samples = len(adata.obs['Sample'].cat.categories)
+    fig, axs = plt.subplots(num_samples, 1, figsize=(10, 5 * num_samples))
+    if num_samples == 1:
+        axs = [axs]
+    for i, sample in enumerate(adata.obs['Sample'].cat.categories):
+        sample_adata = adata[adata.obs['Sample'] == sample]
+        sc.pl.umap(sample_adata, color='phenotype', title=f'{sample}', ax=axs[i], show=False)
+    plt.tight_layout()
+    plt.savefig(f'clustering_phenotypes_bysample.pdf')
