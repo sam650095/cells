@@ -23,7 +23,8 @@ async function processbtn(event) {
     formData,
     csrftoken
   );
-  console.log(phenotype_result);
+  document.getElementById("phenotype_result").textContent =
+    phenotype_result.phenotyping_result;
   toggleLoading(false, "processbutton");
   loadImage(
     "phenotype_result",

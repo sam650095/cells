@@ -529,8 +529,8 @@ class PhenotypingView(APIView):
         with open(file_path, 'wb+') as destination:
             for chunk in uploaded_file.chunks():
                 destination.write(chunk)
-        self.perform_phenotyping(file_path)
-        return Response({'file_name': file_name}, status=status.HTTP_201_CREATED)
+        phenotyping_result = self.perform_phenotyping(file_path)
+        return Response({'phenotyping_result': phenotyping_result}, status=status.HTTP_201_CREATED)
 
     def perform_phenotyping(self, file_path):
         adata = read_h5ad_file('adata_identify_gate.h5ad')
@@ -541,10 +541,29 @@ class PhenotypingView(APIView):
         phenotype = pd.read_csv(file_path)
         adata = sm.tl.phenotype_cells(adata, phenotype=phenotype,
                                     label="phenotype", imageid = 'Sample')
-        phenotype_result(adata, chosen_adata, n_pcs) 
-        return adata
+        adata, phenotyping_result = phenotype_result(adata, chosen_adata, n_pcs) 
+        save_h5ad_file(adata, 'adata_phenotyping.h5ad')
+        return phenotyping_result
     
+class AddUmapPhenotypeView(APIView):
+    def post(self, request, met):
+        if met == 'phenotypes':
+            return self.post_leidens(request)
+        elif met == 'markers':
+            return self.post_markers(request)
+        else:
+            return Response({"error": "Invalid method"}, status=status.HTTP_400_BAD_REQUEST)
 
+    def post_leidens(self, request):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        adding_umap(adata)
+        return Response({"message": "Leidens processed"}, status=status.HTTP_201_CREATED)
+
+    def post_markers(self, request):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        chosen_method = request.data.getlist('markers')
+        adding_umap(adata, chosen_method)
+        return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)
 
 # Spatial Analysis
 class PreloadSpatialAnalysisView(APIView):

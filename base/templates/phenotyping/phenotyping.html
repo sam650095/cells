@@ -130,7 +130,11 @@
       role="tabpanel"
       aria-labelledby="summary-tab"
     >
-      <div id="p-summary-container"></div>
+      <div id="p-summary-container">
+        <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
+          <li id="phenotype_result"></li>
+        </ul>
+      </div>
     </div>
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
@@ -143,7 +147,7 @@
           <li>
             <div class="flex items-center my-2">
               <label for="Addphenotypes" class="w-1/2 mr-2"
-                >Add leidens distribution grouped by sample
+                >Add phenotypes distribution grouped by sample
               </label>
               <button
                 type="button"

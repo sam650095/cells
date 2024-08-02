@@ -184,10 +184,9 @@ def adding_umap(adata, chosen_markers=None):
 
 # phenotyping
 def summary_phenotype(adata, chosen_adata):
-    if len(adata.obs['Sample'].cat.categories) > 1: 
-        n_obs, n_vars = adata.shape
-        # print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}") 
+    n_obs, n_vars = adata.shape
         
+    if len(adata.obs['Sample'].cat.categories) > 1: 
         for sample in adata.obs['Sample'].cat.categories:
             sample_adata = adata[adata.obs['Sample'] == sample]
             n_obs, n_vars = sample_adata.shape
@@ -208,10 +207,7 @@ def summary_phenotype(adata, chosen_adata):
         # print(summary_df)
         
     else: 
-        n_obs, n_vars = adata.shape 
         sample_name = adata.obs['Sample'].unique()[0]
-        # print(f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
-        
         summary_df = pd.DataFrame(columns=['Phenotypes', 'Count', f'{sample_name}_Proportion'])
         counts = adata.obs['phenotype'].value_counts()
         proportions = (counts / counts.sum()).round(2)
@@ -220,12 +216,12 @@ def summary_phenotype(adata, chosen_adata):
         summary_df[f'{sample_name}_Proportion'] = proportions.values
         # print(summary_df)
     
-    return summary_df
+    return summary_df, f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
 def phenotype_result(adata,chosen_adata, n_pcs):
     save_dir = os.path.join(settings.MEDIA_ROOT, 'phenotype_result')
     os.makedirs(save_dir, exist_ok=True)
     # Summary表格
-    summary_df_phenotype = summary_phenotype(adata,chosen_adata)
+    summary_df_phenotype, result_text = summary_phenotype(adata,chosen_adata)
     dataframe_to_image(summary_df_phenotype, os.path.join(save_dir, 'phenotyping_summary.png'))
 
     # Umap
@@ -250,7 +246,4 @@ def phenotype_result(adata,chosen_adata, n_pcs):
                      use_raw=False, cmap="vlag", standard_scale=None, title='phenotype')
     plt.savefig(os.path.join(save_dir, 'phenotyping_heatmap.png'), bbox_inches='tight')
     
-    # Save the results
-    adata.write('adata_phenotyping.h5ad') 
-    
-    return adata
+    return adata, result_text
