@@ -9,6 +9,9 @@ def index(request):
 def page(request, process, method):
     context = {'process': process, 'method': method}
     return render(request, f"{process}/{method}.html", context)
+def gui(request):
+    context = {}
+    return render(request, '/vkt/gui.html', context)
 def get_image(request):
     if request.method == 'POST':
         folder = request.POST.get('folder', '')

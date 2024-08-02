@@ -1,5 +1,7 @@
 const f_sampleSelect = document.getElementById("f_sampleSelect");
+const v_sampleSelect = document.getElementById("v_sampleSelect");
 let sampletextnode;
+let v_sampletextnode;
 // proccess button click
 async function processbtn(event) {
   event.preventDefault();
@@ -42,9 +44,13 @@ function showimage(result) {
     result["adata_results"][0].indexOf(":")
   );
   sampletextnode = document.createTextNode(defaultsample);
+  v_sampletextnode = document.createTextNode(defaultsample);
   const svalue = document.getElementById("sample");
+  const v_svalue = document.getElementById("v_sample");
   svalue.value = defaultsample;
+  v_svalue.value = defaultsample;
   f_sampleSelect.insertBefore(sampletextnode, f_sampleSelect.firstChild);
+  v_sampleSelect.insertBefore(v_sampletextnode, v_sampleSelect.firstChild);
 
   for (let i = 0; i < result.adata_results.length; i++) {
     const li = document.createElement("li");
@@ -58,6 +64,7 @@ function showimage(result) {
     ul.appendChild(li);
 
     const sample_ul = document.getElementById("sampleul");
+    const v_sample_ul = document.getElementById("v_sampleul");
     // selection add data
     var sample = result["adata_results"][i].substring(
       0,
@@ -65,18 +72,31 @@ function showimage(result) {
     );
 
     const sample_li = document.createElement("li");
+    const v_sample_li = document.createElement("li");
     sample_li.innerHTML = `
-                <a onclick="sampletextnodefix('${sample}')"
-                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
-            >${sample}</a>
-        `;
+              <a onclick="sampletextnodefix('${sample}')"
+              class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+          >${sample}</a>
+      `;
+    v_sample_li.innerHTML = `
+            <a onclick="v_sampletextnodefix('${sample}')"
+            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+        >${sample}</a>
+    `;
     sample_ul.appendChild(sample_li);
+    v_sample_ul.appendChild(v_sample_li);
+    console.log(sample_ul);
   }
   imgbox.appendChild(ul);
 }
 function sampletextnodefix(newText) {
   sampletextnode.nodeValue = newText;
   const sample = document.getElementById("sample");
+  sample.value = newText;
+}
+function v_sampletextnodefix(newText) {
+  v_sampletextnode.nodeValue = newText;
+  const sample = document.getElementById("v_sample");
   sample.value = newText;
 }
 function methodtextnodefix(newText) {
