@@ -3,7 +3,11 @@ let samplemethodtextnode;
 // renameing
 async function grabnames() {
   const csrftoken = getCookie("csrftoken");
-  const grabname_result = await fetchAPI("/api/grabnames", 0, csrftoken);
+  const grabname_result = await fetchAPI(
+    "/api/grabclustersnames",
+    0,
+    csrftoken
+  );
   show_name_table(grabname_result.rename_df);
 }
 function show_name_table(rename_df) {
@@ -22,7 +26,7 @@ function show_name_table(rename_df) {
       <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
         ${i}
       </th>
-      <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap w-1/3" id="currentname_${i}">
+      <td class="px-6 py-4 font-medium text-gray-900 w-1/3" id="currentname_${i}">
         ${rename_df.CurrentName[i]}
       </td>
       <td class="px-6 py-4 w-1/3" id="newname_${i}">${rename_df.NewName[i]}</td>
@@ -58,7 +62,11 @@ async function reanme_confirmbtn() {
   console.log(new_rename_df);
   const csrftoken = getCookie("csrftoken");
   const jsonData = JSON.stringify(new_rename_df);
-  const renameresult = await fetchAPI("/api/rename", jsonData, csrftoken);
+  const renameresult = await fetchAPI(
+    "/api/clusterrename",
+    jsonData,
+    csrftoken
+  );
   loadImage("cluster_result", "clustering_summary.png", "summary-container");
   loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
   loadImage("cluster_result", "clustering_leidens.png", "umap-container");

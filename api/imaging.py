@@ -138,7 +138,7 @@ def summary_cluster(adata):
         # print(summary_df)
     
     return summary_df
-def adding_umap(adata, chosen_markers=None):
+def adding_clusteringumap(adata, chosen_markers=None):
     num_cols = 3
     
     if chosen_markers:
@@ -217,7 +217,7 @@ def summary_phenotype(adata, chosen_adata):
         # print(summary_df)
     
     return summary_df, f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
-def phenotype_result(adata,chosen_adata, n_pcs):
+def phenotype_result(adata, chosen_adata, n_pcs):
     save_dir = os.path.join(settings.MEDIA_ROOT, 'phenotype_result')
     os.makedirs(save_dir, exist_ok=True)
     # Summary表格
@@ -256,4 +256,38 @@ def add_phenotypes_bysample(adata):
         sample_adata = adata[adata.obs['Sample'] == sample]
         sc.pl.umap(sample_adata, color='phenotype', title=f'{sample}', ax=axs[i], show=False)
     plt.tight_layout()
-    plt.savefig(f'clustering_phenotypes_bysample.pdf')
+
+    if settings and hasattr(settings, 'MEDIA_ROOT'):
+        save_dir = os.path.join(settings.MEDIA_ROOT, 'umap_phenotyping')
+    else:
+        save_dir = 'umap_phenotyping'
+    os.makedirs(save_dir, exist_ok=True)
+    
+    save_path = os.path.join(save_dir, 'phenotypes_bysample.png')
+    plt.savefig(save_path)
+    plt.close(fig)
+    
+    return save_path  
+
+def add_phenotypes_markers(adata, chosen_markers):
+    num_cols = 3
+    num_markers = len(chosen_markers)
+    num_rows = np.ceil(num_markers / num_cols).astype(int)
+    fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, 4 * num_rows))
+    axs = axs.flatten()
+    for i, marker in enumerate(chosen_markers):
+        sc.pl.umap(adata, color=marker, title=f'{marker}', ax=axs[i], show=False)  
+    for j in range(i + 1, len(axs)):
+        fig.delaxes(axs[j])
+    plt.tight_layout()
+    if settings and hasattr(settings, 'MEDIA_ROOT'):
+        save_dir = os.path.join(settings.MEDIA_ROOT, 'umap_phenotyping')
+    else:
+        save_dir = 'umap_phenotyping'
+    os.makedirs(save_dir, exist_ok=True)
+    
+    save_path = os.path.join(save_dir, 'phenotypes_markers.png')
+    plt.savefig(save_path)
+    plt.close(fig)
+    
+    return save_path

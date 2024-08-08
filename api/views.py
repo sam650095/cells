@@ -336,7 +336,7 @@ class CLusteringView(APIView):
         
         save_h5ad_file(adata, 'adata_clustering.h5ad')
         return adata
-class PreloadMarkersView(APIView):
+class PreloadClusterMarkersView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_clustering.h5ad')
         marker_list = adata.var_names.tolist()
@@ -353,13 +353,13 @@ class AddUmapClusterView(APIView):
 
     def post_leidens(self, request):
         adata = read_h5ad_file('adata_clustering.h5ad')
-        adding_umap(adata)
+        adding_clusteringumap(adata)
         return Response({"message": "Leidens processed"}, status=status.HTTP_201_CREATED)
 
     def post_markers(self, request):
         adata = read_h5ad_file('adata_clustering.h5ad')
         chosen_method = request.data.getlist('markers')
-        adding_umap(adata, chosen_method)
+        adding_clusteringumap(adata, chosen_method)
         return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)
 class GrabClusterNameView(APIView):
     def post(self, request):
@@ -542,29 +542,86 @@ class PhenotypingView(APIView):
         adata = sm.tl.phenotype_cells(adata, phenotype=phenotype,
                                     label="phenotype", imageid = 'Sample')
         adata, phenotyping_result = phenotype_result(adata, chosen_adata, n_pcs) 
+        
         save_h5ad_file(adata, 'adata_phenotyping.h5ad')
         return phenotyping_result
     
 class AddUmapPhenotypeView(APIView):
     def post(self, request, met):
         if met == 'phenotypes':
-            return self.post_leidens(request)
+            return self.post_phenotypes(request)
         elif met == 'markers':
             return self.post_markers(request)
         else:
             return Response({"error": "Invalid method"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def post_leidens(self, request):
+    def post_phenotypes(self, request):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
-        adding_umap(adata)
-        return Response({"message": "Leidens processed"}, status=status.HTTP_201_CREATED)
+        add_phenotypes_bysample(adata)
+        return Response({"message": "Phenotypes processed"}, status=status.HTTP_201_CREATED)
 
     def post_markers(self, request):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
         chosen_method = request.data.getlist('markers')
-        adding_umap(adata, chosen_method)
+        add_phenotypes_markers(adata, chosen_method)
         return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)
+class PreloadPhenotypesMarkersView(APIView):
+    def post(self, request):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        marker_list = adata.var_names.tolist()
+        marker_list.insert(0,"Select All") 
+        return Response({'marker_list': marker_list}, status=status.HTTP_201_CREATED)
+class GrabPhenotypesNameView(APIView):
+    def post(self, request):
+        rename_df = self.grabnames()
+        return Response({'rename_df': rename_df}, status=status.HTTP_201_CREATED)
+    def grabnames(self):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        columns = ['CurrentName', 'NewName']
+        rename_df = pd.DataFrame(columns=columns)
+        rename_df['CurrentName'] = adata.obs['phenotype'].cat.categories.tolist()
+        rename_df['NewName'] = adata.obs['phenotype'].cat.categories.tolist()
+        return rename_df
+class RenamePhenotypeView(APIView):
+    def post(self, request):
+        data = json.loads(request.body)
+        self.perform_rename_cluster(pd.DataFrame(data))
+        return Response({}, status=status.HTTP_201_CREATED)
+    def perform_rename_cluster(self, rename_df):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        n_pcs = load_data('n_pcs')
 
+        rename_dict = {}
+        for _, row in rename_df.iterrows():
+            current_name = str(row['CurrentName'])
+            new_name = str(row['NewName'])
+            rename_dict[current_name] = new_name
+
+        adata.obs['phenotype'] = adata.obs['phenotype'].astype(str).map(rename_dict).astype('category')
+        chosen_adata = load_data('chosen_adata')
+        n_pcs = load_data('n_pcs')
+        phenotype_result(adata, chosen_adata, n_pcs)
+
+        save_h5ad_file(adata, 'adata_phenotyping.h5ad')
+        return adata
+class GrabDropPhenotypeView(APIView):
+    def post(self, request):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        drop_list = adata.obs['phenotype'].cat.categories.tolist()
+        return Response({'drop_list': drop_list}, status=status.HTTP_201_CREATED)
+    
+class DropPhenotypeView(APIView):
+    def post(self, request):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        drop_groups = request.data.getlist('drops')
+        adata = sm.hl.dropFeatures(adata, drop_groups=drop_groups, groups_column='phenotype', subset_raw=False)
+        chosen_adata = load_data('chosen_adata')
+        n_pcs = load_data('n_pcs')
+        phenotype_result(adata, chosen_adata, n_pcs)
+
+        save_h5ad_file(adata, 'adata_phenotyping.h5ad')
+        return Response({'message': 'drop phenotype successfully!'}, status=status.HTTP_201_CREATED)
+  
 # Spatial Analysis
 class PreloadSpatialAnalysisView(APIView):
     def post(self, request):

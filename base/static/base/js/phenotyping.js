@@ -42,7 +42,61 @@ async function processbtn(event) {
     "phenotyping_ranking.png",
     "p-ranking-container"
   );
+  // Preload Markers
+  const preloadmerkersresult = await fetchAPI(
+    "/api/preloadclustermarkers",
+    formData,
+    csrftoken
+  );
+  console.log(preloadmerkersresult);
+  // Insert markers options
+  insert_marker_options(preloadmerkersresult.marker_list);
   document.getElementById("btnbox").classList.remove("hidden");
   document.getElementById("imgbox").classList.remove("hidden");
   document.getElementById("nextbtn").classList.remove("hidden");
+}
+
+async function addphenotypes() {
+  const csrftoken = getCookie("csrftoken");
+  const addphenotypesresult = await fetchAPI(
+    "/api/addumapphenotype/phenotypes",
+    0,
+    csrftoken
+  );
+  console.log(addphenotypesresult);
+  // add to container
+  loadImage(
+    "umap_phenotyping",
+    "phenotypes_bysample.png",
+    "addphenotypes-container"
+  );
+}
+async function addmarkers() {
+  const csrftoken = getCookie("csrftoken");
+
+  const form = document.getElementById("markerform");
+
+  const formData = new FormData(form);
+
+  const selectedCheckboxes = document.querySelectorAll(
+    ".marker-checkbox:checked"
+  );
+  const selectedMarkers = Array.from(selectedCheckboxes)
+    .map((checkbox) => checkbox.value)
+    .filter((value) => value !== "Select All");
+
+  selectedMarkers.forEach((marker) => {
+    formData.append("markers", marker);
+  });
+  const addleidensresult = await fetchAPI(
+    "/api/addumapphenotype/markers",
+    formData,
+    csrftoken
+  );
+  console.log(addleidensresult);
+  loadImage(
+    "umap_phenotyping",
+    "phenotypes_markers.png",
+    "addmarkers-container"
+  );
 }

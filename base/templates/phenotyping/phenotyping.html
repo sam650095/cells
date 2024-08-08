@@ -47,6 +47,7 @@
     class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
     data-modal-target="rename-modal"
     data-modal-toggle="rename-modal"
+    onclick="grabnames()"
   >
     Rename Phenotyping
   </button>
@@ -54,6 +55,7 @@
     class="rounded-md bg-gray-400 py-2 px-4 text-white text-sm font-semibold my-3 mx-2"
     data-modal-target="dropphenotype-modal"
     data-modal-toggle="dropphenotype-modal"
+    onclick="grabdropphenotype()"
   >
     Drop Phenotypes
   </button>
@@ -69,6 +71,7 @@
       data-tabs-inactive-classes="text-gray-500 hover:text-gray-600 border-gray-100 hover:border-gray-300"
       role="tablist"
     >
+      <!-- summary -->
       <li class="me-2" role="presentation">
         <button
           class="inline-block p-4 border-b-2 rounded-t-lg text-base"
@@ -82,6 +85,7 @@
           Summary
         </button>
       </li>
+      <!-- umap -->
       <li class="me-2" role="presentation">
         <button
           class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
@@ -95,6 +99,7 @@
           Umap
         </button>
       </li>
+      <!-- ranking -->
       <li class="me-2" role="presentation">
         <button
           class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
@@ -108,7 +113,8 @@
           Ranking
         </button>
       </li>
-      <li role="presentation">
+      <!-- heatmap -->
+      <li class="me-2" role="presentation">
         <button
           class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
           id="heatmap-styled-tab"
@@ -123,7 +129,9 @@
       </li>
     </ul>
   </div>
+
   <div id="default-styled-tab-content">
+    <!-- summarytab -->
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
       id="styled-summary"
@@ -136,8 +144,9 @@
         </ul>
       </div>
     </div>
+    <!-- umap tab -->
     <div
-      class="hidden p-4 rounded-lg bg-gray-50"
+      class="hidden p-4 rounded-lg bg-gray-50 max-h-[64rem] overflow-y-auto"
       id="styled-umap"
       role="tabpanel"
       aria-labelledby="umap-tab"
@@ -164,8 +173,8 @@
             <div class="flex items-center my-2">
               <label for="Addmarkers" class="w-1/2 mr-2">Add Markers </label>
               <button
-                name="pca_markers"
-                id="pca_markers"
+                name="phenotype_markers"
+                id="phenotype_markers"
                 data-dropdown-toggle="dropdownmarkers"
                 class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
               >
@@ -219,7 +228,10 @@
           </li>
         </ul>
       </div>
+      <div id="addphenotypes-container"></div>
+      <div id="addmarkers-container"></div>
     </div>
+    <!-- ranking tab -->
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
       id="styled-ranking"
@@ -228,6 +240,7 @@
     >
       <div id="p-ranking-container"></div>
     </div>
+    <!-- heatmap tab -->
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
       id="styled-heatmap"
@@ -260,7 +273,7 @@
       <div
         class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
       >
-        <h3 class="text-xl font-semibold text-gray-900">Rename Clusters</h3>
+        <h3 class="text-xl font-semibold text-gray-900">Rename Phenotypes</h3>
         <button
           type="button"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
@@ -292,7 +305,8 @@
           <div>
             <div class="flex items-center my-2 gap-5">
               <span class="font-bold text-gray-500"
-                >Please rename clusters by editing the 'New Name' columns below:
+                >Please rename phenotypes by editing the 'New Name' columns
+                below:
               </span>
             </div>
 
@@ -345,7 +359,7 @@
       <div
         class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
       >
-        <h3 class="text-xl font-semibold text-gray-900">dropphenotypes</h3>
+        <h3 class="text-xl font-semibold text-gray-900">Drop Phenotypes</h3>
         <button
           type="button"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
@@ -378,8 +392,7 @@
             <label
               for="divide_dropphenotype"
               class="text-base leading-relaxed text-gray-500"
-              >Please select the clusters you want to divide into smaller
-              dropphenotypes:
+              >Please enter the phenotype to drop:
             </label>
             <button
               name="divide_dropphenotype"
@@ -407,28 +420,14 @@
             </button>
             <div
               id="divide_dropphenotype_dropdown"
-              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 h-72 overflow-y-auto"
             >
               <ul
-                class="py-2 text-sm text-gray-700"
+                class="p-3 space-y-1 text-sm text-gray-700"
                 id="dropphenotypeul"
                 aria-labelledby="divide_dropphenotype"
               ></ul>
             </div>
-          </div>
-
-          <div class="flex items-center my-2 gap-5">
-            <label
-              for="resolution"
-              class="text-base leading-relaxed text-gray-500"
-              >Please enter the resolution:</label
-            >
-            <input
-              type="number"
-              name="resolution"
-              id="resolution"
-              class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
-            />
           </div>
         </form>
         <div class="text-right my-2">
@@ -439,7 +438,7 @@
             data-modal-hide="dropphenotype-modal"
             class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
           >
-            Confirm
+            Drop
           </button>
         </div>
       </div>
@@ -448,4 +447,5 @@
 </div>
 
 <script src="{% static 'base/js/phenotyping.js'%}"></script>
+<script src="{% static 'base/js/phenotyping_modal.js'%}"></script>
 {%endblock%}
