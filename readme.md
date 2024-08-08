@@ -76,21 +76,18 @@
         sudo apt-get install redis
         ```
 
-     3. 啟動 redis
-
-        ```sh
-        sudo service redis-server start
-        ```
-
 4. 執行專案
 
-   ```sh
-   python manage.py runserver # 開啟 http://localhost:8000
+   - 這兩個必須同時啟動
+     啟動 redis & 啟動 Django
+
+   ```
+   sudo service redis-server start
+   python manage.py runserver
    ```
 
-- 這兩個必須同時啟動
+   - 或者只執行
 
-  ```
-  sudo service redis-server start
-  python manage.py runserver
-  ```
+   ```
+   python run.py
+   ```
