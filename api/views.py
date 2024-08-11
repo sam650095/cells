@@ -538,7 +538,9 @@ class PhenotypingView(APIView):
         chosen_adata = load_data('chosen_adata')
         n_pcs = load_data('n_pcs')
         adata = sm.pp.rescale(adata, gate = gate_df, imageid = 'Sample', method = 'by_image')
-        phenotype = pd.read_csv(file_path)
+        print('test')
+        phenotype = pd.read_csv(file_path, encoding='utf-8')
+        print('test2')
         adata = sm.tl.phenotype_cells(adata, phenotype=phenotype,
                                     label="phenotype", imageid = 'Sample')
         adata, phenotyping_result = phenotype_result(adata, chosen_adata, n_pcs) 

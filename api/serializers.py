@@ -12,7 +12,7 @@ class FileUploadSerializer(serializers.Serializer):
         elif file.name.endswith('signal_value.csv'):
             target_dir = 'signal_value'
         else:
-            raise serializers.ValidationError('Invalid Fiile Name')
+            raise serializers.ValidationError('Invalid File Name')
 
         target_path = os.path.join(settings.MEDIA_ROOT,'tempfile', target_dir)
         if not os.path.exists(target_path):

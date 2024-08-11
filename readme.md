@@ -1,35 +1,42 @@
 # Django Project
 
-## 需求
+### Url
+
+1. Frontend Slides: https://docs.google.com/presentation/d/1e6EwQYKyvkKRE1Z1Q--5is8NDSv-8fH3/edit#slide=id.p23
+2. Backend Codes: https://github.com/sherry-1230/Single-Cell-Analysis/blob/main/%24final.html
+
+## Versions
 
 - Python 3.8
 
-## 安裝
+## Installations
 
-1. 虛擬環境：
+1. Create Virtual Environment
+   ##### miniconda3
+   https://docs.anaconda.com/miniconda/
 
    ```sh
    conda create --name CellsProjectenv python=3.8
    conda activate CellsProjectenv
    ```
 
-2. 安裝必要套件:
+2. Install Requirements:
 
-   ### 只能執行到 00 Preprocessing
+   ### Install Requirements
 
    ```sh
    pip install -r requirements.txt
    ```
 
-   ### 如果下載有誤，請先打上
+   ### You mighht need before install requirements.txt
 
-   - MacOS
+   - In MacOS
 
    ```sh
    export PYTHONUTF8=1
    ```
 
-   - Windows
+   - In Windows
 
    ```sh
    $env:PYTHONUTF8 = 1
@@ -39,8 +46,6 @@
 
    - MacOS
 
-     ##### 如果先前 install requiremnents.txt 是正常，那只要執行以下就不會有意外。
-
      ```sh
      redis-server
      ```
@@ -48,8 +53,10 @@
      ##### # 如果看到這個 port 有被使用
 
      ```sh
-     lsof -i :6379 # 查看port 6379的使用情形
-     kill -9 <PID> # 將上面指令看到的PID一欄的數字填上
+     sudo lsof -i :6379 # 查看port 6379的使用情形
+     sudo kill -9 <PID> # 將上面指令看到的PID一欄的數字填上
+     sudo systemctl status redis
+     sudo systemctl stop redis
      ```
 
    - Windows
@@ -84,10 +91,4 @@
    ```
    sudo service redis-server start
    python manage.py runserver
-   ```
-
-   - 或者只執行
-
-   ```
-   python run.py
    ```
