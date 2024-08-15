@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('clear', views.ClearAllDataView.as_view(),name='clear data'),
+
     # preprocessing
     path('upload', views.FileUploadView.as_view(), name='file-upload'),
     path('qualitycontrol', views.QualityControlView.as_view(), name='qualicty-control'),
@@ -11,7 +12,8 @@ urlpatterns = [
     path('confirm', views.ConfirmView.as_view(), name="confirm-filter"),
     path('normal', views.NormalizationView.as_view(), name="normalize"),
     path('merge', views.MergeView.as_view(), name="merged-data"),
-    # phenotypeing
+
+    # clustering
     path('preloadpca', views.PreloadPCAView.as_view(), name="PreloadPCA"),
     path('pca', views.PCAView.as_view(), name="PCA"),
     path('preloadclustering', views.PreloadCLusteringView.as_view(), name="PreloadClustering"),
@@ -25,6 +27,7 @@ urlpatterns = [
     path('preloadsubset', views.PreloadSubsetView.as_view(), name="preloadsubset"),
     path('grabclustersubset', views.GrabClusterSubsetView.as_view(), name="grabclustersubset"),
     path('subset', views.SubsetView.as_view(), name="subset"),
+
     # phenotyping
     path('preloadidentifythegates', views.PreloadIdentifytheGatesView.as_view(), name="preloadidentifythegates"),
     path('choseadata', views.ChosenAdataResultView.as_view(),name="choseadata"),
@@ -36,5 +39,9 @@ urlpatterns = [
     path('grabphenotypesnames', views.GrabPhenotypesNameView.as_view(), name="grabphenotypesname"),
     path('phenotyperename', views.RenamePhenotypeView.as_view(), name="phenotyperename"),
     path('grabdropphenotype', views.GrabDropPhenotypeView.as_view(), name="grabdropphenotype"),
-    path('dropphenotype', views.DropPhenotypeView.as_view(), name="dropphenotype")
+    path('dropphenotype', views.DropPhenotypeView.as_view(), name="dropphenotype"),
+
+    # cells interaction
+    path('preloadspatialanalysis', views.PreloadSpatialAnalysisView.as_view(), name="preloadspatialanalysis"),
+    path('spatialanalysis', views.SpatialAnalysisView.as_view(), name="spatialanalysis")
 ]

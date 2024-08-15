@@ -1,6 +1,9 @@
 {%extends "base.html"%} {% load static %} {%block content%}
 <!-- main -->
 <div class="mb-3 text-gray-900">
+  <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
+    <li id="preloadresult"></li>
+  </ul>
   Distance Measurement
   <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
     <li>
@@ -39,14 +42,14 @@
       <li class="me-2" role="presentation">
         <button
           class="inline-block p-4 border-b-2 rounded-t-lg text-base"
-          id="summary-styled-tab"
-          data-tabs-target="#styled-summary"
+          id="distances-heatmap-styled-tab"
+          data-tabs-target="#styled-distances-heatmap"
           type="button"
           role="tab"
-          aria-controls="summary"
+          aria-controls="distances-heatmap"
           aria-selected="false"
         >
-          Heatmap
+          Distances Heatmap
         </button>
       </li>
       <li class="me-2" role="presentation">
@@ -66,14 +69,14 @@
       <li role="presentation">
         <button
           class="inline-block p-4 border-b-2 rounded-t-lg text-base hover:text-gray-600 hover:border-gray-300"
-          id="heatmap-styled-tab"
-          data-tabs-target="#styled-heatmap"
+          id="interactions_heatmap-styled-tab"
+          data-tabs-target="#styled-interactions_heatmap"
           type="button"
           role="tab"
-          aria-controls="heatmap"
+          aria-controls="interactions_heatmap"
           aria-selected="false"
         >
-          Heatmap
+          Interactions Heatmap
         </button>
       </li>
       <li class="me-2" role="presentation">
@@ -94,14 +97,81 @@
   <div id="default-styled-tab-content">
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
-      id="styled-summary"
+      id="styled-distances-heatmap"
       role="tabpanel"
-      aria-labelledby="summary-tab"
+      aria-labelledby="distances-heatmap-tab"
     >
-      <div id="summary-container" class="flex gap-5">
-        <img src="/media/coverimage/coverimage1.png" alt="" class="w-2/5" />
-        <img src="/media/coverimage/coverimage2.png" alt="" class="w-2/5" />
+      <!-- conditioner -->
+      <div>
+        <!-- dropdown -->
+        <button
+          name="DH_dp_btn"
+          id="DH_dp_btn"
+          data-dropdown-toggle="DH_dp"
+          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        >
+          &nbsp
+          <svg
+            class="w-2.5 h-2.5 ms-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        <!-- Dropdown menu -->
+        <div
+          id="DH_dp"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+        >
+          <form id="DH_form">
+            <ul class="p-3 space-y-1 text-sm text-gray-700">
+              <li>
+                <div class="flex p-2 rounded hover:bg-gray-100">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="DH_phenotypes"
+                      type="checkbox"
+                      class="drop-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                  </div>
+                  <div class="ms-2 text-sm w-full">
+                    <label for="DH_phenotypes" class="font-bold text-gray-900">
+                      <div>PHENOTYPES</div>
+                    </label>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="flex p-2 rounded hover:bg-gray-100">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="DH_leidenr"
+                      type="checkbox"
+                      class="drop-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                  </div>
+                  <div class="ms-2 text-sm w-full">
+                    <label for="DH_leidenr" class="font-bold text-gray-900">
+                      <div>LEIDEN_R</div>
+                    </label>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </form>
+        </div>
       </div>
+      <!-- img -->
+      <div id="distances-heatmap-container" class="flex gap-5"></div>
     </div>
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
@@ -109,20 +179,151 @@
       role="tabpanel"
       aria-labelledby="numeric_plot-tab"
     >
-      <div id="numeric_plot-container" class="flex gap-5">
-        <span>No image found. Might be something got wrong.</span>
-        <img src="/media/coverimage/coverimage3.png" alt="" class="w-2/5" />
+      <!-- conditioner -->
+      <div>
+        <!-- dropdown -->
+        <button
+          name="NP_dp_btn"
+          id="NP_dp_btn"
+          data-dropdown-toggle="NP_dp"
+          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        >
+          &nbsp
+          <svg
+            class="w-2.5 h-2.5 ms-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        <button
+          name="NPD_dp_btn"
+          id="NPD_dp_btn"
+          data-dropdown-toggle="NPD_dp"
+          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        >
+          &nbsp
+          <svg
+            class="w-2.5 h-2.5 ms-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        <!-- Dropdown menu -->
+        <div
+          id="NP_dp"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+        >
+          <form id="NP_form">
+            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+          </form>
+        </div>
+        <div
+          id="NPD_dp"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+        >
+          <form id="NPD_form">
+            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+          </form>
+        </div>
       </div>
+      <!-- img -->
+      <div id="numeric_plot-container" class="flex gap-5"></div>
     </div>
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
-      id="styled-heatmap"
+      id="styled-interactions_heatmap"
       role="tabpanel"
-      aria-labelledby="heatmap-tab"
+      aria-labelledby="interactions_heatmap-tab"
     >
-      <div id="heatmap-container">
-        <img src="/media/coverimage/coverimage4.png" alt="" class="w-2/5" />
+      <!-- conditioner -->
+      <div>
+        <!-- dropdown -->
+        <button
+          name="IH_dp_btn"
+          id="IH_dp_btn"
+          data-dropdown-toggle="IH_dp"
+          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        >
+          &nbsp
+          <svg
+            class="w-2.5 h-2.5 ms-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        <button
+          name="IHM_dp_btn"
+          id="IHM_dp_btn"
+          data-dropdown-toggle="IHM_dp"
+          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        >
+          &nbsp
+          <svg
+            class="w-2.5 h-2.5 ms-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        <!-- Dropdown menu -->
+        <div
+          id="IH_dp"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+        >
+          <form id="IH_form">
+            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+          </form>
+        </div>
+        <div
+          id="IHM_dp"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+        >
+          <form id="IHM_form">
+            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+          </form>
+        </div>
       </div>
+      <!-- img -->
+      <div id="interactions_heatmap-container"></div>
     </div>
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
@@ -130,9 +331,44 @@
       role="tabpanel"
       aria-labelledby="voronoi_plot-tab"
     >
-      <div id="voronoi_plot-container">
-        <img src="/media/coverimage/coverimage5.png" alt="" class="w-2/5" />
+      <!-- conditioner -->
+      <div>
+        <!-- dropdown -->
+        <button
+          name="VP_dp_btn"
+          id="VP_dp_btn"
+          data-dropdown-toggle="VP_dp"
+          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        >
+          &nbsp
+          <svg
+            class="w-2.5 h-2.5 ms-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        <!-- Dropdown menu -->
+        <div
+          id="VP_dp"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+        >
+          <form id="VP_form">
+            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+          </form>
+        </div>
       </div>
+      <!-- img -->
+      <div id="voronoi_plot-container"></div>
     </div>
   </div>
 </div>
@@ -147,4 +383,5 @@
 </div>
 
 <script src="{% static 'base/js/spatialanalysis.js'%}"></script>
+<script src="{% static 'base/js/spatialDP.js'%}"></script>
 {%endblock%}

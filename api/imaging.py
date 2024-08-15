@@ -5,6 +5,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import scanpy as sc
+import scimap as sm 
 import matplotlib
 matplotlib.use('Agg')
 
@@ -51,7 +52,6 @@ def plot_clustering_pca(adata):
     plt.savefig(pca_plot_path, bbox_inches='tight')
     plt.close() 
     return 'clustering_pca.jpg'
-
 def clustering_result(adata, npcs):
     if 'leiden_R' not in adata.obs.columns:
         adata.obs['leiden_R'] = adata.obs['leiden']
@@ -268,7 +268,6 @@ def add_phenotypes_bysample(adata):
     plt.close(fig)
     
     return save_path  
-
 def add_phenotypes_markers(adata, chosen_markers):
     num_cols = 3
     num_markers = len(chosen_markers)
@@ -291,3 +290,37 @@ def add_phenotypes_markers(adata, chosen_markers):
     plt.close(fig)
     
     return save_path
+
+# spatial analysis
+def distances_heatmap(adata):
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'spatial_result')
+    os.makedirs(save_dir, exist_ok=True)
+
+    sm.pl.spatial_distance(adata, spatial_distance='spatial_distance_leiden_R', phenotype='leiden_R', imageid='Sample', heatmap_summarize=False)
+    plt.savefig(os.path.join(save_dir, 'distances_heatmap_leiden_R.png'))
+    
+    sm.pl.spatial_distance(adata, spatial_distance='spatial_distance_phenotype', phenotype='phenotype', imageid='Sample', heatmap_summarize=False)
+    plt.savefig(os.path.join(save_dir,'distances_heatmap_phenotype.png'))
+        
+def distances_numeric_plot(adata, chosen_column, chosen_cluster): 
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'spatial_result')
+    os.makedirs(save_dir, exist_ok=True)
+
+    sm.pl.spatial_distance(adata, spatial_distance=f'spatial_distance_{chosen_column}', method='numeric', distance_from=chosen_cluster,
+                           imageid='Sample', phenotype=chosen_column, log=True)
+    plt.savefig(os.path.join(save_dir,f'distances_numeric_plot_{chosen_column}_{chosen_cluster}.png'))
+
+def interactions_heatmap(adata, chosen_column, chosen_method):
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'spatial_result')
+    os.makedirs(save_dir, exist_ok=True)
+    sm.pl.spatial_interaction(adata, p_val=0.05, summarize_plot=True, row_cluster=True,
+                              spatial_interaction=f'spatial_interaction_{chosen_column}_{chosen_method}')
+    plt.savefig(os.path.join(save_dir,f'interactions_heatmap_{chosen_column}_{chosen_method}.png'))
+    
+def interactions_voronoi(adata, chosen_column):
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'spatial_result')
+    os.makedirs(save_dir, exist_ok=True)
+    plt.rcParams['figure.figsize'] = [15, 10]
+    sm.pl.voronoi(adata, color_by=chosen_column, voronoi_edge_color = 'black', voronoi_line_width = 0.3, 
+                  voronoi_alpha = 0.8, size_max=5000, overlay_points=None, plot_legend=True, legend_size=6)
+    plt.savefig(os.path.join(save_dir, f'interactions_voronoi_{chosen_column}.png'))

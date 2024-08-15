@@ -627,15 +627,43 @@ class DropPhenotypeView(APIView):
 # Spatial Analysis
 class PreloadSpatialAnalysisView(APIView):
     def post(self, request):
-        return Response({}, status=status.HTTP_201_CREATED)
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        chosen_adata = load_data('chosen_adata')
+
+        n_obs, n_vars = adata.shape
+        return Response({'preload_result': f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"}, status=status.HTTP_201_CREATED)
 class SpatialAnalysisView(APIView):
     def post(self, request):
-        return Response({}, status=status.HTTP_201_CREATED)
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        columns_list = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
+        default_chosen_column = 'phenotype'
+        cluster_list = adata.obs[default_chosen_column].unique()
+        default_chosen_cluster = "Hepatocyte"
+        method_list = ['radius', 'knn']
+        default_chosen_method = 'radius'
+        
+        for col in columns_list: 
+            sm.tl.spatial_distance(adata, x_coordinate='X_centroid', y_coordinate='Y_centroid', 
+                                phenotype=col, imageid='Sample', label=f'spatial_distance_{col}')
+        
+        for col in columns_list:
+            sm.tl.spatial_interaction(adata, phenotype=col, method='knn', radius=30, 
+                                    imageid='Sample', label=f'spatial_interaction_{col}_knn', pval_method='zscore')
+            sm.tl.spatial_interaction(adata, phenotype=col, method='radius', radius=30, 
+                                    imageid='Sample', label=f'spatial_interaction_{col}_radius', pval_method='zscore')
+        distances_heatmap(adata)
+        distances_numeric_plot(adata, default_chosen_column, default_chosen_cluster)
+        interactions_heatmap(adata, default_chosen_column, default_chosen_method)
+        interactions_voronoi(adata, default_chosen_column)
+        adata.write('adata_spatial_analysis.h5ad') 
+
+        return Response({'cluster_list:',cluster_list, 'method_list:',method_list}, status=status.HTTP_201_CREATED)
     
 # Neighborhood
 class PreloadNeighborView(APIView):
     def post(self, request):
         return Response({}, status=status.HTTP_201_CREATED)
+        
 class NeighborView(APIView):
     def post(self, request):
         return Response({}, status=status.HTTP_201_CREATED)
