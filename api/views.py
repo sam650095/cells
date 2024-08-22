@@ -641,24 +641,54 @@ class SpatialAnalysisView(APIView):
         default_chosen_cluster = "Hepatocyte"
         method_list = ['radius', 'knn']
         default_chosen_method = 'radius'
-        
+
         for col in columns_list: 
             sm.tl.spatial_distance(adata, x_coordinate='X_centroid', y_coordinate='Y_centroid', 
                                 phenotype=col, imageid='Sample', label=f'spatial_distance_{col}')
-        
         for col in columns_list:
             sm.tl.spatial_interaction(adata, phenotype=col, method='knn', radius=30, 
                                     imageid='Sample', label=f'spatial_interaction_{col}_knn', pval_method='zscore')
             sm.tl.spatial_interaction(adata, phenotype=col, method='radius', radius=30, 
                                     imageid='Sample', label=f'spatial_interaction_{col}_radius', pval_method='zscore')
-        distances_heatmap(adata)
+        distances_heatmap(adata, default_chosen_column)
         distances_numeric_plot(adata, default_chosen_column, default_chosen_cluster)
         interactions_heatmap(adata, default_chosen_column, default_chosen_method)
         interactions_voronoi(adata, default_chosen_column)
-        adata.write('adata_spatial_analysis.h5ad') 
+        save_h5ad_file(adata, 'adata_spatial_analysis.h5ad')
 
-        return Response({'cluster_list:',cluster_list, 'method_list:',method_list}, status=status.HTTP_201_CREATED)
-    
+        return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'method_list':method_list}, status=status.HTTP_201_CREATED)
+class AddSpatial(APIView):
+    def post(self, request, met):
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        filename = ''
+        if(met == "DH"):
+            filename = self.post_dh(request)
+        elif(met == "NP"):
+            filename = self.post_np(request)
+        elif(met == "IH"):
+            filename = self.post_ih(request)
+        else:
+            filename = self.post_vp(request)
+        save_h5ad_file(adata, 'adata_spatial_analysis.h5ad')
+
+        return Response({"filename":filename}, status=status.HTTP_201_CREATED)
+    def post_dh(self, request):
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        filename = distances_heatmap(adata, json.loads(request.body).get('dh_ul_input'))
+        return filename
+    def post_np(self, request):
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        filename = distances_numeric_plot(adata, json.loads(request.body).get('np_ul_input'), json.loads(request.body).get('npd_ul_input'))
+        return filename
+    def post_ih(self, request):
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        filename = interactions_heatmap(adata, json.loads(request.body).get('ih_ul_input'), json.loads(request.body).get('ihm_ul_input'))
+        return filename
+    def post_vp(self, request):
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        filename = interactions_voronoi(adata, json.loads(request.body).get('vp_ul_input'))
+        return filename
+
 # Neighborhood
 class PreloadNeighborView(APIView):
     def post(self, request):

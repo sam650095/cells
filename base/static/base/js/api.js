@@ -30,7 +30,8 @@ async function fetchAPI(url, formData, csrftoken) {
 }
 
 // fetching image
-function loadImage(folder, filename, containerId) {
+function loadImage(folder, filename, containerId, refresh = true) {
+  console.log(folder, filename);
   const csrftoken = getCookie("csrftoken");
   fetch("/get_image/", {
     method: "POST",
@@ -45,7 +46,7 @@ function loadImage(folder, filename, containerId) {
     .then((response) => response.json())
     .then((data) => {
       let container = document.getElementById(containerId);
-      containerId.innerHTML = "";
+      if (refresh) containerId.innerHTML = "";
       if (container) {
         if (data.image_path) {
           if (document.getElementById(filename)) {

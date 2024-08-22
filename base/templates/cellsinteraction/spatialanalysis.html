@@ -29,7 +29,7 @@
   </button>
 </div>
 <!-- imgbox -->
-<div id="imgbox" class="hidden">
+<div id="imgbox" class="">
   <div class="mb-4 border-b border-gray-200 mt-5">
     <ul
       class="flex flex-wrap -mb-px text-sm font-medium text-center"
@@ -95,6 +95,7 @@
     </ul>
   </div>
   <div id="default-styled-tab-content">
+    <!-- DH -->
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
       id="styled-distances-heatmap"
@@ -108,9 +109,10 @@
           name="DH_dp_btn"
           id="DH_dp_btn"
           data-dropdown-toggle="DH_dp"
-          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+          class="mb-5 mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
         >
-          &nbsp
+          <span id="dh_ul_select">phenotype</span>
+          <input type="hidden" value="phenotype" id="dh_ul_input" />
           <svg
             class="w-2.5 h-2.5 ms-3"
             aria-hidden="true"
@@ -130,49 +132,29 @@
         <!-- Dropdown menu -->
         <div
           id="DH_dp"
-          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
         >
-          <form id="DH_form">
-            <ul class="p-3 space-y-1 text-sm text-gray-700">
-              <li>
-                <div class="flex p-2 rounded hover:bg-gray-100">
-                  <div class="flex items-center h-5">
-                    <input
-                      id="DH_phenotypes"
-                      type="checkbox"
-                      class="drop-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                    />
-                  </div>
-                  <div class="ms-2 text-sm w-full">
-                    <label for="DH_phenotypes" class="font-bold text-gray-900">
-                      <div>PHENOTYPES</div>
-                    </label>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="flex p-2 rounded hover:bg-gray-100">
-                  <div class="flex items-center h-5">
-                    <input
-                      id="DH_leidenr"
-                      type="checkbox"
-                      class="drop-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                    />
-                  </div>
-                  <div class="ms-2 text-sm w-full">
-                    <label for="DH_leidenr" class="font-bold text-gray-900">
-                      <div>LEIDEN_R</div>
-                    </label>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </form>
+          <ul
+            class="py-2 text-sm text-gray-700 dark:text-gray-200"
+            id="dh_ul"
+            aria-labelledby="DH_dp_btn"
+          ></ul>
         </div>
+        <button
+          class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+          id="DH_btn"
+          onclick="addbtn('DH')"
+        >
+          Add
+        </button>
       </div>
       <!-- img -->
-      <div id="distances-heatmap-container" class="flex gap-5"></div>
+      <div
+        id="distances-heatmap-container"
+        class="grid grid-cols-1 sm:grid-cols-2 auto-rows-auto gap-5"
+      ></div>
     </div>
+    <!-- NP -->
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
       id="styled-numeric_plot"
@@ -186,9 +168,10 @@
           name="NP_dp_btn"
           id="NP_dp_btn"
           data-dropdown-toggle="NP_dp"
-          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+          class="mb-5 mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
         >
-          &nbsp
+          <span id="np_ul_select">phenotype</span>
+          <input type="hidden" value="phenotype" id="np_ul_input" />
           <svg
             class="w-2.5 h-2.5 ms-3"
             aria-hidden="true"
@@ -205,13 +188,15 @@
             />
           </svg>
         </button>
+        Distance From =
         <button
           name="NPD_dp_btn"
           id="NPD_dp_btn"
           data-dropdown-toggle="NPD_dp"
-          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+          class="mb-5 mr-5 p-3 w-48 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
         >
-          &nbsp
+          <span id="npd_ul_select">&nbsp</span>
+          <input type="hidden" value="phenotype" id="npd_ul_input" />
           <svg
             class="w-2.5 h-2.5 ms-3"
             aria-hidden="true"
@@ -231,24 +216,43 @@
         <!-- Dropdown menu -->
         <div
           id="NP_dp"
-          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
         >
           <form id="NP_form">
-            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+            <ul
+              class="py-2 text-sm text-gray-700 dark:text-gray-200"
+              id="np_ul"
+              aria-labelledby="NP_dp_btn"
+            ></ul>
           </form>
         </div>
         <div
           id="NPD_dp"
-          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-52 overflow-y-auto max-h-72"
         >
           <form id="NPD_form">
-            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+            <ul
+              class="py-2 text-sm text-gray-700 dark:text-gray-200"
+              id="npd_ul"
+              aria-labelledby="NPD_dp_btn"
+            ></ul>
           </form>
         </div>
+        <button
+          class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+          id="NP_btn"
+          onclick="addbtn('NP')"
+        >
+          Add
+        </button>
       </div>
       <!-- img -->
-      <div id="numeric_plot-container" class="flex gap-5"></div>
+      <div
+        id="numeric-plot-container"
+        class="grid grid-cols-1 sm:grid-cols-2 auto-rows-auto gap-5"
+      ></div>
     </div>
+    <!-- IH -->
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
       id="styled-interactions_heatmap"
@@ -262,9 +266,10 @@
           name="IH_dp_btn"
           id="IH_dp_btn"
           data-dropdown-toggle="IH_dp"
-          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+          class="mb-5 mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
         >
-          &nbsp
+          <span id="ih_ul_select">phenotype</span>
+          <input type="hidden" value="phenotype" id="ih_ul_input" />
           <svg
             class="w-2.5 h-2.5 ms-3"
             aria-hidden="true"
@@ -285,9 +290,10 @@
           name="IHM_dp_btn"
           id="IHM_dp_btn"
           data-dropdown-toggle="IHM_dp"
-          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+          class="mb-5 mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
         >
-          &nbsp
+          <span id="ihm_ul_select">&nbsp</span>
+          <input type="hidden" value="phenotype" id="ihm_ul_input" />
           <svg
             class="w-2.5 h-2.5 ms-3"
             aria-hidden="true"
@@ -307,24 +313,43 @@
         <!-- Dropdown menu -->
         <div
           id="IH_dp"
-          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
         >
           <form id="IH_form">
-            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+            <ul
+              class="py-2 text-sm text-gray-700 dark:text-gray-200"
+              id="ih_ul"
+              aria-labelledby="IH_dp_btn"
+            ></ul>
           </form>
         </div>
         <div
           id="IHM_dp"
-          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
         >
           <form id="IHM_form">
-            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+            <ul
+              class="py-2 text-sm text-gray-700 dark:text-gray-200"
+              id="ihm_ul"
+              aria-labelledby="IHM_dp_btn"
+            ></ul>
           </form>
         </div>
+        <button
+          class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+          id="IH_btn"
+          onclick="addbtn('IH')"
+        >
+          Add
+        </button>
       </div>
       <!-- img -->
-      <div id="interactions_heatmap-container"></div>
+      <div
+        id="interactions-heatmap-container"
+        class="grid grid-cols-1 sm:grid-cols-2 auto-rows-auto gap-5"
+      ></div>
     </div>
+    <!-- VP -->
     <div
       class="hidden p-4 rounded-lg bg-gray-50"
       id="styled-voronoi_plot"
@@ -338,9 +363,10 @@
           name="VP_dp_btn"
           id="VP_dp_btn"
           data-dropdown-toggle="VP_dp"
-          class="mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+          class="mb-5 mr-5 p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
         >
-          &nbsp
+          <span id="vp_ul_select">phenotype</span>
+          <input type="hidden" value="phenotype" id="vp_ul_input" />
           <svg
             class="w-2.5 h-2.5 ms-3"
             aria-hidden="true"
@@ -360,15 +386,29 @@
         <!-- Dropdown menu -->
         <div
           id="VP_dp"
-          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 max-h-72 overflow-y-auto"
+          class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
         >
           <form id="VP_form">
-            <ul class="p-3 space-y-1 text-sm text-gray-700"></ul>
+            <ul
+              class="py-2 text-sm text-gray-700 dark:text-gray-200"
+              id="vp_ul"
+              aria-labelledby="VP_dp_btn"
+            ></ul>
           </form>
         </div>
+        <button
+          class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+          id="VP_btn"
+          onclick="addbtn('VP')"
+        >
+          Add
+        </button>
       </div>
       <!-- img -->
-      <div id="voronoi_plot-container"></div>
+      <div
+        id="voronoi-plot-container"
+        class="grid grid-cols-1 sm:grid-cols-2 auto-rows-auto gap-5"
+      ></div>
     </div>
   </div>
 </div>

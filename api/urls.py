@@ -43,5 +43,6 @@ urlpatterns = [
 
     # cells interaction
     path('preloadspatialanalysis', views.PreloadSpatialAnalysisView.as_view(), name="preloadspatialanalysis"),
-    path('spatialanalysis', views.SpatialAnalysisView.as_view(), name="spatialanalysis")
+    path('spatialanalysis', views.SpatialAnalysisView.as_view(), name="spatialanalysis"),
+    path('addspatial/<str:met>', views.AddSpatial.as_view(), name="addspatial")
 ]

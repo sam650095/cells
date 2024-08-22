@@ -22,4 +22,58 @@ async function processbtn(event) {
   toggleLoading(false, "processbutton");
   document.getElementById("imgbox").classList.remove("hidden");
   document.getElementById("nextbtn").classList.remove("hidden");
+
+  // show dropdown menu
+  adddp(
+    spatialanalysis_results["columns_list"],
+    spatialanalysis_results["cluster_list"],
+    spatialanalysis_results["method_list"]
+  );
+  // show image
+  addimg();
+}
+
+async function addbtn(m) {
+  const csrftoken = getCookie("csrftoken");
+
+  let data;
+  let container;
+  if (m == "DH") {
+    const dh_ul_input = document.getElementById("dh_ul_input").value;
+    container = "distances-heatmap-container";
+    data = {
+      dh_ul_input: dh_ul_input,
+    };
+  } else if (m == "NP") {
+    const np_ul_input = document.getElementById("np_ul_input").value;
+    const npd_ul_input = document.getElementById("npd_ul_input").value;
+    container = "numeric-plot-container";
+    data = {
+      np_ul_input: np_ul_input,
+      npd_ul_input: npd_ul_input,
+    };
+  } else if (m == "IH") {
+    const ih_ul_input = document.getElementById("ih_ul_input").value;
+    const ihm_ul_input = document.getElementById("ihm_ul_input").value;
+    container = "interactions-heatmap-container";
+    data = {
+      ih_ul_input: ih_ul_input,
+      ihm_ul_input: ihm_ul_input,
+    };
+  } else if (m == "VP") {
+    const vp_ul_input = document.getElementById("vp_ul_input").value;
+    container = "voronoi-plot-container";
+    data = {
+      vp_ul_input: vp_ul_input,
+    };
+  }
+  toggleLoading(true, m + "_btn");
+  const rslt = await fetchAPI(
+    `/api/addspatial/${m}`,
+    JSON.stringify(data),
+    csrftoken
+  );
+  console.log(rslt);
+  toggleLoading(false, m + "_btn");
+  loadImage("spatial_result", rslt["filename"], container, false);
 }

@@ -15,7 +15,7 @@
   <body class="bg-slate-100 overflow-x-hidden overflow-y-auto">
     <main class="h-screen w-screen">
       <div class="flex md:flex-row flex-col-reverse">
-        <div class="basis-3/4 p-16">
+        <div class="basis-3/4 py-16 px-32">
           <div
             class="mb-4 text-3xl font-extrabold leading-none tracking-tight text-gray-900"
           >
@@ -23,7 +23,7 @@
           </div>
           {% block content %} {% endblock %}
         </div>
-        <div class="basis-1/4 p-5">{%include "nav.html"%}</div>
+        <div class="basis-1/4 px-5 py-16">{%include "nav.html"%}</div>
       </div>
     </main>
 
