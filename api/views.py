@@ -692,7 +692,10 @@ class AddSpatial(APIView):
 # Neighborhood
 class PreloadNeighborView(APIView):
     def post(self, request):
-        return Response({}, status=status.HTTP_201_CREATED)
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        n_obs, n_vars = adata.shape
+        chosen_adata = load_data('chosen_adata')
+        return Response({"preload_result":f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"}, status=status.HTTP_201_CREATED)
         
 class NeighborView(APIView):
     def post(self, request):

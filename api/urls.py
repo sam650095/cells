@@ -44,5 +44,8 @@ urlpatterns = [
     # cells interaction
     path('preloadspatialanalysis', views.PreloadSpatialAnalysisView.as_view(), name="preloadspatialanalysis"),
     path('spatialanalysis', views.SpatialAnalysisView.as_view(), name="spatialanalysis"),
-    path('addspatial/<str:met>', views.AddSpatial.as_view(), name="addspatial")
+    path('addspatial/<str:met>', views.AddSpatial.as_view(), name="addspatial"),
+    
+    # neighbor
+    path('preloadneighbor', views.PreloadNeighborView.as_view(), name="preloadneighbor")
 ]
