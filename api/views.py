@@ -538,9 +538,9 @@ class PhenotypingView(APIView):
         chosen_adata = load_data('chosen_adata')
         n_pcs = load_data('n_pcs')
         adata = sm.pp.rescale(adata, gate = gate_df, imageid = 'Sample', method = 'by_image')
-        print('test')
+
         phenotype = pd.read_csv(file_path, encoding='utf-8')
-        print('test2')
+
         adata = sm.tl.phenotype_cells(adata, phenotype=phenotype,
                                     label="phenotype", imageid = 'Sample')
         adata, phenotyping_result = phenotype_result(adata, chosen_adata, n_pcs) 
@@ -638,7 +638,7 @@ class SpatialAnalysisView(APIView):
         columns_list = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
         default_chosen_column = 'phenotype'
         cluster_list = adata.obs[default_chosen_column].unique()
-        default_chosen_cluster = "Hepatocyte"
+        default_chosen_cluster = cluster_list[0]
         method_list = ['radius', 'knn']
         default_chosen_method = 'radius'
 

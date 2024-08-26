@@ -28,7 +28,34 @@ async function fetchAPI(url, formData, csrftoken) {
   }
   return response.json();
 }
-
+function downloadImages(folder) {
+  const csrftoken = getCookie("csrftoken");
+  fetch("/download_image/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-CSRFToken": csrftoken,
+    },
+    body: `folder=${encodeURIComponent(folder)}`,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if (data.image_paths) {
+        data.image_paths.forEach((imagePath, index) => {
+          setTimeout(() => {
+            const link = document.createElement("a");
+            link.href = imagePath;
+            link.download = imagePath.split("/").pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }, index * 1000);
+        });
+      }
+    })
+    .catch((error) => console.error("Error:", error));
+}
 // fetching image
 function loadImage(folder, filename, containerId, refresh = true) {
   console.log(folder, filename);

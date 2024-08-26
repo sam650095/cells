@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
 import os
@@ -9,9 +8,7 @@ def index(request):
 def page(request, process, method):
     context = {'process': process, 'method': method}
     return render(request, f"{process}/{method}.html", context)
-def gui(request):
-    context = {}
-    return render(request, '/vkt/gui.html', context)
+
 def get_image(request):
     if request.method == 'POST':
         folder = request.POST.get('folder', '')
@@ -29,3 +26,16 @@ def get_image(request):
             return JsonResponse({'error': 'File not found'}, status=404)
     
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+def download_images(request):
+    folder = request.POST.get('folder', '')
+    print(folder)
+    folder_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, folder))
+    if not folder_path.startswith(settings.MEDIA_ROOT):
+        return JsonResponse({'error': 'Invalid path'}, status=400)
+    
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        image_files = [f for f in os.listdir(folder_path) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        image_paths = [os.path.join(settings.MEDIA_URL, folder, f) for f in image_files]
+        return JsonResponse({'image_paths': image_paths})
+    else:
+        return JsonResponse({'error': 'Folder not found'}, status=404)

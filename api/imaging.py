@@ -368,9 +368,12 @@ def preprocessing(adata, chosen_column, k):
     clustering_columns = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
     neigberhood_df = adata.obs[['X_centroid', 'Y_centroid', 'Sample'] + clustering_columns] 
     neigberhood_df.to_csv('neigberhood_data.csv')
-
+    k = int(k)
     n_neighbors = k
-    path_to_data = 'neigberhood_data.csv'
+    path = os.path.join(settings.MEDIA_ROOT, 'tempfile/neighbor')
+    os.makedirs(path, exist_ok=True)
+    path_to_data = os.path.join(path,'neigberhood_data.csv')
+
     X = 'X_centroid'
     Y = 'Y_centroid'
     reg = 'Sample' 
@@ -407,7 +410,8 @@ def perform_neighborhoods(adata, chosen_column, k, n_neighborhoods):
     windows, sum_cols, cells, values, reg = preprocessing(adata, chosen_column, k)
     neighborhood_name = "neighborhood" + str(k)
     k_centroids = {}  
-
+    k = int(k)
+    n_neighborhoods = int(n_neighborhoods)
     windows2 = windows[k] 
     km = MiniBatchKMeans(n_clusters=n_neighborhoods, random_state=0) 
     labelskm = km.fit_predict(windows2[sum_cols].values) 

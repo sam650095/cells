@@ -46,11 +46,11 @@ function showimage(result) {
   sampletextnode = document.createTextNode(defaultsample);
   v_sampletextnode = document.createTextNode(defaultsample);
   const svalue = document.getElementById("sample");
-  const v_svalue = document.getElementById("v_sample");
+  // const v_svalue = document.getElementById("v_sample");
   svalue.value = defaultsample;
-  v_svalue.value = defaultsample;
+  // v_svalue.value = defaultsample;
   f_sampleSelect.insertBefore(sampletextnode, f_sampleSelect.firstChild);
-  v_sampleSelect.insertBefore(v_sampletextnode, v_sampleSelect.firstChild);
+  // v_sampleSelect.insertBefore(v_sampletextnode, v_sampleSelect.firstChild);
 
   for (let i = 0; i < result.adata_results.length; i++) {
     const li = document.createElement("li");
@@ -84,7 +84,7 @@ function showimage(result) {
         >${sample}</a>
     `;
     sample_ul.appendChild(sample_li);
-    v_sample_ul.appendChild(v_sample_li);
+    // v_sample_ul.appendChild(v_sample_li);
     console.log(sample_ul);
   }
   imgbox.appendChild(ul);
