@@ -12,7 +12,9 @@
 ## Installations
 
 1. Create Virtual Environment
+
    ##### miniconda3
+
    https://docs.anaconda.com/miniconda/
 
    ```sh

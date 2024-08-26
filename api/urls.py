@@ -47,5 +47,7 @@ urlpatterns = [
     path('addspatial/<str:met>', views.AddSpatial.as_view(), name="addspatial"),
     
     # neighbor
-    path('preloadneighbor', views.PreloadNeighborView.as_view(), name="preloadneighbor")
+    path('preloadneighbor', views.PreloadNeighborView.as_view(), name="preloadneighbor"),
+    path('neighbor', views.NeighborView.as_view(), name="neighbor")
+
 ]

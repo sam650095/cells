@@ -699,4 +699,9 @@ class PreloadNeighborView(APIView):
         
 class NeighborView(APIView):
     def post(self, request):
-        return Response({}, status=status.HTTP_201_CREATED)
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        chosen_column = json.loads(request.body).get('n_input')
+        k = json.loads(request.body).get('k_neighbor')
+        n_neighborhoods =json.loads(request.body).get('n_neighbor')
+        perform_neighborhoods(adata, chosen_column, k, n_neighborhoods)
+        return Response({"test":"test"}, status=status.HTTP_201_CREATED)

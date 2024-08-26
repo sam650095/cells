@@ -6,6 +6,10 @@ import os
 import matplotlib.pyplot as plt
 import scanpy as sc
 import scimap as sm 
+import time
+from sklearn.neighbors import NearestNeighbors
+from sklearn.cluster import MiniBatchKMeans
+import seaborn as sns
 import matplotlib
 matplotlib.use('Agg')
 
@@ -330,3 +334,102 @@ def interactions_voronoi(adata, chosen_column):
                   voronoi_alpha = 0.8, size_max=5000, overlay_points=None, plot_legend=True, legend_size=6)
     plt.savefig(os.path.join(save_dir, f'interactions_voronoi_{chosen_column}.png'))
     return f'interactions_voronoi_{chosen_column}.png'
+
+
+# neighbor
+def get_windows(job, n_neighbors, tissue_group, exps, X, Y):
+    start_time,idx,tissue_name,indices = job
+    job_start = time.time()
+    
+    print ("Starting:", str(idx+1)+'/'+str(len(exps)),': ' + exps[idx])
+
+    tissue = tissue_group.get_group(tissue_name)
+    to_fit = tissue.loc[indices][[X,Y]].values
+
+    # fit = NearestNeighbors(n_neighbors=n_neighbors+1).fit(tissue[[X,Y]].values)
+    fit = NearestNeighbors(n_neighbors=n_neighbors).fit(tissue[[X,Y]].values)
+    m = fit.kneighbors(to_fit)
+    # m = m[0][:,1:], m[1][:,1:]
+    m = m[0], m[1]
+    
+    # sort_neighbors
+    args = m[0].argsort(axis = 1)
+    add = np.arange(m[1].shape[0])*m[1].shape[1]
+    sorted_indices = m[1].flatten()[args+add[:,None]]
+
+    neighbors = tissue.index.values[sorted_indices]
+   
+    end_time = time.time()
+   
+    print ("Finishing:", str(idx+1)+"/"+str(len(exps)),": "+ exps[idx],end_time-job_start,end_time-start_time)
+    return neighbors.astype(np.int32)
+
+def preprocessing(adata, chosen_column, k):
+    clustering_columns = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
+    neigberhood_df = adata.obs[['X_centroid', 'Y_centroid', 'Sample'] + clustering_columns] 
+    neigberhood_df.to_csv('neigberhood_data.csv')
+
+    n_neighbors = k
+    path_to_data = 'neigberhood_data.csv'
+    X = 'X_centroid'
+    Y = 'Y_centroid'
+    reg = 'Sample' 
+    keep_cols = [X,Y,reg,chosen_column] 
+
+    cells = pd.read_csv(path_to_data)
+    cells = pd.concat([cells, pd.get_dummies(cells[chosen_column])], axis=1)
+    sum_cols = cells[chosen_column].unique()
+    values = cells[sum_cols].values 
+
+    tissue_group = cells[[X, Y, reg]].groupby(reg) 
+    exps = list(cells[reg].unique()) 
+    tissue_chunks = [(time.time(), exps.index(t), t, a) for t, indices in tissue_group.groups.items() for a in
+                     np.array_split(indices, 1)]
+
+    tissues = [get_windows(job, n_neighbors, tissue_group, exps, X, Y) for job in tissue_chunks]
+
+    out_dict = {}
+    for neighbors, job in zip(tissues, tissue_chunks):
+        chunk = np.arange(len(neighbors))  
+        tissue_name = job[2] 
+        indices = job[3] 
+        window = values[neighbors[chunk, :k].flatten()].reshape(len(chunk), k, len(sum_cols)).sum(axis=1)
+        out_dict[(tissue_name, k)] = (window.astype(np.float16), indices)
+
+    windows = {}
+    window = pd.concat([pd.DataFrame(out_dict[(exp,k)][0],index = out_dict[(exp,k)][1].astype(int),columns = sum_cols) for exp in exps],axis=0)
+    window = window.loc[cells.index.values]
+    window = pd.concat([cells[keep_cols], window], axis=1)
+    windows[k] = window
+    return windows, sum_cols, cells, values, reg
+
+def perform_neighborhoods(adata, chosen_column, k, n_neighborhoods):
+    windows, sum_cols, cells, values, reg = preprocessing(adata, chosen_column, k)
+    neighborhood_name = "neighborhood" + str(k)
+    k_centroids = {}  
+
+    windows2 = windows[k] 
+    km = MiniBatchKMeans(n_clusters=n_neighborhoods, random_state=0) 
+    labelskm = km.fit_predict(windows2[sum_cols].values) 
+    k_centroids[k] = km.cluster_centers_ 
+    cells[neighborhood_name] = labelskm 
+    cells[neighborhood_name] = cells[neighborhood_name].astype('category')
+
+    # Heatmap
+    cell_order = sum_cols
+    niche_clusters = k_centroids[k]
+    tissue_avgs = values.mean(axis=0)
+    fc = np.log2(((niche_clusters + tissue_avgs) / (niche_clusters + tissue_avgs).sum(axis=1, keepdims=True)) / tissue_avgs)
+    fc = pd.DataFrame(fc, columns=sum_cols)
+    s = sns.clustermap(fc.loc[range(n_neighborhoods), cell_order], vmin=-3, vmax=3, cmap='bwr', row_cluster=False)
+    
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'neighbor_result')
+    os.makedirs(save_dir, exist_ok=True)
+    
+    plt.savefig(os.path.join(save_dir,"neighborhood_heatmap.png"))
+
+    cells[neighborhood_name] = cells[neighborhood_name].astype('category')
+    plt.rcParams['figure.figsize'] = [15, 10]
+    sns.lmplot(data = cells, x = 'X_centroid', y='Y_centroid', hue = neighborhood_name, palette = 'bright', 
+               height = 15, col = reg, col_wrap = 1, fit_reg = False)
+    plt.savefig(os.path.join(save_dir,"neighborhood_lmplot.png"))
