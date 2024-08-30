@@ -24,7 +24,7 @@ async function fetchAPI(url, formData, csrftoken) {
   });
 
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    return "Network response was not ok";
   }
   return response.json();
 }

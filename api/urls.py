@@ -26,7 +26,7 @@ urlpatterns = [
     path('subclusters', views.SubclusterView.as_view(), name="subclusters"),
     path('preloadsubset', views.PreloadSubsetView.as_view(), name="preloadsubset"),
     path('grabclustersubset', views.GrabClusterSubsetView.as_view(), name="grabclustersubset"),
-    path('subset', views.SubsetView.as_view(), name="subset"),
+    path('subset/<str:met>', views.SubsetView.as_view(), name="subset"),
 
     # phenotyping
     path('preloadidentifythegates', views.PreloadIdentifytheGatesView.as_view(), name="preloadidentifythegates"),

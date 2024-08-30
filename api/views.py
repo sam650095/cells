@@ -47,7 +47,6 @@ class ClearAllDataView(APIView):
 # Preprocessing     
 class FileUploadView(APIView):
     def post(self, request):
-        clearmediafiles('tempfile')
         files = request.FILES.getlist('files')
         file_serializers = []
 
@@ -89,7 +88,6 @@ class FileUploadView(APIView):
         return adata_objects, original_adata_objects, adata_results
 class QualityControlView(APIView):
     def post(self, request):
-        clear_media = clearmediafiles('tempimage')
         adata_objects, qc_adata_objects, adata_results, save_image_names = self.post_reset_adata()
         save_data(adata_objects, 'adata_objects')
         save_data(qc_adata_objects, 'qc_adata_objects')
@@ -281,8 +279,6 @@ class PCAView(APIView):
         adata, merged_results = load_info('adata_preprocessing.h5ad')
         adata = adata[:, chosen_markers]
         
-        # /imaging/plot_clustering_pca
-        clearmediafiles('pca_img')
         save_img_name = plot_clustering_pca(adata)
 
         variance_ratio = adata.uns['pca']['variance_ratio']
@@ -309,7 +305,6 @@ class PreloadCLusteringView(APIView):
             return Response({'methods': methods}, status=status.HTTP_201_CREATED)
 class CLusteringView(APIView):
     def post(self, request):
-        clearmediafiles('cluster_result')
         chosen_method = request.data.get('method')
         n_neighbors = int(request.data.get('n_neighbors'))
         resolution = float(request.data.get('resolution'))
@@ -439,12 +434,25 @@ class GrabClusterSubsetView(APIView):
         cluster = adata.obs[chosen_cluster].cat.categories
         return Response({'cluster':cluster}, status=status.HTTP_201_CREATED)
 class SubsetView(APIView):
-    def post(self, request):
+    def post(self, request, met):
+        if(met == "new"):
+            available_files_result = self.post_new(request)
+        if(met == "merged"):
+            available_files_result = self.post_merged()
+        return Response({'available_files_result':available_files_result}, status=status.HTTP_201_CREATED)
+    def post_merged(self):
+        adata = read_h5ad_file('adata_clustering.h5ad')
+        chosen_cluster = "Sample"
+        chosen_cluster_names = list(adata.obs[chosen_cluster].cat.categories)
+        subset_name = "Merged Data"
+        available_files_result = self.add_subset_cluster(chosen_cluster, chosen_cluster_names, subset_name)
+        return available_files_result
+    def post_new(self, request):
         chosen_cluster = request.data.get('sample')
         chosen_cluster_names = request.data.getlist('clusters')
         subset_name = request.data.get('naming_cluster')
         available_files_result = self.add_subset_cluster(chosen_cluster, chosen_cluster_names, subset_name)
-        return Response({'available_files_result':available_files_result}, status=status.HTTP_201_CREATED)
+        return available_files_result
     def add_subset_cluster(self, chosen_cluster, chosen_cluster_names, subset_name):
         adata = read_h5ad_file('adata_clustering.h5ad')
         available_files = load_data('available_files')
@@ -462,7 +470,6 @@ class PreloadIdentifytheGatesView(APIView):
     def post(self, request):
         available_files = load_data('available_files')
         adata_list = list(available_files.keys())
-        print(adata_list)
         return Response({'adata_list': adata_list}, status=status.HTTP_201_CREATED)
     
 class ChosenAdataResultView(APIView):

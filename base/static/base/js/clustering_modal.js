@@ -168,7 +168,7 @@ function show_dropdown(clustering_col) {
   sampleul.innerHTML = "";
   subset_sample.removeChild(subset_sample.firstChild);
 
-  samplemethodtextnode = document.createTextNode("None");
+  samplemethodtextnode = document.createTextNode(" ");
   subset_sample.insertBefore(samplemethodtextnode, subset_sample.firstChild);
   for (let i = 0; i < clustering_col.length; i++) {
     const li = document.createElement("li");
@@ -253,7 +253,7 @@ async function subset_confirmbtn(event) {
     "naming_cluster",
     document.getElementById("name_cluster").value
   );
-  const subset_results = await fetchAPI("/api/subset", formData, csrftoken);
+  const subset_results = await fetchAPI("/api/subset/new", formData, csrftoken);
   console.log(subset_results);
   document.getElementById("subsetresult").textContent =
     subset_results.available_files_result;

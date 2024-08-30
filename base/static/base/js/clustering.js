@@ -1,4 +1,13 @@
 let methodtextnode;
+async function prenext(event) {
+  event.preventDefault();
+  const csrftoken = getCookie("csrftoken");
+  const m_subset_results = await fetchAPI("/api/subset/merged", 0, csrftoken);
+  console.log(m_subset_results);
+  if (m_subset_results) {
+    window.location.href = event.target.href;
+  }
+}
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
   const preload_clustering_results = await fetchAPI(

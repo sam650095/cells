@@ -1,7 +1,6 @@
 ### Notes
 
-1. 一定要進行 subset 才可以 phenotype
-2. cluster phenotyping 產圖時刪除 select all
-3. Identify the gates 那一頁要確定按下 Confirm 才可下一頁
-4. Gate Finder
-5. Identify the gate table 要平分
+2. 優化系統（讀取圖片、往前按需要記憶、往後需要卡控）
+3. Clustering bbknn 失敗
+4. voroni 的圖片是錯的
+5. GUI
