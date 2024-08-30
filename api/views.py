@@ -332,7 +332,7 @@ class CLusteringView(APIView):
             
         sc.tl.umap(adata, random_state=42)
         sc.tl.leiden(adata, resolution=resolution, random_state=42)        
-        adata = clustering_result(adata, n_pcs) # cluster總結果: Summary, Umap*1, Ranking, Heatmap
+        adata = clustering_result(adata, n_pcs)
         
         save_h5ad_file(adata, 'adata_clustering.h5ad')
         return adata
