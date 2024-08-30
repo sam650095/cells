@@ -638,6 +638,7 @@ class SpatialAnalysisView(APIView):
         columns_list = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
         default_chosen_column = 'phenotype'
         cluster_list = adata.obs[default_chosen_column].unique()
+        cluster_list_L = adata.obs['leiden_R'].unique()
         default_chosen_cluster = cluster_list[0]
         method_list = ['radius', 'knn']
         default_chosen_method = 'radius'
@@ -650,13 +651,14 @@ class SpatialAnalysisView(APIView):
                                     imageid='Sample', label=f'spatial_interaction_{col}_knn', pval_method='zscore')
             sm.tl.spatial_interaction(adata, phenotype=col, method='radius', radius=30, 
                                     imageid='Sample', label=f'spatial_interaction_{col}_radius', pval_method='zscore')
-        distances_heatmap(adata, default_chosen_column)
-        distances_numeric_plot(adata, default_chosen_column, default_chosen_cluster)
-        interactions_heatmap(adata, default_chosen_column, default_chosen_method)
-        interactions_voronoi(adata, default_chosen_column)
+        filename = []
+        filename.append(distances_heatmap(adata, default_chosen_column))
+        filename.append(distances_numeric_plot(adata, default_chosen_column, default_chosen_cluster))
+        filename.append(interactions_heatmap(adata, default_chosen_column, default_chosen_method))
+        filename.append(interactions_voronoi(adata, default_chosen_column))
         save_h5ad_file(adata, 'adata_spatial_analysis.h5ad')
 
-        return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'method_list':method_list}, status=status.HTTP_201_CREATED)
+        return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'cluster_list_L':cluster_list_L, 'method_list':method_list, "filename":filename}, status=status.HTTP_201_CREATED)
 class AddSpatial(APIView):
     def post(self, request, met):
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')

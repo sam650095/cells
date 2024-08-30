@@ -1,3 +1,5 @@
+let cluster_lst = [];
+let cluster_lst_L = [];
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
   const preload_spatialanalysis_results = await fetchAPI(
@@ -19,6 +21,8 @@ async function processbtn(event) {
     csrftoken
   );
   console.log(spatialanalysis_results);
+  cluster_lst = spatialanalysis_results["cluster_list"];
+  cluster_lst_L = spatialanalysis_results["cluster_list_L"];
   toggleLoading(false, "processbutton");
   document.getElementById("imgbox").classList.remove("hidden");
   document.getElementById("nextbtn").classList.remove("hidden");
@@ -30,7 +34,7 @@ async function processbtn(event) {
     spatialanalysis_results["method_list"]
   );
   // show image
-  addimg();
+  addimg(spatialanalysis_results["filename"]);
 }
 
 async function addbtn(m) {
