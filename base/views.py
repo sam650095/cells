@@ -1,13 +1,25 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 from django.conf import settings
 import os
+from .models import *
+
+from api.saved import *
 
 def index(request):
     return render(request, 'base/index.html')
 def page(request, process, method):
     context = {'process': process, 'method': method}
     return render(request, f"{process}/{method}.html", context)
+def createadata(request):
+    if request.method == 'POST':
+        file_name = request.POST.get('file_names')
+        UploadData.objects.create(file_name=file_name)
+    return True
 
 def get_image(request):
     if request.method == 'POST':
@@ -39,3 +51,12 @@ def download_images(request):
         return JsonResponse({'image_paths': image_paths})
     else:
         return JsonResponse({'error': 'Folder not found'}, status=404)
+class StepView(APIView):
+    def post(self, request, met):
+        if(met == "save"):
+            save_data(request.data.get('steps'), 'steps')
+        elif(met == "check"):
+            steps = load_data('steps')
+            if(steps<request.data.get('steps')):
+                return Response({'message':'finish previous steps'}, status=404)
+        return Response({'steps':steps}, status=status.HTTP_201_CREATED)

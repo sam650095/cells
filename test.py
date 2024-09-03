@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import scimap as sm 
 import matplotlib
 import anndata as ad
-
+import time
+start = time.time()
 # 設置
 chosen_column = 'phenotype'
 matplotlib.use('Agg')
@@ -27,20 +28,21 @@ sm.pl.voronoi(adata,
 # 保存圖形
 plt.savefig(f'interactions_voronoi_{chosen_column}.png')
 plt.close()  # 關閉圖形以釋放內存
+end = time.time()
 
 # 檢查數據
 print(f"Data shape: {adata.shape}")
 print(f"Available columns: {adata.obs.columns}")
 print(f"Unique values in {chosen_column}: {adata.obs[chosen_column].unique()}")
-
-# 如果還是不行，嘗試使用 scatter plot
-plt.figure(figsize=(15, 10))
-sc = plt.scatter(adata.obsm['spatial'][:, 0], 
-                 adata.obsm['spatial'][:, 1], 
-                 c=adata.obs[chosen_column].astype('category').cat.codes, 
-                 s=1, 
-                 alpha=0.8)
-plt.colorbar(sc)
-plt.title(f'Scatter plot of {chosen_column}')
-plt.savefig(f'scatter_{chosen_column}.png')
-plt.close()
+print(format(end - start)+'秒')
+# # 如果還是不行，嘗試使用 scatter plot
+# plt.figure(figsize=(15, 10))
+# sc = plt.scatter(adata.obsm['spatial'][:, 0], 
+#                  adata.obsm['spatial'][:, 1], 
+#                  c=adata.obs[chosen_column].astype('category').cat.codes, 
+#                  s=1, 
+#                  alpha=0.8)
+# plt.colorbar(sc)
+# plt.title(f'Scatter plot of {chosen_column}')
+# plt.savefig(f'scatter_{chosen_column}.png')
+# plt.close()

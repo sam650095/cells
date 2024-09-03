@@ -43,6 +43,7 @@ class ClearAllDataView(APIView):
         clear_all_data()
         clearmediafiles('')
         clear_all_h5ad_files()
+        save_data(0, 'steps')
         return Response({'message':'data are all killed'}, status=status.HTTP_200_OK)
 # Preprocessing     
 class FileUploadView(APIView):
@@ -441,20 +442,25 @@ class SubsetView(APIView):
             available_files_result = self.post_merged()
         return Response({'available_files_result':available_files_result}, status=status.HTTP_201_CREATED)
     def post_merged(self):
+        # for no subset
         adata = read_h5ad_file('adata_clustering.h5ad')
         chosen_cluster = "Sample"
         chosen_cluster_names = list(adata.obs[chosen_cluster].cat.categories)
-        subset_name = "Merged Data"
-        available_files_result = self.add_subset_cluster(chosen_cluster, chosen_cluster_names, subset_name)
+        if(adata.uns['is_merged'] == True):
+            subset_name = "Merged Data"
+        else:
+            subset_name = adata.uns['prefix']
+        available_files_result = self.add_subset_cluster(adata, chosen_cluster, chosen_cluster_names, subset_name)
         return available_files_result
     def post_new(self, request):
+        # for subset
+        adata = read_h5ad_file('adata_clustering.h5ad')
         chosen_cluster = request.data.get('sample')
         chosen_cluster_names = request.data.getlist('clusters')
         subset_name = request.data.get('naming_cluster')
-        available_files_result = self.add_subset_cluster(chosen_cluster, chosen_cluster_names, subset_name)
+        available_files_result = self.add_subset_cluster(adata, chosen_cluster, chosen_cluster_names, subset_name)
         return available_files_result
-    def add_subset_cluster(self, chosen_cluster, chosen_cluster_names, subset_name):
-        adata = read_h5ad_file('adata_clustering.h5ad')
+    def add_subset_cluster(self, adata, chosen_cluster, chosen_cluster_names, subset_name):
         available_files = load_data('available_files')
         available_files_result = []
         subset_adata = adata[adata.obs[chosen_cluster].isin(chosen_cluster_names)].copy()
@@ -506,12 +512,10 @@ class AddValueView(APIView):
     def post(self, request):
         editdata = json.loads(request.POST.get('editdata'))
         gate_df = load_data('gate_df')
-        print(gate_df)
         edit_df = pd.DataFrame(editdata)
-        
+        edit_df = edit_df.apply(pd.to_numeric, errors='coerce')
         gate_df.set_index('Marker', inplace=True)
         edit_df.set_index('Marker', inplace=True)
-        
         for marker in edit_df.index:
             for column in edit_df.columns:
                 if marker in gate_df.index and column in gate_df.columns:
@@ -520,8 +524,11 @@ class AddValueView(APIView):
                         gate_df.loc[marker, column] = new_value
         
         gate_df.reset_index(inplace=True)
-        print(gate_df)
-        return Response({}, status=status.HTTP_201_CREATED)
+        gate_df = gate_df.replace([np.inf, -np.inf], None)
+        gate_df = gate_df.where(pd.notnull(gate_df), None)
+        
+        result = gate_df.to_dict(orient='records')
+        return Response({'result':result}, status=status.HTTP_201_CREATED)
     
 # Phenotyping
 class PhenotypingView(APIView):
@@ -545,9 +552,7 @@ class PhenotypingView(APIView):
         chosen_adata = load_data('chosen_adata')
         n_pcs = load_data('n_pcs')
         adata = sm.pp.rescale(adata, gate = gate_df, imageid = 'Sample', method = 'by_image')
-
         phenotype = pd.read_csv(file_path, encoding='utf-8')
-
         adata = sm.tl.phenotype_cells(adata, phenotype=phenotype,
                                     label="phenotype", imageid = 'Sample')
         adata, phenotyping_result = phenotype_result(adata, chosen_adata, n_pcs) 

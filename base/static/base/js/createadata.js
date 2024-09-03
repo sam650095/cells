@@ -21,6 +21,9 @@ async function processbtn(event) {
   }
   const csrftoken = getCookie("csrftoken");
   const result = await fetchAPI("/api/upload", formData, csrftoken);
+
+  toggleLoading(false, "processbutton");
+
   let adata_results = document.getElementById("adata_results");
   adata_results.innerHTML = "";
   let ul = document.createElement("ul");
@@ -37,7 +40,6 @@ async function processbtn(event) {
     ul.appendChild(li);
   });
   adata_results.appendChild(ul);
-  toggleLoading(false, "processbutton");
   let nextbtn = document.getElementById("nextbtn");
   nextbtn.classList.remove("hidden");
 }

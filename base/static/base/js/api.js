@@ -13,6 +13,13 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+// save steps
+async function savesteps(event, steps) {
+  event.preventDefault();
+  if (true) {
+    return;
+  }
+}
 // fetchapi
 async function fetchAPI(url, formData, csrftoken) {
   const response = await fetch(url, {
@@ -22,7 +29,6 @@ async function fetchAPI(url, formData, csrftoken) {
       "X-CSRFToken": csrftoken,
     },
   });
-
   if (!response.ok) {
     return "Network response was not ok";
   }

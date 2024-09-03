@@ -51,8 +51,7 @@ async function processbtn(event) {
   toggleLoading(false, "processbutton");
 
   document.getElementById("btnbox").classList.remove("hidden");
-  document.getElementById("clearbtn").classList.remove("hidden");
-  document.getElementById("confirmbtn").classList.remove("hidden");
+  document.getElementById("btnchanges").classList.remove("hidden");
   document.getElementById("nextbtn").classList.remove("hidden");
 }
 function createTable(data) {
@@ -102,7 +101,7 @@ function handleClick(td, rowIndex, columnName) {
   const currentValue = td.textContent;
   td.textContent = "";
   const input = document.createElement("input");
-  input.type = "text";
+  input.type = "number";
   input.value = currentValue === "N/A" ? "" : currentValue;
   input.className =
     "my-2 w-3/4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900";
@@ -131,4 +130,5 @@ async function confirmbtn() {
   const formData = new FormData();
   formData.append("editdata", JSON.stringify(editdata));
   const addvalueresult = await fetchAPI("/api/addvalue", formData, csrftoken);
+  console.log(addvalueresult);
 }

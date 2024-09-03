@@ -73,20 +73,23 @@
   </thead>
   <tbody id="nametbody"></tbody>
 </table>
-<div class="text-right">
+<div class="text-right hidden" id="btnchanges">
   <button
-    class="rounded-md bg-red-500 py-2 px-4 text-white text-sm font-semibold my-3 hidden"
+    class="rounded-md bg-red-500 py-2 px-4 text-white text-sm font-semibold my-3"
     id="clearbtn"
   >
     Clear Changes
   </button>
   <button
-    class="rounded-md bg-emerald-600 py-2 px-4 text-white text-sm font-semibold my-3 hidden"
+    class="rounded-md bg-emerald-600 py-2 px-4 text-white text-sm font-semibold my-3"
     id="confirmbtn"
     onclick="confirmbtn()"
   >
     Confirm Changes
   </button>
+  <div class="text-gray-500 text-bold text-xs">
+    * 確保按下Confirm Changes，在執行下一步
+  </div>
 </div>
 
 <!-- button -->
