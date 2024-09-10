@@ -51,12 +51,3 @@ def download_images(request):
         return JsonResponse({'image_paths': image_paths})
     else:
         return JsonResponse({'error': 'Folder not found'}, status=404)
-class StepView(APIView):
-    def post(self, request, met):
-        if(met == "save"):
-            save_data(request.data.get('steps'), 'steps')
-        elif(met == "check"):
-            steps = load_data('steps')
-            if(steps<request.data.get('steps')):
-                return Response({'message':'finish previous steps'}, status=404)
-        return Response({'steps':steps}, status=status.HTTP_201_CREATED)

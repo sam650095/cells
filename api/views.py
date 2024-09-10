@@ -3,7 +3,6 @@ import pandas as pd
 import scanpy as sc
 import scimap as sm 
 import numpy as np
-import shutil
 import bbknn
 import logging
 import json
@@ -17,26 +16,7 @@ from .saved import *
 logger = logging.getLogger(__name__)
 def sort_key(filename):
     return int(filename.split('_')[0][1:]) 
-def clearmediafiles(temp):
-    media_root = settings.MEDIA_ROOT
-    temp_dir = os.path.join(media_root, temp)
-    messages = []
-
-    if os.path.exists(temp_dir):
-        for item in os.listdir(temp_dir):
-            item_path = os.path.join(temp_dir, item)
-            try:
-                if os.path.isfile(item_path) or os.path.islink(item_path):
-                    os.unlink(item_path)
-                elif os.path.isdir(item_path):
-                    shutil.rmtree(item_path)
-                messages.append(f'Successfully deleted {item_path}')
-            except Exception as e:
-                messages.append(f'Failed to delete {item_path}. Reason: {e}')
-    else:
-        messages.append(f'Directory {temp_dir} does not exist')
-
-    return '\n'.join(messages)    
+  
 # cleardata
 class ClearAllDataView(APIView):
     def post(self, request):
@@ -318,7 +298,9 @@ class CLusteringView(APIView):
         if chosen_method == 'none':
             sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, random_state=42)
         elif chosen_method == 'bbknn':
+            print("bbknn start")
             sc.external.pp.bbknn(adata, batch_key='Sample', computation='fast')
+            print("bbknn finish")
         elif chosen_method == 'harmony':
             sc.external.pp.harmony_integrate(adata, key='Sample', random_state=42)
             sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, use_rep='X_pca_harmony', random_state=42)

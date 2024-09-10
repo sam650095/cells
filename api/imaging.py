@@ -61,7 +61,7 @@ def clustering_result(adata, npcs):
         adata.obs['leiden_R'] = adata.obs['leiden']
     save_dir = os.path.join(settings.MEDIA_ROOT, 'cluster_result')
     os.makedirs(save_dir, exist_ok=True)
-    
+    print('image start')
     # Summary表格
     summary_df_cluster = summary_cluster(adata)
     dataframe_to_image(summary_df_cluster, os.path.join(save_dir, 'clustering_summary.png'))
