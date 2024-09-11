@@ -646,10 +646,11 @@ class SpatialAnalysisView(APIView):
             sm.tl.spatial_interaction(adata, phenotype=col, method='radius', radius=30, 
                                     imageid='Sample', label=f'spatial_interaction_{col}_radius', pval_method='zscore')
         filename = []
+        filename.append(interactions_voronoi(adata, default_chosen_column))
         filename.append(distances_heatmap(adata, default_chosen_column))
         filename.append(distances_numeric_plot(adata, default_chosen_column, default_chosen_cluster))
         filename.append(interactions_heatmap(adata, default_chosen_column, default_chosen_method))
-        filename.append(interactions_voronoi(adata, default_chosen_column))
+        
         save_h5ad_file(adata, 'adata_spatial_analysis.h5ad')
 
         return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'cluster_list_L':cluster_list_L, 'method_list':method_list, "filename":filename}, status=status.HTTP_201_CREATED)
@@ -669,19 +670,19 @@ class AddSpatial(APIView):
 
         return Response({"filename":filename}, status=status.HTTP_201_CREATED)
     def post_dh(self, request):
-        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
         filename = distances_heatmap(adata, json.loads(request.body).get('dh_ul_input'))
         return filename
     def post_np(self, request):
-        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
         filename = distances_numeric_plot(adata, json.loads(request.body).get('np_ul_input'), json.loads(request.body).get('npd_ul_input'))
         return filename
     def post_ih(self, request):
-        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
         filename = interactions_heatmap(adata, json.loads(request.body).get('ih_ul_input'), json.loads(request.body).get('ihm_ul_input'))
         return filename
     def post_vp(self, request):
-        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
         filename = interactions_voronoi(adata, json.loads(request.body).get('vp_ul_input'))
         return filename
 

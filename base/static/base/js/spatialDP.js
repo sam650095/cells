@@ -7,10 +7,10 @@ function adddp(columns_list, cluster_list, method_list) {
   dp("vp_ul", columns_list);
 }
 function addimg(filename) {
-  loadImage("spatial_result", filename[0], "distances-heatmap-container");
-  loadImage("spatial_result", filename[1], "numeric-plot-container");
-  loadImage("spatial_result", filename[2], "interactions-heatmap-container");
-  loadImage("spatial_result", filename[3], "voronoi-plot-container");
+  // loadImage("spatial_result", filename[1], "distances-heatmap-container");
+  // loadImage("spatial_result", filename[2], "numeric-plot-container");
+  // loadImage("spatial_result", filename[3], "interactions-heatmap-container");
+  loadImage("spatial_result", filename[0], "voronoi-plot-container");
 }
 function dp(s_ul, data_list) {
   const ul = document.getElementById(s_ul);

@@ -330,8 +330,15 @@ def interactions_voronoi(adata, chosen_column):
     save_dir = os.path.join(settings.MEDIA_ROOT, 'spatial_result')
     os.makedirs(save_dir, exist_ok=True)
     plt.rcParams['figure.figsize'] = [15, 10]
-    sm.pl.voronoi(adata, color_by=chosen_column, voronoi_edge_color = 'black', voronoi_line_width = 0.3, 
-                  voronoi_alpha = 0.8, size_max=5000, overlay_points=None, plot_legend=True, legend_size=6)
+    sm.pl.voronoi(adata, 
+              color_by=chosen_column, 
+              voronoi_edge_color='black', 
+              voronoi_line_width=0.3, 
+              voronoi_alpha=0.8, 
+              size_max=5000, 
+              overlay_points=None, 
+              plot_legend=True, 
+              legend_size=12)
     plt.savefig(os.path.join(save_dir, f'interactions_voronoi_{chosen_column}.png'))
     return f'interactions_voronoi_{chosen_column}.png'
 
@@ -346,10 +353,8 @@ def get_windows(job, n_neighbors, tissue_group, exps, X, Y):
     tissue = tissue_group.get_group(tissue_name)
     to_fit = tissue.loc[indices][[X,Y]].values
 
-    # fit = NearestNeighbors(n_neighbors=n_neighbors+1).fit(tissue[[X,Y]].values)
     fit = NearestNeighbors(n_neighbors=n_neighbors).fit(tissue[[X,Y]].values)
     m = fit.kneighbors(to_fit)
-    # m = m[0][:,1:], m[1][:,1:]
     m = m[0], m[1]
     
     # sort_neighbors
@@ -372,7 +377,7 @@ def preprocessing(adata, chosen_column, k):
     n_neighbors = k
     path = os.path.join(settings.MEDIA_ROOT, 'tempfile/neighbor')
     os.makedirs(path, exist_ok=True)
-    path_to_data = os.path.join(path,'neigberhood_data.csv')
+    path_to_data = os.path.join('data','neigberhood_data.csv')
 
     X = 'X_centroid'
     Y = 'Y_centroid'
