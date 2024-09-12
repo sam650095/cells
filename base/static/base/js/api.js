@@ -15,17 +15,25 @@ function getCookie(name) {
 }
 // fetchapi
 async function fetchAPI(url, formData, csrftoken) {
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData,
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-  });
-  if (!response.ok) {
-    return "Network response was not ok";
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-CSRFToken": csrftoken,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw { message: data, status: response.status };
+    }
+
+    return { data, status: response.status };
+  } catch (error) {
+    return { error: error.message || "未知錯誤", status: error.status || 500 };
   }
-  return response.json();
 }
 function downloadImages(folder) {
   const csrftoken = getCookie("csrftoken");

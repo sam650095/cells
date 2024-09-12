@@ -5,14 +5,11 @@ filename_showplace.classList.add("max-h-60", "overflow-y-auto");
 async function processbtn(event) {
   event.preventDefault();
   toggleLoading(true, "processbutton");
+  document.getElementById("adata_results").innerHTML = "";
   const file_upload = document.getElementById("file_upload");
   const files = file_upload.files;
-
-  if (files.length === 0) {
-    alert("Please Upload Unless one File");
-    toggleLoading(false, "processbutton");
-    return;
-  }
+  const errorElement = document.getElementById("error");
+  const errorMessageElement = document.getElementById("errormessage");
 
   const formData = new FormData();
 
@@ -20,28 +17,35 @@ async function processbtn(event) {
     formData.append("files", files[i]);
   }
   const csrftoken = getCookie("csrftoken");
-  const result = await fetchAPI("/api/upload", formData, csrftoken);
+  try {
+    const result = await fetchAPI("/api/upload", formData, csrftoken);
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+    errorElement.classList.add("hidden");
+    toggleLoading(false, "processbutton");
+    const ul = document.createElement("ul");
+    ul.classList.add(
+      "max-w-md",
+      "space-y-1",
+      "text-gray-500",
+      "list-disc",
+      "list-inside"
+    );
 
-  toggleLoading(false, "processbutton");
+    result.data.adata_results.forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      ul.appendChild(li);
+    });
 
-  let adata_results = document.getElementById("adata_results");
-  adata_results.innerHTML = "";
-  let ul = document.createElement("ul");
-  ul.classList.add(
-    "max-w-md",
-    "space-y-1",
-    "text-gray-500",
-    "list-disc",
-    "list-inside"
-  );
-  result["adata_results"].forEach((item) => {
-    let li = document.createElement("li");
-    li.textContent = item;
-    ul.appendChild(li);
-  });
-  adata_results.appendChild(ul);
-  let nextbtn = document.getElementById("nextbtn");
-  nextbtn.classList.remove("hidden");
+    adata_results.appendChild(ul);
+    nextbtn.classList.remove("hidden");
+  } catch (error) {
+    toggleLoading(false, "processbutton");
+    errorMessageElement.textContent = error.message || "上傳過程中發生錯誤";
+    errorElement.classList.remove("hidden");
+  }
 }
 
 // file upload
@@ -49,11 +53,13 @@ document.getElementById("file_upload").addEventListener("change", function (e) {
   filename_showplace.innerHTML = "";
   files = e.target.files;
   if (files.length > 0) {
+    filename_showplace.classList.remove("justify-center");
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       createFileDiv(file);
     }
   } else {
+    filename_showplace.classList.add("justify-center");
     filename_showplace.textContent = "No Data Upload Yet.";
   }
 });
@@ -91,6 +97,17 @@ function createFileDiv(file) {
   );
   delfile.onclick = function () {
     filediv.remove();
+    const file_upload = document.getElementById("file_upload");
+    let files = Array.from(file_upload.files);
+
+    let filename = file.name;
+
+    files = files.filter((file) => file.name !== filename);
+    file_upload.value = "";
+    const dt = new DataTransfer();
+    files.forEach((file) => dt.items.add(file));
+    file_upload.files = dt.files;
+
     if (filename_showplace.children.length === 0) {
       filename_showplace.textContent = "No Data Upload Yet.";
     }

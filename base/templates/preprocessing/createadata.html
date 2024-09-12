@@ -13,16 +13,38 @@
 <form>
   {% csrf_token %}
   <div class="rounded-md bg-white grid grid-cols-2 divide-x p-3">
-    <div class="text-center p-8 font-bold items-center">
-      <div class="text-start text-base">Upload Data</div>
+    <div class="text-center p-8 font-bold">
+      <div class="text-start">UPLOAD DATA</div>
       <label
         for="file_upload"
-        class="rounded-md bg-sky-700 md:px-16 md:py-4 p-0 text-white text-sm font-semibold my-3 w-full"
+        class="rounded-md bg-sky-700 md:px-16 md:py-4 p-0 text-white text-sm font-semibold my-3 w-full hover:bg-sky-600 border-0"
         style="display: inline-block; cursor: pointer"
       >
         Upload Files
       </label>
       <input id="file_upload" type="file" style="display: none" multiple />
+      <div class="text-start hidden" id="error">
+        <div
+          class="text-red-500 font-normal text-xs inline-flex items-center gap-1"
+        >
+          <svg
+            class="w-[16px] h-[16px]"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v5a1 1 0 1 0 2 0V8Zm-1 7a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span id="errormessage"></span>
+        </div>
+      </div>
     </div>
     <div
       id="showplace"
@@ -33,7 +55,7 @@
   </div>
   <div class="text-end py-5">
     <button
-      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600"
       id="processbutton"
       onclick="processbtn(event)"
     >
@@ -46,7 +68,7 @@
 <div id="nextbtn" class="text-end py-5 hidden">
   <a
     href="{% url 'page' process='preprocessing' method='qualitycontrol' %}"
-    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600"
   >
     Next:Quality Control
   </a>

@@ -3,16 +3,15 @@ import pandas as pd
 import scanpy as sc
 import scimap as sm 
 import numpy as np
-import bbknn
 import logging
 import json
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import FileUploadSerializer
 from .imaging import *
 from .saved import *
+
 logger = logging.getLogger(__name__)
 def sort_key(filename):
     return int(filename.split('_')[0][1:]) 
@@ -23,24 +22,41 @@ class ClearAllDataView(APIView):
         clear_all_data()
         clearmediafiles('')
         clear_all_h5ad_files()
-        save_data(0, 'steps')
         return Response({'message':'data are all killed'}, status=status.HTTP_200_OK)
 # Preprocessing     
 class FileUploadView(APIView):
     def post(self, request):
+        clearmediafiles('tempfile')
         files = request.FILES.getlist('files')
-        file_serializers = []
-
+        if(len(files) < 2):
+            return Response({'message': "Please uplaod unless 2 files."}, status=status.HTTP_400_BAD_REQUEST)
+        # file types
+        file_type_mapping = {
+            'metadata.csv': 'metadata',
+            # signal_value
+            'value.csv': 'signal_value'
+        }
         for file in files:
-            serializer = FileUploadSerializer(data={'file': file})
-            if serializer.is_valid():
-                saved_file = serializer.save()
-                file_serializers.append(saved_file)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            file_extension = file.name.split('_')[-1]
+            target_dir = file_type_mapping.get(file_extension)
+            
+            if not target_dir:
+                return Response({'message': "Invalid File Type, Please read the rule above and upload again."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            target_path = os.path.join(settings.MEDIA_ROOT, 'tempfile', target_dir)
+            os.makedirs(target_path, exist_ok=True) 
+            new_file_path = os.path.join(target_path, file.name)
+
+            with open(new_file_path, 'wb') as f:
+                for chunk in file.chunks():
+                    f.write(chunk)
+            
         signal_value_files = sorted(os.listdir(os.path.join(settings.MEDIA_ROOT, 'tempfile', 'signal_value')), key=sort_key)
         metadata_files = sorted(os.listdir(os.path.join(settings.MEDIA_ROOT, 'tempfile', 'metadata')), key=sort_key)
-        adata_objects, original_adata_objects, adata_results = self.create_adata(signal_value_files, metadata_files)
+        result = self.create_adata(signal_value_files, metadata_files)
+        if isinstance(result, str):
+            return Response({'message': result}, status=status.HTTP_400_BAD_REQUEST)
+        adata_objects, original_adata_objects, adata_results = result
         save_data(adata_objects, 'adata_objects')
         save_data(original_adata_objects, 'original_adata_objects')
         return Response({"adata_results": adata_results}, status=status.HTTP_201_CREATED)
@@ -51,12 +67,12 @@ class FileUploadView(APIView):
         adata_results = []
         signal_value_dir = os.path.join(settings.MEDIA_ROOT, 'tempfile', 'signal_value')
         metadata_dir = os.path.join(settings.MEDIA_ROOT, 'tempfile', 'metadata')
-
+        if(len(signal_value_files)!=len(metadata_files)):   
+            return "File's prefix does not match, Please read the rule above and upload again."
         for signal_value_file in signal_value_files:
             prefix = signal_value_file.split('_')[0]
             matching_metadata_file = next((metadata_file for metadata_file in metadata_files if metadata_file.startswith(prefix)), None)
-
-            if matching_metadata_file:
+            if matching_metadata_file!=None:
                 data = pd.read_csv(os.path.join(signal_value_dir, signal_value_file), header=0, index_col=0)
                 metadata = pd.read_csv(os.path.join(metadata_dir, matching_metadata_file), header=0, index_col=0)
                 adata = sc.AnnData(X=data, obs=metadata)
@@ -66,6 +82,8 @@ class FileUploadView(APIView):
                 adata_results.append(f"{prefix}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
                 adata_objects.append(adata)
                 original_adata_objects.append(adata.copy())
+            else:
+                return "File's prefix does not match, Please read the rule above and upload again."
         return adata_objects, original_adata_objects, adata_results
 class QualityControlView(APIView):
     def post(self, request):
@@ -623,12 +641,13 @@ class PreloadSpatialAnalysisView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
         chosen_adata = load_data('chosen_adata')
-
         n_obs, n_vars = adata.shape
         return Response({'preload_result': f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"}, status=status.HTTP_201_CREATED)
 class SpatialAnalysisView(APIView):
     def post(self, request):
-        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        self.calculate_spatial()
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
+
         columns_list = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
         default_chosen_column = 'phenotype'
         cluster_list = adata.obs[default_chosen_column].unique()
@@ -636,7 +655,20 @@ class SpatialAnalysisView(APIView):
         default_chosen_cluster = cluster_list[0]
         method_list = ['radius', 'knn']
         default_chosen_method = 'radius'
-
+        filename = []
+        print(adata.shape)
+        interactions_voronoi2(default_chosen_column)
+        print(adata.shape)
+        filename.append(distances_heatmap(default_chosen_column))
+        filename.append(distances_numeric_plot(default_chosen_column, default_chosen_cluster))
+        filename.append(interactions_heatmap(default_chosen_column, default_chosen_method))
+        filename.append(interactions_voronoi(default_chosen_column))
+        print(adata.shape)
+        
+        return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'cluster_list_L':cluster_list_L, 'method_list':method_list, "filename":filename}, status=status.HTTP_201_CREATED)
+    def calculate_spatial(self):
+        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        columns_list = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
         for col in columns_list: 
             sm.tl.spatial_distance(adata, x_coordinate='X_centroid', y_coordinate='Y_centroid', 
                                 phenotype=col, imageid='Sample', label=f'spatial_distance_{col}')
@@ -645,15 +677,8 @@ class SpatialAnalysisView(APIView):
                                     imageid='Sample', label=f'spatial_interaction_{col}_knn', pval_method='zscore')
             sm.tl.spatial_interaction(adata, phenotype=col, method='radius', radius=30, 
                                     imageid='Sample', label=f'spatial_interaction_{col}_radius', pval_method='zscore')
-        filename = []
-        filename.append(interactions_voronoi(adata, default_chosen_column))
-        filename.append(distances_heatmap(adata, default_chosen_column))
-        filename.append(distances_numeric_plot(adata, default_chosen_column, default_chosen_cluster))
-        filename.append(interactions_heatmap(adata, default_chosen_column, default_chosen_method))
-        
         save_h5ad_file(adata, 'adata_spatial_analysis.h5ad')
 
-        return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'cluster_list_L':cluster_list_L, 'method_list':method_list, "filename":filename}, status=status.HTTP_201_CREATED)
 class AddSpatial(APIView):
     def post(self, request, met):
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')
@@ -670,19 +695,19 @@ class AddSpatial(APIView):
 
         return Response({"filename":filename}, status=status.HTTP_201_CREATED)
     def post_dh(self, request):
-        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
         filename = distances_heatmap(adata, json.loads(request.body).get('dh_ul_input'))
         return filename
     def post_np(self, request):
-        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
         filename = distances_numeric_plot(adata, json.loads(request.body).get('np_ul_input'), json.loads(request.body).get('npd_ul_input'))
         return filename
     def post_ih(self, request):
-        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
         filename = interactions_heatmap(adata, json.loads(request.body).get('ih_ul_input'), json.loads(request.body).get('ihm_ul_input'))
         return filename
     def post_vp(self, request):
-        adata = read_h5ad_file('adata_phenotyping.h5ad')
+        adata = read_h5ad_file('adata_spatial_analysis.h5ad')
         filename = interactions_voronoi(adata, json.loads(request.body).get('vp_ul_input'))
         return filename
 
