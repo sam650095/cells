@@ -34,6 +34,7 @@ function initmodal() {
 }
 // filter method change
 function showimage(result) {
+  console.log(result);
   const imgbox = document.getElementById("imgbox");
   imgbox.textContent = "";
   const ul = document.createElement("ul");
@@ -91,7 +92,6 @@ function showimage(result) {
     `;
     sample_ul.appendChild(sample_li);
     // v_sample_ul.appendChild(v_sample_li);
-    console.log(sample_ul);
   }
   imgbox.appendChild(ul);
 }
