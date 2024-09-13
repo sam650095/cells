@@ -35,6 +35,20 @@ async function fetchAPI(url, formData, csrftoken) {
     return { error: error.message || "未知錯誤", status: error.status || 500 };
   }
 }
+// grab steps
+async function grabsteps(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
 function downloadImages(folder) {
   const csrftoken = getCookie("csrftoken");
   fetch("/download_image/", {

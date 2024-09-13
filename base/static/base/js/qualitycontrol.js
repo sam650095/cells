@@ -7,18 +7,24 @@ async function processbtn(event) {
   event.preventDefault();
   toggleLoading(true, "processbutton");
   const csrftoken = getCookie("csrftoken");
-
-  const process_result = await fetchAPI("/api/qualitycontrol", 0, csrftoken);
-  // init modal
-  initmodal();
-  //   show btn
-  const btnbox = document.getElementById("btnbox");
-  btnbox.classList.remove("hidden");
-  //   show image
-  showimage(process_result);
-  toggleLoading(false, "processbutton");
-  // next page btn
-  document.getElementById("nextbtn").classList.remove("hidden");
+  try {
+    const process_result = await fetchAPI("/api/qualitycontrol", 0, csrftoken);
+    if (process_result.error) {
+      throw new Error(process_result.error.message);
+    }
+    // init modal
+    initmodal();
+    //   show btn
+    const btnbox = document.getElementById("btnbox");
+    btnbox.classList.remove("hidden");
+    //   show image
+    showimage(process_result.data);
+    toggleLoading(false, "processbutton");
+    // next page btn
+    document.getElementById("nextbtn").classList.remove("hidden");
+  } catch (error) {
+    toggleLoading(false, "processbutton");
+  }
 }
 
 function initmodal() {
@@ -56,7 +62,7 @@ function showimage(result) {
     const li = document.createElement("li");
     li.textContent = result["adata_results"][i];
     const img = document.createElement("img");
-    img.src = `/media/tempimage/origin/${
+    img.src = `/media/qualitycontrol/origin/${
       result["save_image_names"][i]
     }?t=${Date.now()}`;
     img.classList.add("m-5", "size-3/4");
@@ -139,10 +145,10 @@ async function preview() {
     "w-fit"
   );
   const li = document.createElement("li");
-  li.textContent = preview_result["adata_result"];
+  li.textContent = preview_result.data["adata_result"];
   const img = document.createElement("img");
-  img.src = `/media/tempimage/preview/${
-    preview_result["save_image_names"]
+  img.src = `/media/qualitycontrol/preview/${
+    preview_result.data["save_image_names"]
   }?t=${Date.now()}`;
   img.classList.add("m-5", "size-3/4");
   li.appendChild(img);
@@ -155,15 +161,13 @@ async function preview() {
 async function confirm() {
   const csrftoken = getCookie("csrftoken");
   const replaceimg_result = await fetchAPI("/api/replace", 0, csrftoken);
-  console.log(replaceimg_result);
 
-  showimage(replaceimg_result);
+  showimage(replaceimg_result.data);
 }
 // before next page
 async function presubmit(event) {
   const csrftoken = getCookie("csrftoken");
   event.preventDefault();
   confirm_result = await fetchAPI("/api/confirm", 0, csrftoken);
-  console.log(confirm_result);
   window.location.href = event.target.href;
 }

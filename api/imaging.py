@@ -17,7 +17,7 @@ matplotlib.use('Agg')
 # preprocessing
 def produce_and_save_img(adata, saveplace, name):
     sc.pl.violin(adata, ['n_genes_by_counts', 'total_counts'], jitter=0.4, multi_panel=True)
-    save_dir = os.path.join(settings.MEDIA_ROOT, 'tempimage', saveplace)
+    save_dir = os.path.join(settings.MEDIA_ROOT, 'qualitycontrol', saveplace)
     os.makedirs(save_dir, exist_ok=True)
     save_name = f'{adata.uns["prefix"]}_{name}.png'
     save_path = os.path.join(save_dir, save_name)
@@ -26,8 +26,8 @@ def produce_and_save_img(adata, saveplace, name):
     return adata, save_name
 
 def replaceimage():
-    origin_dir = os.path.join(settings.MEDIA_ROOT, 'tempimage', 'origin')
-    preview_dir = os.path.join(settings.MEDIA_ROOT, 'tempimage', 'preview')
+    origin_dir = os.path.join(settings.MEDIA_ROOT, 'qualitycontrol', 'origin')
+    preview_dir = os.path.join(settings.MEDIA_ROOT, 'qualitycontrol', 'preview')
     replaced = []
     for preview_file in os.listdir(preview_dir):
         prefix = preview_file.split('_')[0]

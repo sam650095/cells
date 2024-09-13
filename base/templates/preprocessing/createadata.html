@@ -1,6 +1,5 @@
 {%extends "base.html"%} {% load static %} {%block content%}
 <!-- main -->
-
 <div class="mb-3 text-gray-900">
   Please follow these naming conventions:
   <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
@@ -17,8 +16,9 @@
       <div class="text-start">UPLOAD DATA</div>
       <label
         for="file_upload"
-        class="rounded-md bg-sky-700 md:px-16 md:py-4 p-0 text-white text-sm font-semibold my-3 w-full hover:bg-sky-600 border-0"
-        style="display: inline-block; cursor: pointer"
+        id="file_upload_l"
+        class="rounded-md bg-sky-700 md:px-16 md:py-4 p-0 text-white text-sm font-semibold my-3 w-full hover:bg-sky-600 border-0 cursor-pointer"
+        style="display: inline-block"
       >
         Upload Files
       </label>
@@ -55,7 +55,7 @@
   </div>
   <div class="text-end py-5">
     <button
-      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600"
+      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
       id="processbutton"
       onclick="processbtn(event)"
     >

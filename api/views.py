@@ -3,7 +3,6 @@ import pandas as pd
 import scanpy as sc
 import scimap as sm 
 import numpy as np
-import logging
 import json
 from django.conf import settings
 from rest_framework.views import APIView
@@ -12,13 +11,24 @@ from rest_framework import status
 from .imaging import *
 from .saved import *
 
-logger = logging.getLogger(__name__)
+from .models import OperationStep
+
 def sort_key(filename):
     return int(filename.split('_')[0][1:]) 
-  
+def SaveSteps(session_id, step, operation_type, input_values, output_values):
+    OperationStep.objects.update_or_create(
+        session_id=session_id,
+        defaults={
+            'step':step,
+            'operation_type':operation_type,
+            'input_values':input_values,
+            'output_values':output_values
+        }
+    )
 # cleardata
 class ClearAllDataView(APIView):
     def post(self, request):
+        OperationStep.objects.all().delete()
         clear_all_data()
         clearmediafiles('')
         clear_all_h5ad_files()
@@ -30,6 +40,8 @@ class FileUploadView(APIView):
         files = request.FILES.getlist('files')
         if(len(files) < 2):
             return Response({'message': "Please uplaod unless 2 files."}, status=status.HTTP_400_BAD_REQUEST)
+        file_names = [file.name for file in files]
+        file_sizes = [file.size for file in files]
         # file types
         file_type_mapping = {
             'metadata.csv': 'metadata',
@@ -59,6 +71,10 @@ class FileUploadView(APIView):
         adata_objects, original_adata_objects, adata_results = result
         save_data(adata_objects, 'adata_objects')
         save_data(original_adata_objects, 'original_adata_objects')
+
+        # saving steps
+        SaveSteps(1, 'create_adata', 'file_upload', {'file_names': file_names, 'file_sizes': file_sizes}, {'adata_results': adata_results})
+        
         return Response({"adata_results": adata_results}, status=status.HTTP_201_CREATED)
     
     def create_adata(self, signal_value_files, metadata_files):

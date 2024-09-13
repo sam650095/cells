@@ -19,8 +19,8 @@ def save_data(data, key):
     print(key, ':\n', data)
     r = get_redis_connection()
     if r:
-        adata_bytes = pickle.dumps(data)
-        r.set(key, adata_bytes)
+        data_bytes = pickle.dumps(data)
+        r.set(key, data_bytes)
 
 def load_data(key):
     r = get_redis_connection()
@@ -29,6 +29,15 @@ def load_data(key):
         if data_bytes:
             return pickle.loads(data_bytes)
     return None
+
+def clear_data(key):
+    r = get_redis_connection()
+    if r:
+        r.delete(key)
+    else:
+        print("無法連接到 Redis")
+
+
 def get_all_keys():
     r = get_redis_connection()
     if r:
