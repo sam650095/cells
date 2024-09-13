@@ -40,7 +40,6 @@
         <form id="filterform">
           <div>
             <div class="flex items-center my-2 gap-5">
-              <input type="hidden" name="sample" id="sample" />
               <label for="f_sampleSelect" class="font-medium"
                 >Please choose the sample you want to filter:
               </label>
@@ -51,6 +50,8 @@
                 class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
                 type="button"
               >
+                <span id="sampleul_select">&nbsp</span>
+                <input type="hidden" name="sample" id="sampleul_input" />
                 <svg
                   class="w-2.5 h-2.5 ms-3"
                   aria-hidden="true"
