@@ -8,6 +8,7 @@ import os
 from .models import *
 from api.saved import *
 from api.models import OperationStep
+import json
 
 def index(request):
     return render(request, 'base/index.html')
@@ -59,3 +60,16 @@ class GetOperationStepView(APIView):
 
         except OperationStep.DoesNotExist:
             return Response({'message': 'notfound'}, status=status.HTTP_200_OK)
+class DeleteOperationStepView(APIView):
+    def get(self, request, step):
+        try:
+            print(step)
+            operation_steps_to_delete = OperationStep.objects.filter(session_id__gte=int(step))
+            if not operation_steps_to_delete.exists():
+                return Response({'message': 'No operations found with id >= {}'.format(id)}, status=status.HTTP_404_NOT_FOUND)
+            operation_steps_to_delete.delete()
+
+            return Response({'message': 'Deleted operations with id >= {}'.format(id)}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

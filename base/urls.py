@@ -5,5 +5,6 @@ urlpatterns = [
     path('<str:process>/<str:method>',views.page, name='page'),
     path('get_image/', views.get_image, name='get_image'),
     path('download_image/', views.download_images, name='download_image'),
-    path('getSteps/<str:step>/<str:operation_type>/', views.GetOperationStepView.as_view(), name='getSteps')
+    path('getSteps/<str:step>/<str:operation_type>/', views.GetOperationStepView.as_view(), name='getSteps'),
+    path('delSteps/<str:step>/', views.DeleteOperationStepView.as_view(), name='delSteps')
 ]

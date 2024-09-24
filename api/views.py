@@ -107,6 +107,13 @@ class QualityControlView(APIView):
         save_data(adata_objects, 'adata_objects')
         save_data(qc_adata_objects, 'qc_adata_objects')
         save_data(qc_adata_objects, 'preview_adata_objects')
+        # saving steps
+        SaveSteps(2, 'qualitycontrol', 'process', {}, {'adata_results': adata_results,'save_image_names': save_image_names})
+        # default filter
+        SaveSteps(3, 'qualitycontrol', 'filter', {}, {})
+        # default qui
+        SaveSteps(4, 'qualitycontrol', 'qui', {}, {})
+        
         return Response({'adata_results': adata_results,'save_image_names': save_image_names}, status=status.HTTP_201_CREATED)
     
     def post_reset_adata(self):
@@ -129,7 +136,7 @@ class PreviewView(APIView):
         # get data from frontend
         f_sampleSelect = request.data.get('sample')
         minGenes = int(request.data.get('minGenes'))
-        filter_method = request.data.get('fmethod')
+        filter_method = request.data.get('filter_sampleul_input')
         lowerlimit = float(request.data.get('lowerlimit')) if request.data.get('lowerlimit') else None
         upperlimit = float(request.data.get('upperlimit')) if request.data.get('upperlimit') else None
         user_inputs = {}
@@ -185,11 +192,17 @@ class PreviewView(APIView):
 class ReplaceView(APIView):
     def post(self,request):
         image_names = replaceimage()
-        update_adata_objects, filtered_adata_objects, adata_results = self.perform_filter()
+        f_sampleSelect = request.data.get('sample')
+        minGenes = int(request.data.get('minGenes'))
+        filter_method = request.data.get('filter_sampleul_input')
+        lowerlimit = float(request.data.get('lowerlimit')) if request.data.get('lowerlimit') else None
+        upperlimit = float(request.data.get('upperlimit')) if request.data.get('upperlimit') else None
+        update_adata_objects, filtered_adata_objects, adata_results, changed_adata_result = self.perform_filter()
 
         save_data(update_adata_objects, 'adata_objects')
         save_data(filtered_adata_objects, 'preview_adata_objects')
-
+        SaveSteps(3, 'qualitycontrol', 'filter', {"f_sampleSelect":f_sampleSelect, "minGenes":minGenes, "filter_method":filter_method, "lowerlimit":lowerlimit, "upperlimit":upperlimit}, {'adata_result':changed_adata_result, 'save_image_names':f_sampleSelect+"_previewimage.png"})
+        
         return Response({'adata_results':adata_results,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
     
     def perform_filter(self):
@@ -198,6 +211,7 @@ class ReplaceView(APIView):
         updated_adata_objects = []
         filtered_adata_objects = []
         adata_results = []
+        changed_adata_result = ""
         for adata in preview_adata_objects:
             if adata.uns['prefix'] == preview_adata.uns['prefix']:
                 updated_adata_objects.append(preview_adata)
@@ -207,10 +221,12 @@ class ReplaceView(APIView):
                 filtered_adata_objects.append(adata.copy())
         for adata in updated_adata_objects:
             n_obs, n_vars = adata.shape
+            if adata.uns['prefix'] == preview_adata.uns['prefix']:
+                changed_adata_result = f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
             adata_results.append(f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
             
 
-        return updated_adata_objects, filtered_adata_objects, adata_results
+        return updated_adata_objects, filtered_adata_objects, adata_results, changed_adata_result
 class ConfirmView(APIView):
     def post(self, request):
         adata_objects = load_data('preview_adata_objects')
@@ -221,23 +237,26 @@ class ConfirmView(APIView):
         return Response({}, status=status.HTTP_201_CREATED)
 class NormalizationView(APIView):
     def post(self, request):
-        chosen_method = request.data.get('normal_method')
+        chosen_method = request.data.get('method')
+        print(chosen_method)
         adata_objects, norm_adata_objects, norm_adata_results = self.perform_normalization(chosen_method)
         save_data(adata_objects, 'adata_objects')
         save_data(norm_adata_objects, 'norm_adata_objects')
+        SaveSteps(5, 'normalization', 'process', {}, {"adata_results": norm_adata_results})
+        
         return Response({"adata_results": norm_adata_results}, status=status.HTTP_201_CREATED)
     
     def perform_normalization(self, chosen_method):
         adata_objects = load_data('filtered_adata_objects')
         norm_adata_objects = []
         norm_adata_result = []
-        if chosen_method == 'cpm':
+        if chosen_method == 'CPM':
             for adata in adata_objects:
                 sc.pp.normalize_total(adata, target_sum=1e6)
                 sc.pp.log1p(adata)
                 norm_adata_result.append(f"Normalization completed for {adata.uns['prefix']}")
                 norm_adata_objects.append(adata.copy())
-        elif chosen_method == 'clr':
+        elif chosen_method == 'CLR':
             for adata in adata_objects:
                 x_pos = adata.X[adata.X > 0] 
                 geo_mean = np.exp(np.sum(np.log1p(x_pos)) / len(x_pos))  
@@ -249,6 +268,8 @@ class NormalizationView(APIView):
 class MergeView(APIView):
     def post(self, request):
         adata_merged_results = self.perform_merged()
+        SaveSteps(6, 'merge', 'process', {}, {"adata_results": adata_merged_results})
+        
         return Response({'adata_results':adata_merged_results}, status=status.HTTP_201_CREATED)
     def perform_merged(self):
         adata_objects = load_data('norm_adata_objects')
@@ -257,15 +278,17 @@ class MergeView(APIView):
         if len(adata_objects) == 1:
             adata = adata_objects[0]
             adata.uns['is_merged'] = False
+            prefix = adata.uns.get('prefix', 'Merged Data')
+            adata_merged_results.append(f"{prefix}: AnnData object after filter and normalization = {adata.shape[0]} × {adata.shape[1]}")
         else:
             adata = sc.concat(adata_objects, axis=0)
             adata.obs_names_make_unique()
             adata.uns['is_merged'] = True
         
-        for data in [*adata_objects, adata]:
-            prefix = data.uns.get('prefix', 'Merged Data')
-            adata_merged_results.append(f"{prefix}: AnnData object after filter and normalization = {data.shape[0]} × {data.shape[1]}")
-        
+            for data in [*adata_objects, adata]:
+                prefix = data.uns.get('prefix', 'Merged Data')
+                adata_merged_results.append(f"{prefix}: AnnData object after filter and normalization = {data.shape[0]} × {data.shape[1]}")
+            
         save_h5ad_file(adata, 'adata_preprocessing.h5ad')
         return adata_merged_results
 
@@ -288,6 +311,7 @@ class PCAView(APIView):
     def post(self, request):
         chosen_markers = request.POST.getlist('markers')
         merged_results, n_pcs_results, save_img_name = self.perform_pca(chosen_markers)
+        SaveSteps(7, 'pca', 'process', {"chosen_markers": chosen_markers}, {"merged_results":merged_results, "n_pcs_results": n_pcs_results, "save_img_name": save_img_name})
         return Response({"merged_results":merged_results,"n_pcs_results": n_pcs_results,"save_img_name":save_img_name}, status=status.HTTP_201_CREATED)
 
     def perform_pca(self, chosen_markers):
@@ -325,6 +349,10 @@ class CLusteringView(APIView):
         resolution = float(request.data.get('resolution'))
         n_pcs = load_data('n_pcs')
         self.perform_clustering(chosen_method, n_neighbors, resolution, n_pcs) 
+        SaveSteps(8, 'clustering', 'process', {"chosen_method": chosen_method, "resolution":resolution, "n_pcs": n_pcs}, {})
+        SaveSteps(9, 'clustering', 'rename', {},{})
+        SaveSteps(10, 'clustering', 'subcluster', {},{})
+        SaveSteps(11, 'clustering', 'subset', {},{})
         return Response({}, status=status.HTTP_201_CREATED)
         
     def perform_clustering(self, chosen_method, n_neighbors, resolution, n_pcs):

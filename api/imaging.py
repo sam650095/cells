@@ -36,7 +36,7 @@ def replaceimage():
         for origin_file in os.listdir(origin_dir):
             if origin_file.startswith(prefix + '_'):
                 origin_path = os.path.join(origin_dir, origin_file)
-                os.replace(preview_path, origin_path)
+                shutil.copy(preview_path, origin_path)
                 replaced.append(f"Replaced {origin_file}")
                 break
     image_files = sorted(os.listdir(origin_dir))

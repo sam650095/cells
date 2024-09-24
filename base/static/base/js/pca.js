@@ -1,100 +1,28 @@
+let stepped = false;
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
   const markerlist_results = await fetchAPI("/api/preloadpca", 0, csrftoken);
-  insert_marker_options(markerlist_results.marker_list);
+  insert_marker_options(markerlist_results.data.marker_list);
+  // grab step
+  const grabstep_rslt = await grabsteps(`/getSteps/pca/process/`);
+
+  if (grabstep_rslt.message != "notfound") {
+    stepped = true;
+    document.getElementById("watchonly").classList.remove("hidden");
+    grabstep_rslt.input_values["chosen_markers"].forEach((element) => {
+      document.getElementById("marker-" + element).checked = true;
+    });
+    logSelectedCount();
+    updateSelectAllState();
+    show_list(grabstep_rslt.output_values);
+    banned_operations();
+  }
 });
-
-function insert_marker_options(markers) {
-  const dropdownList = document.querySelector("#dropdownmarkers ul");
-  dropdownList.innerHTML = "";
-
-  markers.forEach((marker, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-        <div class="flex p-2 rounded hover:bg-gray-100">
-          <div class="flex items-center h-5">
-            <input
-              id="marker-${index}"
-              aria-describedby="marker-text-${index}"
-              type="checkbox"
-              value="${marker}"
-              checked
-              class="marker-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-          </div>
-          <div class="ms-2 text-sm w-full">
-            <label for="marker-${index}" class="font-bold text-gray-900">
-              <div>${marker}</div>
-            </label>
-          </div>
-        </div>
-      `;
-    dropdownList.appendChild(li);
-  });
-  logSelectedCount();
-  dropdownList.addEventListener("change", function (event) {
-    if (event.target.type === "checkbox") {
-      if (event.target.value === "Select All") {
-        handleSelectAll(event.target.checked);
-      } else {
-        updateSelectAllState();
-      }
-      logSelectedCount();
-    }
-  });
-}
-
-function handleSelectAll(isChecked) {
-  const checkboxes = document.querySelectorAll(".marker-checkbox");
-  checkboxes.forEach((checkbox) => {
-    checkbox.checked = isChecked;
-  });
-}
-
-function updateSelectAllState() {
-  const checkboxes = document.querySelectorAll(
-    '.marker-checkbox:not([value="Select All"])'
-  );
-  const selectAllCheckbox = document.querySelector(
-    '.marker-checkbox[value="Select All"]'
-  );
-  const allChecked = Array.from(checkboxes).every(
-    (checkbox) => checkbox.checked
-  );
-  selectAllCheckbox.checked = allChecked;
-}
-
-function logSelectedCount() {
-  const selectedCheckboxes = document.querySelectorAll(
-    ".marker-checkbox:checked"
-  );
-  const selectedMarkers = Array.from(selectedCheckboxes)
-    .map((checkbox) => checkbox.value)
-    .filter((value) => value !== "Select All");
-
-  const selectedCount = selectedMarkers.length;
-
-  const selectedbox = document.getElementById("selectedbox");
-  selectedbox.textContent = "";
-  const ul = document.createElement("ul");
-  ul.classList.add(
-    "space-y-2",
-    "text-gray-500",
-    "list-disc",
-    "list-inside",
-    "w-full",
-    "break-words"
-  );
-
-  const li = document.createElement("li");
-  li.textContent = `Currently selected: ${selectedCount} markers`;
-  const markersdiv = document.createElement("div");
-  markersdiv.textContent = `[${selectedMarkers.join(", ")}]`;
-  markersdiv.classList.add("indent-8");
-  li.appendChild(markersdiv);
-  ul.appendChild(li);
-
-  selectedbox.appendChild(ul);
+function banned_operations() {
+  const processBtn = document.getElementById("processbutton");
+  processBtn.disabled = true;
+  const pca_markers = document.getElementById("pca_markers");
+  pca_markers.disabled = true;
 }
 // proccess button click
 async function processbtn(event) {
@@ -121,7 +49,9 @@ async function processbtn(event) {
   pca_box.textContent = "";
   const process_result = await fetchAPI("/api/pca", formData, csrftoken);
   console.log(process_result);
-
+  show_list(process_result.data);
+}
+function show_list(process_result) {
   const ul = document.createElement("ul");
   ul.classList.add(
     "space-y-1",

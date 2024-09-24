@@ -1,13 +1,5 @@
 let methodtextnode;
-async function prenext(event) {
-  event.preventDefault();
-  const csrftoken = getCookie("csrftoken");
-  const m_subset_results = await fetchAPI("/api/subset/merged", 0, csrftoken);
-  console.log(m_subset_results);
-  if (m_subset_results) {
-    window.location.href = event.target.href;
-  }
-}
+let stepped = false;
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
   const preload_clustering_results = await fetchAPI(
@@ -16,7 +8,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     csrftoken
   );
   console.log(preload_clustering_results);
-  show_clustering_method(preload_clustering_results);
+  show_clustering_method(preload_clustering_results.data);
+  // grab step
+  const grabstep_rslt = await grabsteps(`/getSteps/clustering/process/`);
+  console.log(grabstep_rslt);
+  if (grabstep_rslt.message != "notfound") {
+    stepped = true;
+  }
 });
 // show selection
 function show_clustering_method(preload_clustering_results) {
@@ -50,7 +48,6 @@ async function processbtn(event) {
   console.log(formData);
   const csrftoken = getCookie("csrftoken");
   const clusterresult = await fetchAPI("/api/clustering", formData, csrftoken);
-  console.log(clusterresult);
 
   toggleLoading(false, "processbutton");
   document.getElementById("btnbox").classList.remove("hidden");
@@ -67,7 +64,7 @@ async function processbtn(event) {
     csrftoken
   );
   console.log(preloadmerkersresult);
-  insert_marker_options(preloadmerkersresult.marker_list);
+  insert_marker_options(preloadmerkersresult.data.marker_list);
   document.getElementById("nextbtn").classList.remove("hidden");
 }
 
@@ -78,7 +75,6 @@ async function addleidens() {
     0,
     csrftoken
   );
-  console.log(addleidensresult);
   // add to container
   loadImage(
     "umap_cluster",
@@ -108,6 +104,14 @@ async function addmarkers() {
     formData,
     csrftoken
   );
-  console.log(addleidensresult);
   loadImage("umap_cluster", "clustering_markers.png", "addmarkers-container");
+}
+async function prenext(event) {
+  event.preventDefault();
+  const csrftoken = getCookie("csrftoken");
+  const m_subset_results = await fetchAPI("/api/subset/merged", 0, csrftoken);
+  console.log(m_subset_results);
+  if (m_subset_results) {
+    window.location.href = event.target.href;
+  }
 }

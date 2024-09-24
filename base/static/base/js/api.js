@@ -48,7 +48,26 @@ async function grabsteps(url) {
     return null;
   }
 }
-
+// del steps
+async function deleteSteps() {
+  let step = document.getElementById("steps").value;
+  let steps = {
+    createadata: 1,
+    qualitycontrol: 2,
+    normalizationmerge: 5,
+    pca: 7,
+  };
+  let url = `/delSteps/${steps[step]}/`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      return null;
+    }
+    window.location.reload();
+  } catch (error) {
+    return null;
+  }
+}
 function downloadImages(folder) {
   const csrftoken = getCookie("csrftoken");
   fetch("/download_image/", {
@@ -132,11 +151,10 @@ function insert_marker_options(markers) {
         <div class="flex p-2 rounded hover:bg-gray-100">
           <div class="flex items-center h-5">
             <input
-              id="marker-${index}"
+              id="marker-${marker}"
               aria-describedby="marker-text-${index}"
               type="checkbox"
               value="${marker}"
-              checked
               class="marker-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
             />
           </div>

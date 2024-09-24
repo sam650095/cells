@@ -11,7 +11,7 @@
 </div>
 <div class="text-end py-5">
   <button
-    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600"
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
     id="processbutton"
     onclick="processbtn(event)"
   >
@@ -39,7 +39,7 @@
 <div id="nextbtn" class="text-end py-5 hidden">
   <a
     onclick="presubmit(event)"
-    href="{% url 'page' process='preprocessing' method='normalization&merged' %}"
+    href="{% url 'page' process='preprocessing' method='normalizationmerge' %}"
     class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
   >
     Next: Normalization & Merged

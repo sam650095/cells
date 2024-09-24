@@ -18,7 +18,10 @@ for (let i = 0; i < navul.length; i++) {
 }
 for (let i = 0; i < navContents.length; i++) {
   let element = navContents[i];
-  let content = element.textContent.replace(/\s+/g, "").toLowerCase();
+  let content = element.textContent
+    .replace(/\s+/g, "")
+    .replace(/&/g, "")
+    .toLowerCase();
 
   if (content === secondSegment) {
     element.classList.add("text-sky-700");

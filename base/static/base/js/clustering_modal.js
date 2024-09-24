@@ -8,7 +8,7 @@ async function grabnames() {
     0,
     csrftoken
   );
-  show_name_table(grabname_result.rename_df);
+  show_name_table(grabname_result.data.rename_df);
 }
 function show_name_table(rename_df) {
   const tableBody = document.getElementById("nametbody");
@@ -77,7 +77,7 @@ async function grabclusters() {
   const csrftoken = getCookie("csrftoken");
   const grabclusters_result = await fetchAPI("/api/grabclusters", 0, csrftoken);
   console.log(grabclusters_result);
-  show_divideclusters(grabclusters_result.clusters_list);
+  show_divideclusters(grabclusters_result.data.clusters_list);
 }
 function show_divideclusters(clusters) {
   const dropdownList = document.querySelector("#divide_subcluster_dropdown ul");
@@ -129,7 +129,6 @@ async function subcluster_confirmbtn() {
     formData,
     csrftoken
   );
-  console.log(subclusters_result);
   loadImage("cluster_result", "clustering_summary.png", "summary-container");
   loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
   loadImage("cluster_result", "clustering_leidens.png", "umap-container");
@@ -151,14 +150,14 @@ async function preload_subset() {
   available_files_result.innerHTML = "";
   let ul = document.createElement("ul");
   ul.classList.add("space-y-1", "text-gray-500", "list-disc", "list-inside");
-  preload_subset_result["available_files_result"].forEach((item) => {
+  preload_subset_result.data["available_files_result"].forEach((item) => {
     let li = document.createElement("li");
     li.textContent = item;
     ul.appendChild(li);
   });
   available_files_result.appendChild(ul);
   // dropdown show
-  show_dropdown(preload_subset_result["clustering_columns"]);
+  show_dropdown(preload_subset_result.data["clustering_columns"]);
 }
 function show_dropdown(clustering_col) {
   console.log(clustering_col);
@@ -193,7 +192,7 @@ async function samplemethodtextnodefix(newText) {
     csrftoken
   );
   console.log(grab_cluster_subset_result);
-  show_dropdown_subset(grab_cluster_subset_result.cluster);
+  show_dropdown_subset(grab_cluster_subset_result.data.cluster);
 }
 function show_dropdown_subset(clusters) {
   const dropdownList = document.querySelector("#subset_dropdown ul");
@@ -256,5 +255,5 @@ async function subset_confirmbtn(event) {
   const subset_results = await fetchAPI("/api/subset/new", formData, csrftoken);
   console.log(subset_results);
   document.getElementById("subsetresult").textContent =
-    subset_results.available_files_result;
+    subset_results.data.available_files_result;
 }

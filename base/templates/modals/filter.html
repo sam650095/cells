@@ -47,7 +47,7 @@
                 name="f_sampleSelect"
                 id="f_sampleSelect"
                 data-dropdown-toggle="f_dropdown"
-                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
                 type="button"
               >
                 <span id="sampleul_select">&nbsp</span>
@@ -90,7 +90,7 @@
                 type="number"
                 name="minGenes"
                 id="minGenes"
-                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+                class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
               />
             </div>
             <span class="font-medium">Filter Outliers:</span>
@@ -106,10 +106,16 @@
                 name="filter_method"
                 id="filter_method"
                 data-dropdown-toggle="mdropdown"
-                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
                 type="button"
               >
-                <span id="methodtext">Manual</span>
+                <span id="filter_sampleul_select">Manual</span>
+                <input
+                  type="hidden"
+                  name="filter_sampleul_input"
+                  id="filter_sampleul_input"
+                  value="Manual"
+                />
                 <svg
                   class="w-2.5 h-2.5 ms-3"
                   aria-hidden="true"
@@ -132,27 +138,27 @@
               >
                 <ul
                   class="py-2 text-sm text-gray-700"
-                  id="methodul"
+                  id="filter_sampleul"
                   aria-labelledby="filter_method"
                 >
                   <li>
                     <a
-                      onclick="methodtextnodefix('Manual')"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      onclick="select_method('Manual')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2 cursor-pointer"
                       >Manual</a
                     >
                   </li>
                   <li>
                     <a
-                      onclick="methodtextnodefix('Quantile')"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      onclick="select_method('Quantile')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2 cursor-pointer"
                       >Quantile</a
                     >
                   </li>
                   <li>
                     <a
-                      onclick="methodtextnodefix('1.5IQR')"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                      onclick="select_method('1.5IQR')"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2 cursor-pointer"
                       >1.5IQR</a
                     >
                   </li>
@@ -179,7 +185,7 @@
                   type="number"
                   id="lowerlimit"
                   name="lowerlimit"
-                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+                  class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
                 />
               </div>
               <div class="flex items-center my-2 gap-5 px-5">
@@ -193,15 +199,16 @@
                   type="number"
                   id="upperlimit"
                   name="upperlimit"
-                  class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+                  class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
                 />
               </div>
             </div>
             <div class="text-right my-2">
               <button
                 type="button"
+                id="previewbutton"
                 onclick="preview()"
-                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
               >
                 Preview
               </button>
@@ -215,7 +222,7 @@
             onclick="confirm()"
             id="confirmbtn"
             data-modal-hide="filter-modal"
-            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hidden"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
           >
             Confirm
           </button>
