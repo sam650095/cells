@@ -58,7 +58,7 @@ function confirmname(index) {
   document.getElementById("editbtn_" + index).classList.remove("hidden");
   document.getElementById("confirmbtn_" + index).classList.add("hidden");
 }
-async function reanme_confirmbtn() {
+async function rename_confirmbtn() {
   console.log(new_rename_df);
   const csrftoken = getCookie("csrftoken");
   const jsonData = JSON.stringify(new_rename_df);

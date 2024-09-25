@@ -56,6 +56,7 @@ async function deleteSteps() {
     qualitycontrol: 2,
     normalizationmerge: 5,
     pca: 7,
+    clustering: 8,
   };
   let url = `/delSteps/${steps[step]}/`;
   try {

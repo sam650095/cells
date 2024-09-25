@@ -1,3 +1,4 @@
+let stepped = false;
 // navbar styling
 let pathSegments = window.location.pathname.split("/");
 let firstSegment = pathSegments[1] || "";
@@ -46,4 +47,13 @@ function toggleLoading(isLoading, btnid) {
     btn.classList.remove("bg-sky-600");
     btn.classList.add("bg-sky-700");
   }
+}
+function show_modal(m) {
+  const modal = new Modal(document.getElementById(m));
+  modal.show();
+}
+
+function close_modal(m) {
+  const modal = new Modal(document.getElementById(m));
+  modal.hide();
 }

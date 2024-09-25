@@ -2,6 +2,7 @@ let new_rename_df;
 let samplemethodtextnode;
 // renameing
 async function grabnames() {
+  show_modal("rename-modal");
   const csrftoken = getCookie("csrftoken");
   const grabname_result = await fetchAPI(
     "/api/grabclustersnames",
@@ -16,7 +17,6 @@ function show_name_table(rename_df) {
   // Clear existing rows
   tableBody.innerHTML = "";
   new_rename_df = rename_df;
-  console.log(new_rename_df.NewName);
   // Add new rows based on the API result
   for (let i = 0; i < rename_df.CurrentName.length; i++) {
     const row = document.createElement("tr");
@@ -31,8 +31,8 @@ function show_name_table(rename_df) {
       </td>
       <td class="px-6 py-4 w-1/3" id="newname_${i}">${rename_df.NewName[i]}</td>
       <td class="px-6 py-4 text-right w-1/6">
-        <a onclick="editname(${i})" id="editbtn_${i}" class="font-medium text-sky-700 underline-offset-4 hover:underline hover:cursor-pointer" >Edit</a>
-        <a onclick="confirmname(${i})" id="confirmbtn_${i}" class="hidden font-medium text-sky-700 underline-offset-4 hover:underline hover:cursor-pointer" >Confirm</a>
+        <a onclick="editname(${i})" id="editbtn_${i}" name="editbtn" class="font-medium text-sky-700 underline-offset-4 hover:underline hover:cursor-pointer" >Edit</a>
+        <a onclick="confirmname(${i})" id="confirmbtn_${i}" name="confirmbtn" class="hidden font-medium text-sky-700 underline-offset-4 hover:underline hover:cursor-pointer" >Confirm</a>
       </td>
     `;
 
@@ -58,8 +58,8 @@ function confirmname(index) {
   document.getElementById("editbtn_" + index).classList.remove("hidden");
   document.getElementById("confirmbtn_" + index).classList.add("hidden");
 }
-async function reanme_confirmbtn() {
-  console.log(new_rename_df);
+async function rename_confirmbtn() {
+  toggleLoading(true, "confirmbtn");
   const csrftoken = getCookie("csrftoken");
   const jsonData = JSON.stringify(new_rename_df);
   const renameresult = await fetchAPI(
@@ -71,34 +71,58 @@ async function reanme_confirmbtn() {
   loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
   loadImage("cluster_result", "clustering_leidens.png", "umap-container");
   loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
+  close_modal("rename-modal");
+  toggleLoading(false, "confirmbtn");
 }
 // subclustering
 async function grabclusters() {
+  show_modal("subcluster-modal");
   const csrftoken = getCookie("csrftoken");
   const grabclusters_result = await fetchAPI("/api/grabclusters", 0, csrftoken);
   console.log(grabclusters_result);
   show_divideclusters(grabclusters_result.data.clusters_list);
+
+  // grab steps
+  if (stepped == true) {
+    const grabstep_subcluster_rslt = await grabsteps(
+      `/getSteps/clustering/subcluster/`
+    );
+    console.log(grabstep_subcluster_rslt);
+
+    if (grabstep_subcluster_rslt.input_values.length > 0) {
+      document.getElementById("subcluster_resolution").value =
+        grabstep_subcluster_rslt.input_values["resolution"];
+
+      grabstep_subcluster_rslt.input_values["chosen_clusters"].forEach(
+        (element) => {
+          console.log("cluster-" + element);
+          document.getElementById("cluster-" + element).checked = true;
+        }
+      );
+    }
+    document.getElementById("divide_subcluster").disabled = true;
+    document.getElementById("subcluster_resolution").disabled = true;
+    document.getElementById("subcluster_confirmbtn").disabled = true;
+  }
 }
 function show_divideclusters(clusters) {
   const dropdownList = document.querySelector("#divide_subcluster_dropdown ul");
   dropdownList.innerHTML = "";
-  document.getElementById("_").textContent = clusters[0];
   clusters.forEach((cluster, index) => {
     const li = document.createElement("li");
     li.innerHTML = `
         <div class="flex p-2 rounded hover:bg-gray-100">
           <div class="flex items-center h-5">
             <input
-              id="cluster-${index}"
+              id="cluster-${cluster}"
               aria-describedby="cluster-text-${index}"
               type="checkbox"
               value="${cluster}"
-              checked
               class="clusters_checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
             />
           </div>
           <div class="ms-2 text-sm w-full">
-            <label for="cluster-${index}" class="font-bold text-gray-900">
+            <label for="cluster-${cluster}" class="font-bold text-gray-900">
               <div>${cluster}</div>
             </label>
           </div>
@@ -108,6 +132,7 @@ function show_divideclusters(clusters) {
   });
 }
 async function subcluster_confirmbtn() {
+  toggleLoading(true, "confirmbtn");
   const csrftoken = getCookie("csrftoken");
   const form = document.getElementById("subclusterform");
 
@@ -133,9 +158,12 @@ async function subcluster_confirmbtn() {
   loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
   loadImage("cluster_result", "clustering_leidens.png", "umap-container");
   loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
+  toggleLoading(true, "confirmbtn");
+  close_modal("subcluster-modal");
 }
 // subset
 async function preload_subset() {
+  show_modal("subset-modal");
   const csrftoken = getCookie("csrftoken");
   const preload_subset_result = await fetchAPI(
     "/api/preloadsubset",
@@ -256,4 +284,5 @@ async function subset_confirmbtn(event) {
   console.log(subset_results);
   document.getElementById("subsetresult").textContent =
     subset_results.data.available_files_result;
+  close_modal("subset-modal");
 }

@@ -1,6 +1,6 @@
 let filename_showplace = document.getElementById("showplace");
 filename_showplace.classList.add("max-h-60", "overflow-y-auto");
-let stepped = false;
+
 // check if the step is proccessed
 document.addEventListener("DOMContentLoaded", async function () {
   const grabstep_rslt = await grabsteps(`/getSteps/create_adata/file_upload/`);

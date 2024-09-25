@@ -11,9 +11,11 @@
         name="clustering_method"
         id="clustering_method"
         data-dropdown-toggle="dropdown"
-        class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+        class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
         type="button"
       >
+        <input type="hidden" name="method" id="preloadul_input" value="none" />
+        <span id="preloadul_select">none</span>
         <svg
           class="w-2.5 h-2.5 ms-3"
           aria-hidden="true"
@@ -59,7 +61,7 @@
       type="number"
       id="n_neighbors"
       name="n_neighbors"
-      class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+      class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
     />
   </div>
   <div class="flex items-center my-2 text-gray-900">
@@ -70,13 +72,13 @@
       type="number"
       id="resolution"
       name="resolution"
-      class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+      class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
     />
   </div>
 </form>
 <div class="text-end py-5">
   <button
-    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
     id="processbutton"
     onclick="processbtn(event)"
   >
@@ -327,6 +329,7 @@
         <h3 class="text-xl font-semibold text-gray-900">Rename Clusters</h3>
         <button
           type="button"
+          onclick="close_modal('rename-modal')"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
           data-modal-hide="rename-modal"
         >
@@ -385,10 +388,9 @@
         <div class="text-right my-2">
           <button
             type="button"
-            onclick="reanme_confirmbtn()"
+            onclick="rename_confirmbtn()"
             id="confirmbtn"
-            data-modal-hide="rename-modal"
-            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
           >
             Confirm
           </button>
@@ -412,6 +414,7 @@
         <h3 class="text-xl font-semibold text-gray-900">Subclusters</h3>
         <button
           type="button"
+          onclick="close_modal('subcluster-modal')"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
           data-modal-hide="subcluster-modal"
         >
@@ -449,10 +452,10 @@
               name="divide_subcluster"
               id="divide_subcluster"
               data-dropdown-toggle="divide_subcluster_dropdown"
-              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
               type="button"
             >
-              <span id="_"></span>
+              <span id="_">&nbsp</span>
               <svg
                 class="w-2.5 h-2.5 ms-3"
                 aria-hidden="true"
@@ -490,8 +493,8 @@
             <input
               type="number"
               name="resolution"
-              id="resolution"
-              class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              id="subcluster_resolution"
+              class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
             />
           </div>
         </form>
@@ -499,9 +502,8 @@
           <button
             type="button"
             onclick="subcluster_confirmbtn()"
-            id="confirmbtn"
-            data-modal-hide="subcluster-modal"
-            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+            id="subcluster_confirmbtn"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
           >
             Confirm
           </button>
@@ -525,6 +527,7 @@
         <h3 class="text-xl font-semibold text-gray-900">Subset Clusters</h3>
         <button
           type="button"
+          onclick="close_modal('subset-modal')"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
           data-modal-hide="subset-modal"
         >
@@ -669,7 +672,7 @@
             type="button"
             onclick="subset_confirmbtn(event)"
             id="confirmbtn"
-            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
           >
             Confirm
           </button>

@@ -1,4 +1,3 @@
-let stepped = false;
 document.addEventListener("DOMContentLoaded", async function () {
   const grabstep_normalization_rslt = await grabsteps(
     `/getSteps/normalization/process/`

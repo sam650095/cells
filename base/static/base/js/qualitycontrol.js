@@ -1,6 +1,6 @@
 const f_sampleSelect = document.getElementById("f_sampleSelect");
 const v_sampleSelect = document.getElementById("v_sampleSelect");
-let stepped = false;
+
 // check if the step is proccessed
 document.addEventListener("DOMContentLoaded", async function () {
   const grabstep_rslt = await grabsteps(`/getSteps/qualitycontrol/process/`);
@@ -167,7 +167,6 @@ function select_method(method) {
 function select(s_ul, selected) {
   document.getElementById(s_ul + "_select").textContent = selected;
   document.getElementById(s_ul + "_input").value = selected;
-  console.log(document.getElementById(s_ul + "_input").value);
 }
 // preview
 async function preview() {

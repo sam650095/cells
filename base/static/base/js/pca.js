@@ -1,4 +1,3 @@
-let stepped = false;
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
   const markerlist_results = await fetchAPI("/api/preloadpca", 0, csrftoken);

@@ -1,5 +1,3 @@
-let methodtextnode;
-let stepped = false;
 document.addEventListener("DOMContentLoaded", async function () {
   const csrftoken = getCookie("csrftoken");
   const preload_clustering_results = await fetchAPI(
@@ -11,28 +9,53 @@ document.addEventListener("DOMContentLoaded", async function () {
   show_clustering_method(preload_clustering_results.data);
   // grab step
   const grabstep_rslt = await grabsteps(`/getSteps/clustering/process/`);
-  console.log(grabstep_rslt);
+
+  // clustering process
   if (grabstep_rslt.message != "notfound") {
     stepped = true;
+    document.getElementById("watchonly").classList.remove("hidden");
+    // clustering process
+    document.getElementById("preloadul_input").value =
+      grabstep_rslt.input_values["chosen_method"];
+    document.getElementById("preloadul_select").textContent =
+      grabstep_rslt.input_values["chosen_method"];
+    document.getElementById("n_neighbors").value =
+      grabstep_rslt.input_values["n_neighbors"];
+    document.getElementById("resolution").value =
+      grabstep_rslt.input_values["resolution"];
+
+    show_result();
+    banned_operations();
   }
 });
+// banned operation
+function banned_operations() {
+  const processBtn = document.getElementById("processbutton");
+  processBtn.disabled = true;
+  document.getElementById("clustering_method").disabled = true;
+  document.getElementById("n_neighbors").disabled = true;
+  document.getElementById("resolution").disabled = true;
+  document.getElementById("processbutton").disabled = true;
+}
 // show selection
 function show_clustering_method(preload_clustering_results) {
-  const clustering_method = document.getElementById("clustering_method");
   const clustering_method_ul = document.getElementById("preloadul");
 
   clustering_method_ul.innerHTML = "";
-  methodtextnode = document.createTextNode("none");
-  clustering_method.insertBefore(methodtextnode, clustering_method.firstChild);
+
   for (let i = 0; i < preload_clustering_results.methods.length; i++) {
     const li = document.createElement("li");
     li.innerHTML = `
-                <a onclick="methodtextnodefix('${preload_clustering_results.methods[i]}')"
-                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2"
+                <a onclick="select('preloadul','${preload_clustering_results.methods[i]}')"
+                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2 cursor-pointer disabled:cursor-not-allowed"
             >${preload_clustering_results.methods[i]}</a>
         `;
     clustering_method_ul.appendChild(li);
   }
+}
+function select(s_ul, selected) {
+  document.getElementById(s_ul + "_select").textContent = selected;
+  document.getElementById(s_ul + "_input").value = selected;
 }
 function methodtextnodefix(newText) {
   methodtextnode.nodeValue = newText;
@@ -50,13 +73,7 @@ async function processbtn(event) {
   const clusterresult = await fetchAPI("/api/clustering", formData, csrftoken);
 
   toggleLoading(false, "processbutton");
-  document.getElementById("btnbox").classList.remove("hidden");
-  document.getElementById("imgbox").classList.remove("hidden");
-  loadImage("cluster_result", "clustering_summary.png", "summary-container");
-  loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
-  loadImage("cluster_result", "clustering_leidens.png", "umap-container");
-  loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
-
+  show_result();
   // Preload Markers
   const preloadmerkersresult = await fetchAPI(
     "/api/preloadclustermarkers",
@@ -67,7 +84,14 @@ async function processbtn(event) {
   insert_marker_options(preloadmerkersresult.data.marker_list);
   document.getElementById("nextbtn").classList.remove("hidden");
 }
-
+function show_result() {
+  document.getElementById("btnbox").classList.remove("hidden");
+  document.getElementById("imgbox").classList.remove("hidden");
+  loadImage("cluster_result", "clustering_summary.png", "summary-container");
+  loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
+  loadImage("cluster_result", "clustering_leidens.png", "umap-container");
+  loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
+}
 async function addleidens() {
   const csrftoken = getCookie("csrftoken");
   const addleidensresult = await fetchAPI(

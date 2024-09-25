@@ -349,7 +349,7 @@ class CLusteringView(APIView):
         resolution = float(request.data.get('resolution'))
         n_pcs = load_data('n_pcs')
         self.perform_clustering(chosen_method, n_neighbors, resolution, n_pcs) 
-        SaveSteps(8, 'clustering', 'process', {"chosen_method": chosen_method, "resolution":resolution, "n_pcs": n_pcs}, {})
+        SaveSteps(8, 'clustering', 'process', {"chosen_method": chosen_method, "resolution":resolution, "n_neighbors": n_neighbors}, {})
         SaveSteps(9, 'clustering', 'rename', {},{})
         SaveSteps(10, 'clustering', 'subcluster', {},{})
         SaveSteps(11, 'clustering', 'subset', {},{})
@@ -416,6 +416,7 @@ class RenameClusterView(APIView):
     def post(self, request):
         data = json.loads(request.body)
         self.perform_rename_cluster(pd.DataFrame(data))
+        SaveSteps(9, 'clustering', 'rename', {},{})
         return Response({}, status=status.HTTP_201_CREATED)
     def perform_rename_cluster(self, rename_df):
         adata = read_h5ad_file('adata_clustering.h5ad')
@@ -446,6 +447,7 @@ class SubclusterView(APIView):
         chosen_clusters = request.data.getlist('clusters') 
         resolution = float(request.data.get('resolution'))
         self.perform_subclustering(resolution, chosen_clusters)
+        SaveSteps(10, 'clustering', 'subcluster', {"chosen_clusters":chosen_clusters,"resolution":resolution},{})
         return Response({}, status=status.HTTP_201_CREATED)
     def perform_subclustering(self, resolution, chosen_clusters):
         adata = read_h5ad_file('adata_clustering.h5ad')
