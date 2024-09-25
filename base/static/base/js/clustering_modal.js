@@ -1,5 +1,6 @@
 let new_rename_df;
 let samplemethodtextnode;
+let select_result = [];
 // renameing
 async function grabnames() {
   show_modal("rename-modal");
@@ -88,11 +89,10 @@ async function grabclusters() {
       `/getSteps/clustering/subcluster/`
     );
     console.log(grabstep_subcluster_rslt);
+    document.getElementById("subcluster_resolution").value =
+      grabstep_subcluster_rslt.input_values["resolution"];
 
     if (grabstep_subcluster_rslt.input_values.length > 0) {
-      document.getElementById("subcluster_resolution").value =
-        grabstep_subcluster_rslt.input_values["resolution"];
-
       grabstep_subcluster_rslt.input_values["chosen_clusters"].forEach(
         (element) => {
           console.log("cluster-" + element);
@@ -103,6 +103,8 @@ async function grabclusters() {
     document.getElementById("divide_subcluster").disabled = true;
     document.getElementById("subcluster_resolution").disabled = true;
     document.getElementById("subcluster_confirmbtn").disabled = true;
+    document.getElementById("select_result").textContent =
+      grabstep_subcluster_rslt.input_values["chosen_clusters"];
   }
 }
 function show_divideclusters(clusters) {
@@ -129,10 +131,24 @@ function show_divideclusters(clusters) {
         </div>
       `;
     dropdownList.appendChild(li);
+    document.querySelectorAll(".clusters_checkbox").forEach((checkbox) => {
+      checkbox.addEventListener("change", updateSelectedClusters);
+    });
+
+    function updateSelectedClusters() {
+      const selectedClusters = Array.from(
+        document.querySelectorAll(".clusters_checkbox:checked")
+      ).map((checkbox) => checkbox.value);
+
+      const selectedDisplay = document.getElementById("select_result");
+      if (selectedDisplay) {
+        selectedDisplay.innerHTML = `${selectedClusters.join(",")}`;
+      }
+    }
   });
 }
 async function subcluster_confirmbtn() {
-  toggleLoading(true, "confirmbtn");
+  toggleLoading(true, "subcluster_confirmbtn");
   const csrftoken = getCookie("csrftoken");
   const form = document.getElementById("subclusterform");
 
@@ -158,7 +174,7 @@ async function subcluster_confirmbtn() {
   loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
   loadImage("cluster_result", "clustering_leidens.png", "umap-container");
   loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
-  toggleLoading(true, "confirmbtn");
+  toggleLoading(false, "subcluster_confirmbtn");
   close_modal("subcluster-modal");
 }
 // subset
@@ -186,6 +202,14 @@ async function preload_subset() {
   available_files_result.appendChild(ul);
   // dropdown show
   show_dropdown(preload_subset_result.data["clustering_columns"]);
+
+  // grab steps
+  if (stepped == true) {
+    const grabstep_subset_rslt = await grabsteps(
+      `/getSteps/clustering/subset/`
+    );
+    console.log(grabstep_subset_rslt);
+  }
 }
 function show_dropdown(clustering_col) {
   console.log(clustering_col);

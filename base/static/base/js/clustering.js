@@ -9,7 +9,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   show_clustering_method(preload_clustering_results.data);
   // grab step
   const grabstep_rslt = await grabsteps(`/getSteps/clustering/process/`);
-
+  const grabstep_umap_add_image_rslt = await grabsteps(
+    `/getSteps/clustering/umap_add_image/`
+  );
+  console.log(grabstep_umap_add_image_rslt);
   // clustering process
   if (grabstep_rslt.message != "notfound") {
     stepped = true;
@@ -25,6 +28,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       grabstep_rslt.input_values["resolution"];
 
     show_result();
+    loadImage(
+      "umap_cluster",
+      "clustering_leidens_bysample.png",
+      "addleidens-container"
+    );
+    loadImage("umap_cluster", "clustering_markers.png", "addmarkers-container");
     banned_operations();
   }
 });
@@ -32,10 +41,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 function banned_operations() {
   const processBtn = document.getElementById("processbutton");
   processBtn.disabled = true;
+  document.getElementById("confirmbtn").disabled = true;
   document.getElementById("clustering_method").disabled = true;
   document.getElementById("n_neighbors").disabled = true;
   document.getElementById("resolution").disabled = true;
   document.getElementById("processbutton").disabled = true;
+  document.getElementById("Addleidens").disabled = true;
+  document.getElementById("pca_markers").disabled = true;
+  document.getElementById("Addedmarkers").disabled = true;
 }
 // show selection
 function show_clustering_method(preload_clustering_results) {
@@ -123,7 +136,7 @@ async function addmarkers() {
   selectedMarkers.forEach((marker) => {
     formData.append("markers", marker);
   });
-  const addleidensresult = await fetchAPI(
+  const addmarkersresult = await fetchAPI(
     "/api/addumapcluster/markers",
     formData,
     csrftoken

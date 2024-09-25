@@ -114,7 +114,9 @@ function loadImage(folder, filename, containerId, refresh = true) {
     .then((response) => response.json())
     .then((data) => {
       let container = document.getElementById(containerId);
-      if (refresh) containerId.innerHTML = "";
+      if (refresh) {
+        containerId.textContent = "";
+      }
       if (container) {
         if (data.image_path) {
           if (document.getElementById(filename)) {
@@ -126,8 +128,6 @@ function loadImage(folder, filename, containerId, refresh = true) {
           img.id = filename;
           img.classList.add("h-auto", "max-w-full", "mx-auto");
           container.appendChild(img);
-        } else {
-          container.innerHTML = "No image found. Might be something got wrong.";
         }
       } else {
         console.error("Container not found:", containerId);
@@ -136,9 +136,6 @@ function loadImage(folder, filename, containerId, refresh = true) {
     .catch((error) => {
       console.error("Error:", error);
       let container = document.getElementById(containerId);
-      if (container) {
-        container.innerHTML = "No image found. Might be something got wrong.";
-      }
     });
 }
 // marker option

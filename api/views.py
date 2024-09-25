@@ -353,6 +353,7 @@ class CLusteringView(APIView):
         SaveSteps(9, 'clustering', 'rename', {},{})
         SaveSteps(10, 'clustering', 'subcluster', {},{})
         SaveSteps(11, 'clustering', 'subset', {},{})
+        SaveSteps(12, 'clustering', 'umap_add_image', {},{})
         return Response({}, status=status.HTTP_201_CREATED)
         
     def perform_clustering(self, chosen_method, n_neighbors, resolution, n_pcs):
@@ -400,6 +401,7 @@ class AddUmapClusterView(APIView):
         adata = read_h5ad_file('adata_clustering.h5ad')
         chosen_method = request.data.getlist('markers')
         adding_clusteringumap(adata, chosen_method)
+        SaveSteps(12, 'clustering', 'umap_add_image', {'chosen_method':chosen_method},{})
         return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)
 class GrabClusterNameView(APIView):
     def post(self, request):
@@ -505,6 +507,7 @@ class SubsetView(APIView):
         chosen_cluster_names = request.data.getlist('clusters')
         subset_name = request.data.get('naming_cluster')
         available_files_result = self.add_subset_cluster(adata, chosen_cluster, chosen_cluster_names, subset_name)
+        SaveSteps(11, 'clustering', 'subset', {"chosen_cluster":chosen_cluster,"chosen_cluster_names":chosen_cluster_names,"subset_name":subset_name},{"available_files_result":available_files_result})
         return available_files_result
     def add_subset_cluster(self, adata, chosen_cluster, chosen_cluster_names, subset_name):
         available_files = load_data('available_files')
