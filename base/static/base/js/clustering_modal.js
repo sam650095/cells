@@ -80,7 +80,6 @@ async function grabclusters() {
   show_modal("subcluster-modal");
   const csrftoken = getCookie("csrftoken");
   const grabclusters_result = await fetchAPI("/api/grabclusters", 0, csrftoken);
-  console.log(grabclusters_result);
   show_divideclusters(grabclusters_result.data.clusters_list);
 
   // grab steps
@@ -88,14 +87,12 @@ async function grabclusters() {
     const grabstep_subcluster_rslt = await grabsteps(
       `/getSteps/clustering/subcluster/`
     );
-    console.log(grabstep_subcluster_rslt);
     document.getElementById("subcluster_resolution").value =
       grabstep_subcluster_rslt.input_values["resolution"];
 
     if (grabstep_subcluster_rslt.input_values.length > 0) {
       grabstep_subcluster_rslt.input_values["chosen_clusters"].forEach(
         (element) => {
-          console.log("cluster-" + element);
           document.getElementById("cluster-" + element).checked = true;
         }
       );
@@ -186,7 +183,6 @@ async function preload_subset() {
     0,
     csrftoken
   );
-  console.log(preload_subset_result);
   // data text
   let available_files_result = document.getElementById(
     "available_files_result"
@@ -208,11 +204,22 @@ async function preload_subset() {
     const grabstep_subset_rslt = await grabsteps(
       `/getSteps/clustering/subset/`
     );
-    console.log(grabstep_subset_rslt);
+    console.log(grabstep_subset_rslt.input_values);
+    if (grabstep_subset_rslt.input_values != {}) {
+      document.getElementById("__").textContent =
+        grabstep_subset_rslt.input_values["chosen_cluster"];
+      document.getElementById("subset_rslt").textContent =
+        grabstep_subset_rslt.input_values["chosen_cluster_names"];
+      document.getElementById("name_cluster").value =
+        grabstep_subset_rslt.input_values["subset_name"];
+    }
+    document.getElementById("subset_sample").disabled = true;
+    document.getElementById("subset").disabled = true;
+    document.getElementById("subset_confirmbtn").disabled = true;
+    document.getElementById("name_cluster").disabled = true;
   }
 }
 function show_dropdown(clustering_col) {
-  console.log(clustering_col);
   const subset_sample = document.getElementById("subset_sample");
   const sampleul = document.getElementById("sampleul");
 
@@ -243,7 +250,6 @@ async function samplemethodtextnodefix(newText) {
     formData,
     csrftoken
   );
-  console.log(grab_cluster_subset_result);
   show_dropdown_subset(grab_cluster_subset_result.data.cluster);
 }
 function show_dropdown_subset(clusters) {
@@ -305,7 +311,6 @@ async function subset_confirmbtn(event) {
     document.getElementById("name_cluster").value
   );
   const subset_results = await fetchAPI("/api/subset/new", formData, csrftoken);
-  console.log(subset_results);
   document.getElementById("subsetresult").textContent =
     subset_results.data.available_files_result;
   close_modal("subset-modal");

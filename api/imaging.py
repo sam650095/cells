@@ -305,10 +305,12 @@ def distances_heatmap(chosen_column):
     if(chosen_column == "leiden_R"):
         sm.pl.spatial_distance(adata, spatial_distance='spatial_distance_leiden_R', phenotype='leiden_R', imageid='Sample', heatmap_summarize=False)
         plt.savefig(os.path.join(save_dir, 'distances_heatmap_leiden_R.png'))
+        plt.close()
         return 'distances_heatmap_leiden_R.png'
     else:
         sm.pl.spatial_distance(adata, spatial_distance='spatial_distance_phenotype', phenotype='phenotype', imageid='Sample', heatmap_summarize=False)
         plt.savefig(os.path.join(save_dir,'distances_heatmap_phenotype.png'))
+        plt.close()
         return 'distances_heatmap_phenotype.png'
             
 def distances_numeric_plot(chosen_column, chosen_cluster): 
@@ -319,6 +321,7 @@ def distances_numeric_plot(chosen_column, chosen_cluster):
     sm.pl.spatial_distance(adata, spatial_distance=f'spatial_distance_{chosen_column}', method='numeric', distance_from=chosen_cluster,
                            imageid='Sample', phenotype=chosen_column, log=True)
     plt.savefig(os.path.join(save_dir,f'distances_numeric_plot_{chosen_column}_{chosen_cluster}.png'))
+    plt.close()
     return f'distances_numeric_plot_{chosen_column}_{chosen_cluster}.png'
 
 def interactions_heatmap(chosen_column, chosen_method):
@@ -328,6 +331,7 @@ def interactions_heatmap(chosen_column, chosen_method):
     sm.pl.spatial_interaction(adata, p_val=0.05, summarize_plot=True, row_cluster=True,
                               spatial_interaction=f'spatial_interaction_{chosen_column}_{chosen_method}')
     plt.savefig(os.path.join(save_dir,f'interactions_heatmap_{chosen_column}_{chosen_method}.png'))
+    plt.close()
     return f'interactions_heatmap_{chosen_column}_{chosen_method}.png'
     
 def interactions_voronoi(chosen_column):
@@ -338,16 +342,8 @@ def interactions_voronoi(chosen_column):
     sm.pl.voronoi(adata, color_by=chosen_column, voronoi_edge_color = 'black', voronoi_line_width = 0.3, 
                   voronoi_alpha = 0.8, size_max=5000, overlay_points=None, plot_legend=True, legend_size=6)
     plt.savefig(os.path.join(save_dir, f'interactions_voronoi_{chosen_column}.png'))
+    plt.close()
     return f'interactions_voronoi_{chosen_column}.png'
-def interactions_voronoi2(chosen_column):
-    adata = read_h5ad_file('adata_spatial_analysis.h5ad')
-    save_dir = os.path.join(settings.MEDIA_ROOT, 'spatial_result')
-    os.makedirs(save_dir, exist_ok=True)
-    plt.rcParams['figure.figsize'] = [15, 10]
-    sm.pl.voronoi(adata, color_by=chosen_column, voronoi_edge_color = 'black', voronoi_line_width = 0.3, 
-                  voronoi_alpha = 0.8, size_max=5000, overlay_points=None, plot_legend=True, legend_size=6)
-    plt.savefig(os.path.join(save_dir, f'interactions_voronoi_{chosen_column}.png'))
-    return f'interactions_voronoi_{chosen_column}2.png'
 
 
 # neighbor

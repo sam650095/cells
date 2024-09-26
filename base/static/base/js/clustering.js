@@ -5,12 +5,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     0,
     csrftoken
   );
-  console.log(preload_clustering_results);
   show_clustering_method(preload_clustering_results.data);
   // grab step
   const grabstep_rslt = await grabsteps(`/getSteps/clustering/process/`);
   const grabstep_umap_add_image_rslt = await grabsteps(
     `/getSteps/clustering/umap_add_image/`
+  );
+  const grabstep_umap_add_l_image_rslt = await grabsteps(
+    `/getSteps/clustering/umap_add_l_image/`
   );
   console.log(grabstep_umap_add_image_rslt);
   // clustering process
@@ -28,12 +30,25 @@ document.addEventListener("DOMContentLoaded", async function () {
       grabstep_rslt.input_values["resolution"];
 
     show_result();
-    loadImage(
-      "umap_cluster",
-      "clustering_leidens_bysample.png",
-      "addleidens-container"
-    );
-    loadImage("umap_cluster", "clustering_markers.png", "addmarkers-container");
+
+    if (Object.keys(grabstep_umap_add_l_image_rslt.input_values).length != 0) {
+      loadImage(
+        "umap_cluster",
+        "clustering_leidens_bysample.png",
+        "addleidens-container"
+      );
+      document.getElementById("selectedbox").textContent =
+        grabstep_umap_add_image_rslt.input_values["chosen_method"];
+    }
+    if (Object.keys(grabstep_umap_add_image_rslt.input_values).length != 0) {
+      loadImage(
+        "umap_cluster",
+        "clustering_markers.png",
+        "addmarkers-container"
+      );
+      document.getElementById("selectedbox").textContent =
+        grabstep_umap_add_image_rslt.input_values["chosen_method"];
+    }
     banned_operations();
   }
 });
@@ -81,7 +96,6 @@ async function processbtn(event) {
   toggleLoading(true, "processbutton");
   const form = document.getElementById("clusterform");
   const formData = new FormData(form);
-  console.log(formData);
   const csrftoken = getCookie("csrftoken");
   const clusterresult = await fetchAPI("/api/clustering", formData, csrftoken);
 
@@ -93,7 +107,6 @@ async function processbtn(event) {
     formData,
     csrftoken
   );
-  console.log(preloadmerkersresult);
   insert_marker_options(preloadmerkersresult.data.marker_list);
   document.getElementById("nextbtn").classList.remove("hidden");
 }
@@ -147,7 +160,6 @@ async function prenext(event) {
   event.preventDefault();
   const csrftoken = getCookie("csrftoken");
   const m_subset_results = await fetchAPI("/api/subset/merged", 0, csrftoken);
-  console.log(m_subset_results);
   if (m_subset_results) {
     window.location.href = event.target.href;
   }

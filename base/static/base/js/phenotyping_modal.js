@@ -8,7 +8,7 @@ async function grabnames() {
     csrftoken
   );
   console.log(grabname_result);
-  show_name_table(grabname_result.rename_df);
+  show_name_table(grabname_result.data.rename_df);
 }
 function show_name_table(rename_df) {
   const tableBody = document.getElementById("nametbody");
@@ -93,7 +93,7 @@ async function grabdropphenotype() {
     csrftoken
   );
   console.log(grab_drop_phenotype_result);
-  insert_dreop_list(grab_drop_phenotype_result["drop_list"]);
+  insert_dreop_list(grab_drop_phenotype_result.data["drop_list"]);
 }
 function insert_dreop_list(drop_list) {
   const dropdownList = document.querySelector(

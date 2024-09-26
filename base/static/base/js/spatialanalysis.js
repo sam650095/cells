@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     csrftoken
   );
   document.getElementById("preloadresult").textContent =
-    preload_spatialanalysis_results.preload_result;
+    preload_spatialanalysis_results.data.preload_result;
   console.log(preload_spatialanalysis_results);
 });
 async function processbtn(event) {
@@ -21,20 +21,20 @@ async function processbtn(event) {
     csrftoken
   );
   console.log(spatialanalysis_results);
-  cluster_lst = spatialanalysis_results["cluster_list"];
-  cluster_lst_L = spatialanalysis_results["cluster_list_L"];
+  cluster_lst = spatialanalysis_results.data["cluster_list"];
+  cluster_lst_L = spatialanalysis_results.data["cluster_list_L"];
   toggleLoading(false, "processbutton");
   document.getElementById("imgbox").classList.remove("hidden");
   document.getElementById("nextbtn").classList.remove("hidden");
 
   // show dropdown menu
   adddp(
-    spatialanalysis_results["columns_list"],
-    spatialanalysis_results["cluster_list"],
-    spatialanalysis_results["method_list"]
+    spatialanalysis_results.data["columns_list"],
+    spatialanalysis_results.data["cluster_list"],
+    spatialanalysis_results.data["method_list"]
   );
   // show image
-  addimg(spatialanalysis_results["filename"]);
+  addimg(spatialanalysis_results.data["filename"]);
 }
 
 async function addbtn(m) {

@@ -8,7 +8,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     csrftoken
   );
   console.log(preload_results);
-  showdropdown(preload_results.adata_list);
+  showdropdown(preload_results.data.adata_list);
+  // grab step
+  const grabstep_rslt = await grabsteps(`/getSteps/identifythegates/process/`);
+  console.log(grabstep_rslt);
 });
 function showdropdown(adata_list) {
   const preloadul = document.getElementById("preloadul");
@@ -47,7 +50,7 @@ async function processbtn(event) {
     csrftoken
   );
   console.log(identifythegates_result);
-  createTable(identifythegates_result.gate_df);
+  createTable(identifythegates_result.data.gate_df);
   toggleLoading(false, "processbutton");
 
   document.getElementById("btnbox").classList.remove("hidden");

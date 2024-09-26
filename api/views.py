@@ -331,29 +331,33 @@ class PCAView(APIView):
 class PreloadCLusteringView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_preprocessing.h5ad')
-        available_files = {}
         if adata.uns.get('is_merged'):
-            available_files['Merged Data'] = adata.copy()
             methods = ['none','harmony', 'combat', 'bbknn']
-            save_data(available_files, 'available_files') 
             return Response({'methods': methods}, status=status.HTTP_201_CREATED)
         else:
             methods = ['none']
-            available_files[adata.uns['prefix']] = adata.copy()
-            save_data(available_files, 'available_files') 
             return Response({'methods': methods}, status=status.HTTP_201_CREATED)
 class CLusteringView(APIView):
     def post(self, request):
+        adata = read_h5ad_file('adata_preprocessing.h5ad')
+        available_files = {}
         chosen_method = request.data.get('method')
         n_neighbors = int(request.data.get('n_neighbors'))
         resolution = float(request.data.get('resolution'))
         n_pcs = load_data('n_pcs')
+        if adata.uns.get('is_merged'):
+            available_files['Merged Data'] = adata.copy()
+            save_data(available_files, 'available_files') 
+        else:
+            available_files[adata.uns['prefix']] = adata.copy()
+            save_data(available_files, 'available_files') 
         self.perform_clustering(chosen_method, n_neighbors, resolution, n_pcs) 
         SaveSteps(8, 'clustering', 'process', {"chosen_method": chosen_method, "resolution":resolution, "n_neighbors": n_neighbors}, {})
         SaveSteps(9, 'clustering', 'rename', {},{})
         SaveSteps(10, 'clustering', 'subcluster', {},{})
         SaveSteps(11, 'clustering', 'subset', {},{})
         SaveSteps(12, 'clustering', 'umap_add_image', {},{})
+        SaveSteps(13, 'clustering', 'umap_add_l_image', {},{})
         return Response({}, status=status.HTTP_201_CREATED)
         
     def perform_clustering(self, chosen_method, n_neighbors, resolution, n_pcs):
@@ -524,6 +528,7 @@ class SubsetView(APIView):
 class PreloadIdentifytheGatesView(APIView):
     def post(self, request):
         available_files = load_data('available_files')
+        print(available_files.keys())
         adata_list = list(available_files.keys())
         return Response({'adata_list': adata_list}, status=status.HTTP_201_CREATED)
     
@@ -705,9 +710,7 @@ class SpatialAnalysisView(APIView):
         method_list = ['radius', 'knn']
         default_chosen_method = 'radius'
         filename = []
-        print(adata.shape)
-        interactions_voronoi2(default_chosen_column)
-        print(adata.shape)
+
         filename.append(distances_heatmap(default_chosen_column))
         filename.append(distances_numeric_plot(default_chosen_column, default_chosen_cluster))
         filename.append(interactions_heatmap(default_chosen_column, default_chosen_method))

@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   );
   console.log(preload_neighbor_result);
   document.getElementById("preloadresult").textContent =
-    preload_neighbor_result.preload_result;
+    preload_neighbor_result.data.preload_result;
 });
 function select(s_ul, selected) {
   document.getElementById(s_ul + "_select").textContent = selected;

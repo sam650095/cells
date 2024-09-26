@@ -24,7 +24,7 @@ async function processbtn(event) {
     csrftoken
   );
   document.getElementById("phenotype_result").textContent =
-    phenotype_result.phenotyping_result;
+    phenotype_result.data.phenotyping_result;
   toggleLoading(false, "processbutton");
   loadImage(
     "phenotype_result",
@@ -50,7 +50,7 @@ async function processbtn(event) {
   );
   console.log(preloadmerkersresult);
   // Insert markers options
-  insert_marker_options(preloadmerkersresult.marker_list);
+  insert_marker_options(preloadmerkersresult.data.marker_list);
   document.getElementById("btnbox").classList.remove("hidden");
   document.getElementById("imgbox").classList.remove("hidden");
   document.getElementById("nextbtn").classList.remove("hidden");

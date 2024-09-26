@@ -57,6 +57,7 @@ async function deleteSteps() {
     normalizationmerge: 5,
     pca: 7,
     clustering: 8,
+    identifythegates: 13,
   };
   let url = `/delSteps/${steps[step]}/`;
   try {
@@ -206,12 +207,12 @@ function logSelectedCount() {
     .map((checkbox) => checkbox.value)
     .filter((value) => value !== "Select All");
 
-  const selectedCount = selectedMarkers.length;
+  // const selectedCount = selectedMarkers.length;
 
   const selectedbox = document.getElementById("selectedbox");
-  selectedbox.textContent = `Currently selected: ${selectedCount} markers`;
+
   const markersdiv = document.createElement("div");
-  markersdiv.textContent = `[${selectedMarkers.join(", ")}]`;
+  markersdiv.textContent = `${selectedMarkers.join(", ")}`;
   markersdiv.classList.add("indent-8");
 
   selectedbox.appendChild(markersdiv);

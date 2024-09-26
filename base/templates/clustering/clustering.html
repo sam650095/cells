@@ -275,8 +275,10 @@
             </div>
           </li>
           <li>
+            Selected Method : [
             <label for="Addedmarkers" class="w-1/2 mr-2" id="selectedbox">
-            </label>
+            </label
+            >]
           </li>
         </ul>
       </div>
@@ -574,7 +576,7 @@
               name="subset_sample"
               id="subset_sample"
               data-dropdown-toggle="sample_dropdown"
-              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
               type="button"
             >
               <span id="__">&nbsp</span>
@@ -618,7 +620,7 @@
               name="subset"
               id="subset"
               data-dropdown-toggle="subset_dropdown"
-              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
               type="button"
             >
               <span id="__">&nbsp</span>
@@ -664,7 +666,7 @@
               type="text"
               name="name_cluster"
               id="name_cluster"
-              class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+              class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
             />
           </div>
         </form>
@@ -673,7 +675,7 @@
           <button
             type="button"
             onclick="subset_confirmbtn(event)"
-            id="confirmbtn"
+            id="subset_confirmbtn"
             class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
           >
             Confirm
