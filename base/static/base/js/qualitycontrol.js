@@ -1,6 +1,5 @@
 const f_sampleSelect = document.getElementById("f_sampleSelect");
-const v_sampleSelect = document.getElementById("v_sampleSelect");
-
+let marker_list = []
 // check if the step is proccessed
 document.addEventListener("DOMContentLoaded", async function () {
   const grabstep_rslt = await grabsteps(`/getSteps/qualitycontrol/process/`);
@@ -79,6 +78,8 @@ async function processbtn(event) {
     toggleLoading(false, "processbutton");
     // next page btn
     document.getElementById("nextbtn").classList.remove("hidden");
+    marker_list = process_result.data.marker_list
+    console.log(marker_list)
   } catch (error) {
     toggleLoading(false, "processbutton");
   }
@@ -89,6 +90,10 @@ function initmodal() {
   document.getElementById("previewimagebox").innerHTML = "";
   document.getElementById("confirmbtn").classList.add("hidden");
 }
+const toggleDropdown = (e) => {
+  e.preventDefault();
+  setIsOpen(!isOpen);
+};
 // filter method change
 function showimage(result) {
   const imgbox = document.getElementById("imgbox");
@@ -108,6 +113,8 @@ function showimage(result) {
   );
   document.getElementById("sampleul_select").textContent = defaultsample;
   document.getElementById("sampleul_input").value = defaultsample;
+  document.getElementById("v_sampleul_select").textContent = defaultsample;
+  document.getElementById("v_sampleul_input").value = defaultsample;
   for (let i = 0; i < result.adata_results.length; i++) {
     const li = document.createElement("li");
     li.textContent = result["adata_results"][i];
@@ -134,6 +141,18 @@ function showimage(result) {
       `;
 
     sample_ul.appendChild(sample_li);
+
+    const v_sample_ul = document.getElementById("v_sampleul");
+    // selection add data
+
+    const v_sample_li = document.createElement("li");
+    v_sample_li.innerHTML = `
+              <a onclick="select('v_sampleul','${sample}')"
+              class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2 cursor-pointer"
+          >${sample}</a>
+      `;
+
+    v_sample_ul.appendChild(v_sample_li);
   }
   imgbox.appendChild(ul);
 }
@@ -167,6 +186,9 @@ function select_method(method) {
 function select(s_ul, selected) {
   document.getElementById(s_ul + "_select").textContent = selected;
   document.getElementById(s_ul + "_input").value = selected;
+  if(s_ul == 'v_sampleul'){
+    console.log('test');
+  }
 }
 // preview
 async function preview() {

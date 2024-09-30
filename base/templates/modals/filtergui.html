@@ -38,43 +38,120 @@
         class="p-4 md:p-5 space-y-4 overflow-y-scroll hover:overflow-y-scroll max-h-[80vh]"
       >
         <form id="filterguiform">
-          <div class="flex items-center my-2 gap-5">
-            <input type="hidden" id="v_sample" name="v_sample" />
-            <label for="v_sampleSelect" class="font-bold"
-              >Please choose the sample you want to filter:
-            </label>
-            <button
-              name="v_sampleSelect"
-              id="v_sampleSelect"
-              data-dropdown-toggle="v_dropdown"
-              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
-              type="button"
-            >
-              <svg
-                class="w-2.5 h-2.5 ms-3"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
+          <div>
+            <div class="flex items-center my-2 gap-5">
+              <!-- select to view -->
+              <label for="viewsample" class="font-medium"
+                >Please select the sample to view:
+              </label>
+              <button
+                name="viewsample"
+                id="viewsample"
+                data-dropdown-toggle="v_dropdown"
+                class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                type="button"
               >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 4 4 4-4"
-                />
-              </svg>
-            </button>
-            <div
-              id="v_dropdown"
-              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
-            >
-              <ul
-                class="py-2 text-sm text-gray-700"
-                id="v_sampleul"
-                aria-labelledby="v_sampleSelect"
-              ></ul>
+                <span id="v_sampleul_select">&nbsp</span>
+                <input type="hidden" name="sample" id="v_sampleul_input" />
+                <svg
+                  class="w-2.5 h-2.5 ms-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="v_dropdown"
+                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+              >
+                <ul
+                  class="py-2 text-sm text-gray-700"
+                  id="v_sampleul"
+                  aria-labelledby="viewsample"
+                ></ul>
+              </div>
+            </div>
+            <!-- upload file -->
+            <label class="w-96 my-2">Please upload the sample image:</label>
+            <div class="mb-3 text-gray-900 flex items-center gap-5">
+              <div>
+                <label
+                  for="file_upload"
+                  class="rounded-md bg-sky-950 py-2 px-4 text-white text-sm font-semibold my-3"
+                  style="display: inline-block; cursor: pointer"
+                >
+                  +Upload File
+                </label>
+                <input id="file_upload" type="file" style="display: none" />
+              </div>
+
+              <div id="uploaded" class="text-gray-700 text-bold"></div>
+            </div>
+            <!-- marker to view -->
+            <div class="mb-3 text-gray-900">
+              <div class="flex items-center my-2 gap-5">
+                <label for="pca_markers" class="text-base leading-relaxed"
+                  >Please select a marker you want to PCA:</label
+                >
+                <button
+                  name="pca_markers"
+                  id="pca_markers"
+                  data-dropdown-toggle="dropdownmarkers"
+                  class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                >
+                  Select All
+                  <svg
+                    class="w-2.5 h-2.5 ms-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m1 1 4 4 4-4"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div
+                  id="dropdownmarkers"
+                  class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 h-96 overflow-y-auto"
+                >
+                  <form id="markerform">
+                    <ul
+                      class="p-3 space-y-1 text-sm text-gray-700"
+                      aria-labelledby="dropdownmarkersButton"
+                    ></ul>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="text-gray-500">
+              Selected markers : <span id="selectedbox"></span>
+            </div>
+            <div class="text-gray-500 my-2">
+              Note:
+              <ul class="list-disc pl-5">
+                <li>
+                  The GUI shows the image's DAPI channel, chosen markers, and
+                  cell positions before (retained) and after (removed)
+                  filtering.
+                </li>
+              </ul>
             </div>
           </div>
         </form>

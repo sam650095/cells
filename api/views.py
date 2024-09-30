@@ -103,21 +103,22 @@ class FileUploadView(APIView):
         return adata_objects, original_adata_objects, adata_results
 class QualityControlView(APIView):
     def post(self, request):
-        adata_objects, qc_adata_objects, adata_results, save_image_names = self.post_reset_adata()
+        adata_objects, qc_adata_objects, adata_results, save_image_names, marker_list = self.post_reset_adata()
         save_data(adata_objects, 'adata_objects')
         save_data(qc_adata_objects, 'qc_adata_objects')
         save_data(qc_adata_objects, 'preview_adata_objects')
         # saving steps
-        SaveSteps(2, 'qualitycontrol', 'process', {}, {'adata_results': adata_results,'save_image_names': save_image_names})
+        SaveSteps(2, 'qualitycontrol', 'process', {}, {'adata_results': adata_results,'save_image_names': save_image_names, 'marker_list': marker_list})
         # default filter
         SaveSteps(3, 'qualitycontrol', 'filter', {}, {})
         # default qui
         SaveSteps(4, 'qualitycontrol', 'qui', {}, {})
         
-        return Response({'adata_results': adata_results,'save_image_names': save_image_names}, status=status.HTTP_201_CREATED)
+        return Response({'adata_results': adata_results,'save_image_names': save_image_names, 'marker_list': marker_list}, status=status.HTTP_201_CREATED)
     
     def post_reset_adata(self):
         adata_objects = load_data('original_adata_objects')
+        marker_list = []
         qc_adata_objects = []
         adata_results = []
         save_image_names = []
@@ -128,8 +129,9 @@ class QualityControlView(APIView):
             adata, imgname = produce_and_save_img(adata, "origin", 'violin_plot')
             qc_adata_objects.append(adata)
             save_image_names.append(imgname)
+            marker_list.append(adata.var_names.tolist())
         
-        return adata_objects, qc_adata_objects, adata_results, save_image_names  
+        return adata_objects, qc_adata_objects, adata_results, save_image_names, marker_list
 class PreviewView(APIView):
     def post(self, request):
         adata_objects = load_data('qc_adata_objects')
@@ -710,11 +712,14 @@ class SpatialAnalysisView(APIView):
         method_list = ['radius', 'knn']
         default_chosen_method = 'radius'
         filename = []
-
-        filename.append(distances_heatmap(default_chosen_column))
-        filename.append(distances_numeric_plot(default_chosen_column, default_chosen_cluster))
-        filename.append(interactions_heatmap(default_chosen_column, default_chosen_method))
-        filename.append(interactions_voronoi(default_chosen_column))
+        IV = interactions_voronoi(default_chosen_column)
+        DH = distances_heatmap(default_chosen_column)
+        DN = distances_numeric_plot(default_chosen_column, default_chosen_cluster)
+        IH = interactions_heatmap(default_chosen_column, default_chosen_method)
+        filename.append(DH)
+        filename.append(DN)
+        filename.append(IH)
+        filename.append(IV)
         print(adata.shape)
         
         return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'cluster_list_L':cluster_list_L, 'method_list':method_list, "filename":filename}, status=status.HTTP_201_CREATED)
