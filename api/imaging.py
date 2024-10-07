@@ -62,7 +62,6 @@ def clustering_result(adata, npcs):
         adata.obs['leiden_R'] = adata.obs['leiden']
     save_dir = os.path.join(settings.MEDIA_ROOT, 'cluster_result')
     os.makedirs(save_dir, exist_ok=True)
-    print('image start')
     # Summary表格
     summary_df_cluster = summary_cluster(adata)
     dataframe_to_image(summary_df_cluster, os.path.join(save_dir, 'clustering_summary.png'))
@@ -92,22 +91,23 @@ def clustering_result(adata, npcs):
     
     return adata
 def dataframe_to_image(df, filename):
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(5, 5))
     ax.axis('off')
     table = pd.plotting.table(ax, df, loc='center', cellLoc='center') 
-    table.set_fontsize(60)
+    
+    for key, cell in table.get_celld().items():
+        cell.set_fontsize(36)
+    
     table.scale(3, 3) 
     plt.savefig(filename, bbox_inches='tight')
     plt.close()
 def summary_cluster(adata):
     if adata.uns.get('is_merged', False): 
         n_obs, n_vars = adata.shape
-        # print(f"Merged Data: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
         
         for sample in adata.obs['Sample'].cat.categories:
             sample_adata = adata[adata.obs['Sample'] == sample]
             n_obs, n_vars = sample_adata.shape
-            # print(f"{sample}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
         
         if 'leiden_R' not in adata.obs.columns:
             adata.obs['leiden_R'] = adata.obs['leiden']

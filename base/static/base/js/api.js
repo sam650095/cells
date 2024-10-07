@@ -210,7 +210,7 @@ function logSelectedCount() {
   // const selectedCount = selectedMarkers.length;
 
   const selectedbox = document.getElementById("selectedbox");
-
+  selectedbox.textContent = '';
   const markersdiv = document.createElement("div");
   markersdiv.textContent = `${selectedMarkers.join(", ")}`;
   markersdiv.classList.add("indent-8");

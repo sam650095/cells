@@ -392,9 +392,7 @@ class CLusteringView(APIView):
         if chosen_method == 'none':
             sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, random_state=42)
         elif chosen_method == 'bbknn':
-            print("bbknn start")
             sc.external.pp.bbknn(adata, batch_key='Sample', computation='fast')
-            print("bbknn finish")
         elif chosen_method == 'harmony':
             sc.external.pp.harmony_integrate(adata, key='Sample', random_state=42)
             sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, use_rep='X_pca_harmony', random_state=42)
