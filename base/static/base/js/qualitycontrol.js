@@ -107,6 +107,8 @@ function showimage(result) {
     "w-fit"
   );
 
+  const sample_ul = document.getElementById("sampleul");
+  sample_ul.textContent = '';
   defaultsample = result["adata_results"][0].substring(
     0,
     result["adata_results"][0].indexOf(":")
@@ -126,7 +128,6 @@ function showimage(result) {
     li.appendChild(img);
     ul.appendChild(li);
 
-    const sample_ul = document.getElementById("sampleul");
     // selection add data
     var sample = result["adata_results"][i].substring(
       0,
