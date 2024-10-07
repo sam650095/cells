@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .imaging import *
 from .saved import *
-
 from .models import OperationStep
+
 
 def sort_key(filename):
     return int(filename.split('_')[0][1:]) 
@@ -29,7 +29,8 @@ def SaveSteps(session_id, step, operation_type, input_values, output_values):
 class ClearAllDataView(APIView):
     def post(self, request):
         OperationStep.objects.all().delete()
-        clear_all_data()
+        
+        # clear_all_data()
         clearmediafiles('')
         clear_all_h5ad_files()
         return Response({'message':'data are all killed'}, status=status.HTTP_200_OK)
@@ -69,9 +70,9 @@ class FileUploadView(APIView):
         if isinstance(result, str):
             return Response({'message': result}, status=status.HTTP_400_BAD_REQUEST)
         adata_objects, original_adata_objects, adata_results = result
-        save_data(adata_objects, 'adata_objects')
-        save_data(original_adata_objects, 'original_adata_objects')
-
+        # save_data(original_adata_objects, 'original_adata_objects')
+        for i, adata in enumerate(original_adata_objects):
+            save_h5ad_file(adata, f'original_adata_objects_{i}')
         # saving steps
         SaveSteps(1, 'create_adata', 'file_upload', {'file_names': file_names, 'file_sizes': file_sizes}, {'adata_results': adata_results})
         
@@ -104,9 +105,10 @@ class FileUploadView(APIView):
 class QualityControlView(APIView):
     def post(self, request):
         adata_objects, qc_adata_objects, adata_results, save_image_names, marker_list = self.post_reset_adata()
-        save_data(adata_objects, 'adata_objects')
-        save_data(qc_adata_objects, 'qc_adata_objects')
-        save_data(qc_adata_objects, 'preview_adata_objects')
+        # save anndata
+        for i, adata in enumerate(qc_adata_objects):
+            save_h5ad_file(adata, f'qc_adata_objects_{i}')
+            save_h5ad_file(adata, f'preview_adata_objects_{i}')
         # saving steps
         SaveSteps(2, 'qualitycontrol', 'process', {}, {'adata_results': adata_results,'save_image_names': save_image_names, 'marker_list': marker_list})
         # default filter
@@ -117,7 +119,11 @@ class QualityControlView(APIView):
         return Response({'adata_results': adata_results,'save_image_names': save_image_names, 'marker_list': marker_list}, status=status.HTTP_201_CREATED)
     
     def post_reset_adata(self):
-        adata_objects = load_data('original_adata_objects')
+        # read anndata
+        files = os.listdir(settings.H5AD_STORAGE_PATH)
+        origin_adata_files = [file for file in files if file.startswith('original_adata_objects')]
+        adata_objects = [read_h5ad_file(file) for file in origin_adata_files]
+
         marker_list = []
         qc_adata_objects = []
         adata_results = []
@@ -134,7 +140,11 @@ class QualityControlView(APIView):
         return adata_objects, qc_adata_objects, adata_results, save_image_names, marker_list
 class PreviewView(APIView):
     def post(self, request):
-        adata_objects = load_data('qc_adata_objects')
+        # read anndata
+        files = os.listdir(settings.H5AD_STORAGE_PATH)
+        origin_adata_files = [file for file in files if file.startswith('qc_adata_objects')]
+        adata_objects = [read_h5ad_file(file) for file in origin_adata_files]
+
         # get data from frontend
         f_sampleSelect = request.data.get('sample')
         minGenes = int(request.data.get('minGenes'))
@@ -148,7 +158,8 @@ class PreviewView(APIView):
 
         preview_adata, preview_adata_result, preview_image_name = self.preview_filter(user_inputs)
         # chose adata to preview
-        save_data(preview_adata, 'preview_adata')
+        # save_data(preview_adata, 'preview_adata')
+        save_h5ad_file(preview_adata, 'preview_adata')
         return Response({'adata_result': preview_adata_result,'save_image_names': preview_image_name}, status=status.HTTP_201_CREATED)
     
     def choose_sample(self,adata_objects, sample_select):
@@ -201,15 +212,22 @@ class ReplaceView(APIView):
         upperlimit = float(request.data.get('upperlimit')) if request.data.get('upperlimit') else None
         update_adata_objects, filtered_adata_objects, adata_results, changed_adata_result = self.perform_filter()
 
-        save_data(update_adata_objects, 'adata_objects')
-        save_data(filtered_adata_objects, 'preview_adata_objects')
+        # save anndata
+        for i, adata in enumerate(filtered_adata_objects):
+            save_h5ad_file(adata, f'filtered_adata_objects_{i}')
+        for i, adata in enumerate(update_adata_objects):
+            save_h5ad_file(adata, f'update_adata_objects_{i}')
         SaveSteps(3, 'qualitycontrol', 'filter', {"f_sampleSelect":f_sampleSelect, "minGenes":minGenes, "filter_method":filter_method, "lowerlimit":lowerlimit, "upperlimit":upperlimit}, {'adata_result':changed_adata_result, 'save_image_names':f_sampleSelect+"_previewimage.png"})
         
         return Response({'adata_results':adata_results,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
     
     def perform_filter(self):
-        preview_adata = load_data('preview_adata')
-        preview_adata_objects = load_data('preview_adata_objects')
+        preview_adata = read_h5ad_file('preview_adata')
+        # read anndata
+        files = os.listdir(settings.H5AD_STORAGE_PATH)
+        adata_files = [file for file in files if file.startswith('preview_adata_objects')]
+        preview_adata_objects = [read_h5ad_file(file) for file in adata_files]
+
         updated_adata_objects = []
         filtered_adata_objects = []
         adata_results = []
@@ -231,25 +249,30 @@ class ReplaceView(APIView):
         return updated_adata_objects, filtered_adata_objects, adata_results, changed_adata_result
 class ConfirmView(APIView):
     def post(self, request):
-        adata_objects = load_data('preview_adata_objects')
+        # read anndata
+        files = os.listdir(settings.H5AD_STORAGE_PATH)
+        adata_files = [file for file in files if file.startswith('preview_adata_objects')]
+        adata_objects = [read_h5ad_file(file) for file in adata_files]
+
         filtered_adata_objects = adata_objects.copy()
-        
-        save_data(adata_objects, 'adata_objects')
-        save_data(filtered_adata_objects, 'filtered_adata_objects')
+        for i, adata in enumerate(filtered_adata_objects):
+            save_h5ad_file(adata, f'filtered_adata_objects_{i}')
         return Response({}, status=status.HTTP_201_CREATED)
 class NormalizationView(APIView):
     def post(self, request):
         chosen_method = request.data.get('method')
-        print(chosen_method)
         adata_objects, norm_adata_objects, norm_adata_results = self.perform_normalization(chosen_method)
-        save_data(adata_objects, 'adata_objects')
-        save_data(norm_adata_objects, 'norm_adata_objects')
+        # save anndata
+        for i, adata in enumerate(norm_adata_objects):
+            save_h5ad_file(adata, f'norm_adata_objects_{i}')
         SaveSteps(5, 'normalization', 'process', {}, {"adata_results": norm_adata_results})
         
         return Response({"adata_results": norm_adata_results}, status=status.HTTP_201_CREATED)
     
     def perform_normalization(self, chosen_method):
-        adata_objects = load_data('filtered_adata_objects')
+        files = os.listdir(settings.H5AD_STORAGE_PATH)
+        adata_files = [file for file in files if file.startswith('filtered_adata_objects')]
+        adata_objects = [read_h5ad_file(file) for file in adata_files]
         norm_adata_objects = []
         norm_adata_result = []
         if chosen_method == 'CPM':
@@ -274,7 +297,9 @@ class MergeView(APIView):
         
         return Response({'adata_results':adata_merged_results}, status=status.HTTP_201_CREATED)
     def perform_merged(self):
-        adata_objects = load_data('norm_adata_objects')
+        files = os.listdir(settings.H5AD_STORAGE_PATH)
+        adata_files = [file for file in files if file.startswith('norm_adata_objects')]
+        adata_objects = [read_h5ad_file(file) for file in adata_files]
         adata_merged_results = []
         
         if len(adata_objects) == 1:
@@ -712,10 +737,11 @@ class SpatialAnalysisView(APIView):
         method_list = ['radius', 'knn']
         default_chosen_method = 'radius'
         filename = []
-        IV = interactions_voronoi(default_chosen_column)
+        
         DH = distances_heatmap(default_chosen_column)
         DN = distances_numeric_plot(default_chosen_column, default_chosen_cluster)
         IH = interactions_heatmap(default_chosen_column, default_chosen_method)
+        IV = interactions_voronoi(default_chosen_column)
         filename.append(DH)
         filename.append(DN)
         filename.append(IH)
