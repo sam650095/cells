@@ -241,8 +241,21 @@ def phenotype_result(adata, chosen_adata, n_pcs):
     
     if len(valid_groups) > 1:
         sc.tl.rank_genes_groups(adata, 'phenotype', groups=valid_groups)
-        sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False)
-        plt.savefig(os.path.join(save_dir, 'phenotyping_ranking.png'), bbox_inches='tight')
+        
+        n_cols = 3  
+        n_rows = -(-len(valid_groups) // n_cols) 
+        fig_width = 6 * n_cols 
+        fig_height = 5 * n_rows 
+        
+        plt.figure(figsize=(fig_width, fig_height))
+        
+        sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False,
+                                ncols=n_cols,
+                                fontsize=12,
+                            )
+        plt.tight_layout() 
+        plt.savefig(os.path.join(save_dir, 'phenotyping_ranking.png'), bbox_inches='tight', dpi=300)
+        plt.close()
     
     # Heatmap
     all_markers = adata.var_names.tolist()

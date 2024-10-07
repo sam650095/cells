@@ -115,8 +115,9 @@ function loadImage(folder, filename, containerId, refresh = true) {
     .then((response) => response.json())
     .then((data) => {
       let container = document.getElementById(containerId);
+      console.log(refresh);
       if (refresh) {
-        containerId.textContent = "";
+        container.textContent = "";
       }
       if (container) {
         if (data.image_path) {
