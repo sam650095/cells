@@ -25,6 +25,13 @@ def SaveSteps(session_id, step, operation_type, input_values, output_values):
             'output_values':output_values
         }
     )
+def GetSteps(session_id):
+    steps = OperationStep.objects.filter(session_id=session_id)
+    if steps.exists():
+        return steps
+    else:
+        return None
+
 # cleardata
 class ClearAllDataView(APIView):
     def post(self, request):
@@ -70,7 +77,6 @@ class FileUploadView(APIView):
         if isinstance(result, str):
             return Response({'message': result}, status=status.HTTP_400_BAD_REQUEST)
         adata_objects, original_adata_objects, adata_results = result
-        # save_data(original_adata_objects, 'original_adata_objects')
         for i, adata in enumerate(original_adata_objects):
             save_h5ad_file(adata, f'original_adata_objects_{i}')
         # saving steps
@@ -158,7 +164,6 @@ class PreviewView(APIView):
 
         preview_adata, preview_adata_result, preview_image_name = self.preview_filter(user_inputs)
         # chose adata to preview
-        # save_data(preview_adata, 'preview_adata')
         save_h5ad_file(preview_adata, 'preview_adata')
         return Response({'adata_result': preview_adata_result,'save_image_names': preview_image_name}, status=status.HTTP_201_CREATED)
     
@@ -337,8 +342,8 @@ class PreloadPCAView(APIView):
 class PCAView(APIView):
     def post(self, request):
         chosen_markers = request.POST.getlist('markers')
-        merged_results, n_pcs_results, save_img_name = self.perform_pca(chosen_markers)
-        SaveSteps(7, 'pca', 'process', {"chosen_markers": chosen_markers}, {"merged_results":merged_results, "n_pcs_results": n_pcs_results, "save_img_name": save_img_name})
+        merged_results, n_pcs, n_pcs_results, save_img_name = self.perform_pca(chosen_markers)
+        SaveSteps(7, 'pca', 'process', {"chosen_markers": chosen_markers}, {"merged_results":merged_results, "n_pcs": n_pcs, "n_pcs_results": n_pcs_results, "save_img_name": save_img_name})
         return Response({"merged_results":merged_results,"n_pcs_results": n_pcs_results,"save_img_name":save_img_name}, status=status.HTTP_201_CREATED)
 
     def perform_pca(self, chosen_markers):
@@ -353,8 +358,7 @@ class PCAView(APIView):
         n_pcs_results = f'Selected number of PCs: {n_pcs}(cumulative_variance_ratio >= 0.95)'
 
         save_h5ad_file(adata, 'adata_pca.h5ad')
-        save_data(n_pcs, 'n_pcs')
-        return merged_results, n_pcs_results, save_img_name
+        return merged_results, n_pcs, n_pcs_results, save_img_name
 class PreloadCLusteringView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_preprocessing.h5ad')
@@ -371,15 +375,18 @@ class CLusteringView(APIView):
         chosen_method = request.data.get('method')
         n_neighbors = int(request.data.get('n_neighbors'))
         resolution = float(request.data.get('resolution'))
-        n_pcs = load_data('n_pcs')
+        
+        n_pcs = GetSteps(7)[0].output_values['n_pcs']
+        # n_pcs = load_data('n_pcs')
         if adata.uns.get('is_merged'):
             available_files['Merged Data'] = adata.copy()
-            save_data(available_files, 'available_files') 
+            save_h5ad_file(available_files['Merged Data'], 'available_files.h5ad')
         else:
             available_files[adata.uns['prefix']] = adata.copy()
-            save_data(available_files, 'available_files') 
+            save_h5ad_file(adata.uns['prefix'], 'available_files.h5ad')
+
         self.perform_clustering(chosen_method, n_neighbors, resolution, n_pcs) 
-        SaveSteps(8, 'clustering', 'process', {"chosen_method": chosen_method, "resolution":resolution, "n_neighbors": n_neighbors}, {})
+        SaveSteps(8, 'clustering', 'process', {"chosen_method": chosen_method, "resolution":resolution, "n_neighbors": n_neighbors, "n_pcs": n_pcs}, {})
         SaveSteps(9, 'clustering', 'rename', {},{})
         SaveSteps(10, 'clustering', 'subcluster', {},{})
         SaveSteps(11, 'clustering', 'subset', {},{})
@@ -392,7 +399,7 @@ class CLusteringView(APIView):
         if chosen_method == 'none':
             sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, random_state=42)
         elif chosen_method == 'bbknn':
-            sc.external.pp.bbknn(adata, batch_key='Sample', computation='fast')
+            sc.external.pp.bbknn(adata, batch_key='Sample')
         elif chosen_method == 'harmony':
             sc.external.pp.harmony_integrate(adata, key='Sample', random_state=42)
             sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, use_rep='X_pca_harmony', random_state=42)
@@ -451,7 +458,7 @@ class RenameClusterView(APIView):
         return Response({}, status=status.HTTP_201_CREATED)
     def perform_rename_cluster(self, rename_df):
         adata = read_h5ad_file('adata_clustering.h5ad')
-        n_pcs = load_data('n_pcs')
+        n_pcs = GetSteps(7)[0].output_values['n_pcs']
 
         rename_dict = {}
         for _, row in rename_df.iterrows():
@@ -482,7 +489,7 @@ class SubclusterView(APIView):
         return Response({}, status=status.HTTP_201_CREATED)
     def perform_subclustering(self, resolution, chosen_clusters):
         adata = read_h5ad_file('adata_clustering.h5ad')
-        n_pcs = load_data('n_pcs')
+        n_pcs = GetSteps(7)[0].output_values['n_pcs']
         sc.tl.leiden(adata, resolution=resolution, restrict_to=('leiden', chosen_clusters))
         clustering_result(adata, n_pcs) 
         save_h5ad_file(adata, 'adata_clustering.h5ad') 
@@ -494,7 +501,7 @@ class PreloadSubsetView(APIView):
     def available_adata(self):
         adata = read_h5ad_file('adata_clustering.h5ad')
         clustering_columns = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype", "Sample"))]
-        available_files = load_data('available_files')
+        available_files = read_h5ad_file('available_files')
         available_files_result = []
         if adata.uns.get('is_merged', False):
             available_files['Merged Data'] = adata.copy()
@@ -539,7 +546,7 @@ class SubsetView(APIView):
         SaveSteps(11, 'clustering', 'subset', {"chosen_cluster":chosen_cluster,"chosen_cluster_names":chosen_cluster_names,"subset_name":subset_name},{"available_files_result":available_files_result})
         return available_files_result
     def add_subset_cluster(self, adata, chosen_cluster, chosen_cluster_names, subset_name):
-        available_files = load_data('available_files')
+        available_files = read_h5ad_file('available_files')
         available_files_result = []
         subset_adata = adata[adata.obs[chosen_cluster].isin(chosen_cluster_names)].copy()
         available_files[subset_name] = subset_adata
@@ -552,7 +559,7 @@ class SubsetView(APIView):
 # Identify the gates
 class PreloadIdentifytheGatesView(APIView):
     def post(self, request):
-        available_files = load_data('available_files')
+        available_files = read_h5ad_file('available_files')
         print(available_files.keys())
         adata_list = list(available_files.keys())
         return Response({'adata_list': adata_list}, status=status.HTTP_201_CREATED)
@@ -560,7 +567,7 @@ class PreloadIdentifytheGatesView(APIView):
 class ChosenAdataResultView(APIView):
     def post(self, request):
         chosen_adata = request.data.get('chosen_adata')
-        available_files = load_data('available_files')
+        available_files = read_h5ad_file('available_files')
         adata = available_files[chosen_adata]
         n_obs, n_vars = adata.shape
         result = f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"

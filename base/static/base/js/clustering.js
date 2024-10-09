@@ -84,6 +84,15 @@ function show_clustering_method(preload_clustering_results) {
 function select(s_ul, selected) {
   document.getElementById(s_ul + "_select").textContent = selected;
   document.getElementById(s_ul + "_input").value = selected;
+  if (selected == "bbknn") {
+    document.getElementById("n_neighbor_block").classList.add("hidden");
+    document.getElementById("n_neighbors").value = 10;
+    document.getElementById("resolution").value = "";
+  } else {
+    document.getElementById("n_neighbor_block").classList.remove("hidden");
+    document.getElementById("n_neighbors").value = "";
+    document.getElementById("resolution").value = "";
+  }
 }
 function methodtextnodefix(newText) {
   methodtextnode.nodeValue = newText;
@@ -107,16 +116,37 @@ async function processbtn(event) {
     formData,
     csrftoken
   );
+  console.log(preloadmerkersresult.data.marker_list);
   insert_marker_options(preloadmerkersresult.data.marker_list);
   document.getElementById("nextbtn").classList.remove("hidden");
 }
 function show_result() {
   document.getElementById("btnbox").classList.remove("hidden");
   document.getElementById("imgbox").classList.remove("hidden");
-  loadImage("cluster_result", "clustering_summary.png", "summary-container");
-  loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
-  loadImage("cluster_result", "clustering_leidens.png", "umap-container");
-  loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
+  loadImage(
+    "cluster_result",
+    "clustering_summary.png",
+    "summary-container",
+    false
+  );
+  loadImage(
+    "cluster_result",
+    "clustering_heatmap.png",
+    "heatmap-container",
+    false
+  );
+  loadImage(
+    "cluster_result",
+    "clustering_leidens.png",
+    "umap-container",
+    false
+  );
+  loadImage(
+    "cluster_result",
+    "clustering_ranking.png",
+    "ranking-container",
+    false
+  );
 }
 async function addleidens() {
   const csrftoken = getCookie("csrftoken");

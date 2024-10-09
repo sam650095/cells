@@ -68,10 +68,30 @@ async function rename_confirmbtn() {
     jsonData,
     csrftoken
   );
-  loadImage("cluster_result", "clustering_summary.png", "summary-container");
-  loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
-  loadImage("cluster_result", "clustering_leidens.png", "umap-container");
-  loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
+  await loadImage(
+    "cluster_result",
+    "clustering_summary.png",
+    "summary-container",
+    false
+  );
+  await loadImage(
+    "cluster_result",
+    "clustering_heatmap.png",
+    "heatmap-container",
+    false
+  );
+  await loadImage(
+    "cluster_result",
+    "clustering_leidens.png",
+    "umap-container",
+    false
+  );
+  await loadImage(
+    "cluster_result",
+    "clustering_ranking.png",
+    "ranking-container",
+    false
+  );
   close_modal("rename-modal");
   toggleLoading(false, "confirmbtn");
 }

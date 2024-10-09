@@ -72,11 +72,26 @@ def clustering_result(adata, npcs):
     plt.close()
     
     # Ranking
-    sc.tl.rank_genes_groups(adata, 'leiden_R')
-    sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False)
-    plt.savefig(os.path.join(save_dir, 'clustering_ranking.png'), bbox_inches='tight', dpi=300)
-    plt.close()
-    
+    group_sizes = adata.obs['leiden_R'].value_counts() 
+    valid_groups = group_sizes[group_sizes >= 2].index.tolist() 
+
+    if len(valid_groups) > 1:
+        sc.tl.rank_genes_groups(adata, 'leiden_R')
+        n_cols = 3  
+        n_rows = -(-len(valid_groups) // n_cols) 
+        fig_width = 6 * n_cols 
+        fig_height = 5 * n_rows 
+        
+        plt.figure(figsize=(fig_width, fig_height))
+        
+        sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False,
+                                ncols=n_cols,
+                                fontsize=18,
+                            )
+        plt.tight_layout() 
+        plt.savefig(os.path.join(save_dir, 'clustering_ranking.png'), bbox_inches='tight', dpi=300)
+        plt.close()
+        
     # Heatmap
     available_cmaps = plt.colormaps()
     cmap_choice = 'vlag' if 'vlag' in available_cmaps else 'coolwarm'
@@ -251,7 +266,7 @@ def phenotype_result(adata, chosen_adata, n_pcs):
         
         sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False,
                                 ncols=n_cols,
-                                fontsize=12,
+                                fontsize=18,
                             )
         plt.tight_layout() 
         plt.savefig(os.path.join(save_dir, 'phenotyping_ranking.png'), bbox_inches='tight', dpi=300)
