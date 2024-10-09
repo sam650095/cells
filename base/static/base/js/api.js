@@ -99,10 +99,10 @@ function downloadImages(folder) {
     .catch((error) => console.error("Error:", error));
 }
 // fetching image
-function loadImage(folder, filename, containerId, refresh = true) {
+async function loadImage(folder, filename, containerId, refresh = true) {
   console.log(folder, filename);
   const csrftoken = getCookie("csrftoken");
-  fetch("/get_image/", {
+  await fetch("/get_image/", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -115,9 +115,7 @@ function loadImage(folder, filename, containerId, refresh = true) {
     .then((response) => response.json())
     .then((data) => {
       let container = document.getElementById(containerId);
-      // if (refresh) {
-      //   container.innerHTML = "";
-      // }
+
       if (container) {
         if (data.image_path) {
           if (document.getElementById(filename)) {

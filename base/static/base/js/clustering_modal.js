@@ -71,26 +71,18 @@ async function rename_confirmbtn() {
   await loadImage(
     "cluster_result",
     "clustering_summary.png",
-    "summary-container",
-    false
+    "summary-container"
   );
   await loadImage(
     "cluster_result",
     "clustering_heatmap.png",
-    "heatmap-container",
-    false
+    "heatmap-container"
   );
-  await loadImage(
-    "cluster_result",
-    "clustering_leidens.png",
-    "umap-container",
-    false
-  );
+  await loadImage("cluster_result", "clustering_leidens.png", "umap-container");
   await loadImage(
     "cluster_result",
     "clustering_ranking.png",
-    "ranking-container",
-    false
+    "ranking-container"
   );
   close_modal("rename-modal");
   toggleLoading(false, "confirmbtn");
