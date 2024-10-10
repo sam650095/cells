@@ -86,12 +86,12 @@ def clustering_result(adata, npcs):
         
         sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False,
                                 ncols=n_cols,
-                                fontsize=18,
+                                fontsize=12,
                             )
         plt.tight_layout() 
         plt.savefig(os.path.join(save_dir, 'clustering_ranking.png'), bbox_inches='tight', dpi=300)
         plt.close()
-        
+
     # Heatmap
     available_cmaps = plt.colormaps()
     cmap_choice = 'vlag' if 'vlag' in available_cmaps else 'coolwarm'
@@ -266,7 +266,7 @@ def phenotype_result(adata, chosen_adata, n_pcs):
         
         sc.pl.rank_genes_groups(adata, n_genes=10, sharey=False, show=False,
                                 ncols=n_cols,
-                                fontsize=18,
+                                fontsize=12,
                             )
         plt.tight_layout() 
         plt.savefig(os.path.join(save_dir, 'phenotyping_ranking.png'), bbox_inches='tight', dpi=300)
