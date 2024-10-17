@@ -1,3 +1,12 @@
+document.addEventListener(
+  "contextmenu",
+  function (e) {
+    if (e.target.tagName === "IMG") {
+      e.preventDefault();
+    }
+  },
+  false
+);
 let stepped = false;
 // navbar styling
 let pathSegments = window.location.pathname.split("/");
