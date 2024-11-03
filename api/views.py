@@ -383,7 +383,7 @@ class CLusteringView(APIView):
             save_h5ad_file(available_files['Merged Data'], 'available_files.h5ad')
         else:
             available_files[adata.uns['prefix']] = adata.copy()
-            save_h5ad_file(adata.uns['prefix'], 'available_files.h5ad')
+            save_h5ad_file(available_files[adata.uns['prefix']], 'available_files.h5ad')
 
         self.perform_clustering(chosen_method, n_neighbors, resolution, n_pcs) 
         SaveSteps(8, 'clustering', 'process', {"chosen_method": chosen_method, "resolution":resolution, "n_neighbors": n_neighbors, "n_pcs": n_pcs}, {})
@@ -501,12 +501,13 @@ class PreloadSubsetView(APIView):
     def available_adata(self):
         adata = read_h5ad_file('adata_clustering.h5ad')
         clustering_columns = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype", "Sample"))]
-        available_files = read_h5ad_file('available_files')
+        available_files_saved = read_h5ad_file('available_files.h5ad')
+        available_files= {}
         available_files_result = []
         if adata.uns.get('is_merged', False):
-            available_files['Merged Data'] = adata.copy()
+            available_files['Merged Data'] = available_files_saved
         else:
-            available_files[adata.uns['prefix']] = adata.copy()
+            available_files[adata.uns['prefix']] = available_files_saved
 
         for name, adata_item in available_files.items():
             n_obs, n_vars = adata_item.shape
@@ -546,33 +547,43 @@ class SubsetView(APIView):
         SaveSteps(11, 'clustering', 'subset', {"chosen_cluster":chosen_cluster,"chosen_cluster_names":chosen_cluster_names,"subset_name":subset_name},{"available_files_result":available_files_result})
         return available_files_result
     def add_subset_cluster(self, adata, chosen_cluster, chosen_cluster_names, subset_name):
-        available_files = read_h5ad_file('available_files')
+        available_files_saved = read_h5ad_file('available_files.h5ad')
+        available_files= {}
+        if adata.uns.get('is_merged', False):
+            available_files['Merged Data'] = available_files_saved
+        else:
+            available_files[adata.uns['prefix']] = available_files_saved
+
         available_files_result = []
         subset_adata = adata[adata.obs[chosen_cluster].isin(chosen_cluster_names)].copy()
         available_files[subset_name] = subset_adata
         for name, adata in available_files.items(): 
             n_obs, n_vars = adata.shape
             available_files_result.append(f"{name}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
-        save_data(available_files, 'available_files') 
+        # save_data(available_files, 'available_files') 
+        save_h5ad_file(available_files[subset_name], 'available_files_'+subset_name+'.h5ad')
         return available_files_result    
 
 # Identify the gates
 class PreloadIdentifytheGatesView(APIView):
     def post(self, request):
-        available_files = read_h5ad_file('available_files')
-        print(available_files.keys())
-        adata_list = list(available_files.keys())
+        h5ad_files = [f for f in os.listdir(settings.H5AD_STORAGE_PATH) 
+                  if f.startswith('available_files_') and f.endswith('.h5ad')]
+    
+        adata_list = [file.split('_')[-1].replace('.h5ad', '') for file in h5ad_files]
+        
         return Response({'adata_list': adata_list}, status=status.HTTP_201_CREATED)
     
 class ChosenAdataResultView(APIView):
     def post(self, request):
         chosen_adata = request.data.get('chosen_adata')
-        available_files = read_h5ad_file('available_files')
-        adata = available_files[chosen_adata]
+        available_files = read_h5ad_file('available_files_'+chosen_adata+'.h5ad')
+        adata = available_files
         n_obs, n_vars = adata.shape
         result = f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
         save_h5ad_file(adata, 'adata_identify_gate.h5ad')
-        save_data(chosen_adata, 'chosen_adata') 
+        SaveSteps(14, 'identifythegates', 'chosen', {'chosen_adata':chosen_adata}, {})
+        # save_data(chosen_adata, 'chosen_adata') 
         return Response({'result': result}, status=status.HTTP_201_CREATED)
     
 
@@ -582,7 +593,9 @@ class IdentifytheGatesView(APIView):
         columns = ['Marker'] + list(adata.obs['Sample'].cat.categories)
         gate_df = pd.DataFrame(columns=columns)
         gate_df['Marker'] = adata.var_names
-        save_data(gate_df, 'gate_df') 
+        print(gate_df)
+        # save_data(gate_df, 'gate_df') 
+        SaveSteps(15, 'identifythegates', 'process', {'gate_df': json.dumps(gate_df.to_dict(orient='records'))},{})
         gate_dict = gate_df.applymap(self.clean_value).to_dict(orient='records')
         
         return Response({'gate_df': gate_dict}, status=status.HTTP_201_CREATED)
@@ -597,25 +610,23 @@ class IdentifytheGatesView(APIView):
 class AddValueView(APIView):
     def post(self, request):
         editdata = json.loads(request.POST.get('editdata'))
-        gate_df = load_data('gate_df')
+        
         edit_df = pd.DataFrame(editdata)
+        
         edit_df = edit_df.apply(pd.to_numeric, errors='coerce')
-        gate_df.set_index('Marker', inplace=True)
-        edit_df.set_index('Marker', inplace=True)
-        for marker in edit_df.index:
-            for column in edit_df.columns:
-                if marker in gate_df.index and column in gate_df.columns:
-                    new_value = edit_df.loc[marker, column]
-                    if pd.notna(new_value):  
-                        gate_df.loc[marker, column] = new_value
+        edit_df = edit_df.replace([np.inf, -np.inf, np.nan], None)
         
-        gate_df.reset_index(inplace=True)
-        gate_df = gate_df.replace([np.inf, -np.inf], None)
-        gate_df = gate_df.where(pd.notnull(gate_df), None)
+        for col in edit_df.columns:
+            if col != 'Marker': 
+                edit_df[col] = edit_df[col].where(
+                    (edit_df[col] >= -1e308) & (edit_df[col] <= 1e308), 
+                    None
+                )
         
-        result = gate_df.to_dict(orient='records')
-        return Response({'result':result}, status=status.HTTP_201_CREATED)
-    
+        result = edit_df.to_dict(orient='records')
+        SaveSteps(15, 'identifythegates', 'process', {'gate_df': json.dumps(result)}, {})
+        
+        return Response({'result': result}, status=status.HTTP_201_CREATED)
 # Phenotyping
 class PhenotypingView(APIView):
     def post(self, request):
@@ -630,13 +641,17 @@ class PhenotypingView(APIView):
             for chunk in uploaded_file.chunks():
                 destination.write(chunk)
         phenotyping_result = self.perform_phenotyping(file_path)
+        SaveSteps(16, 'phenotyping', 'process', {'file_name': file_name}, {'phenotyping_result': phenotyping_result})
         return Response({'phenotyping_result': phenotyping_result}, status=status.HTTP_201_CREATED)
 
     def perform_phenotyping(self, file_path):
         adata = read_h5ad_file('adata_identify_gate.h5ad')
-        gate_df = load_data('gate_df')
-        chosen_adata = load_data('chosen_adata')
-        n_pcs = load_data('n_pcs')
+        gate_df_data = GetSteps(15)[0].input_values['gate_df']
+        if isinstance(gate_df_data, str):
+            gate_df_data = json.loads(gate_df_data)
+        gate_df = pd.DataFrame(gate_df_data)
+        chosen_adata = GetSteps(14)[0].input_values['chosen_adata']
+        n_pcs = GetSteps(7)[0].output_values['n_pcs']
         adata = sm.pp.rescale(adata, gate = gate_df, imageid = 'Sample', method = 'by_image')
         phenotype = pd.read_csv(file_path, encoding='utf-8')
         adata = sm.tl.phenotype_cells(adata, phenotype=phenotype,
@@ -658,18 +673,24 @@ class AddUmapPhenotypeView(APIView):
     def post_phenotypes(self, request):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
         add_phenotypes_bysample(adata)
+        SaveSteps(20, 'phenotyping', 'addumapphenotypes', {}, {})
         return Response({"message": "Phenotypes processed"}, status=status.HTTP_201_CREATED)
 
     def post_markers(self, request):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
         chosen_method = request.data.getlist('markers')
         add_phenotypes_markers(adata, chosen_method)
+        SaveSteps(21, 'phenotyping', 'addumapmarkers', {'chosen_method':chosen_method}, {})
         return Response({"message": "Markers processed"}, status=status.HTTP_201_CREATED)
 class PreloadPhenotypesMarkersView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
         marker_list = adata.var_names.tolist()
         marker_list.insert(0,"Select All") 
+        print(marker_list)
+        SaveSteps(17, 'phenotyping', 'preloadmarkers', {}, {'marker_list':marker_list})
+        
+        print(GetSteps(17)[0])
         return Response({'marker_list': marker_list}, status=status.HTTP_201_CREATED)
 class GrabPhenotypesNameView(APIView):
     def post(self, request):
@@ -689,7 +710,7 @@ class RenamePhenotypeView(APIView):
         return Response({}, status=status.HTTP_201_CREATED)
     def perform_rename_cluster(self, rename_df):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
-        n_pcs = load_data('n_pcs')
+        n_pcs = GetSteps(7)[0].output_values['n_pcs']
 
         rename_dict = {}
         for _, row in rename_df.iterrows():
@@ -698,10 +719,9 @@ class RenamePhenotypeView(APIView):
             rename_dict[current_name] = new_name
 
         adata.obs['phenotype'] = adata.obs['phenotype'].astype(str).map(rename_dict).astype('category')
-        chosen_adata = load_data('chosen_adata')
-        n_pcs = load_data('n_pcs')
+        chosen_adata = GetSteps(14)[0].input_values['chosen_adata']
         phenotype_result(adata, chosen_adata, n_pcs)
-
+        SaveSteps(18, 'phenotyping', 'rename', {}, {})
         save_h5ad_file(adata, 'adata_phenotyping.h5ad')
         return adata
 class GrabDropPhenotypeView(APIView):
@@ -715,10 +735,11 @@ class DropPhenotypeView(APIView):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
         drop_groups = request.data.getlist('drops')
         adata = sm.hl.dropFeatures(adata, drop_groups=drop_groups, groups_column='phenotype', subset_raw=False)
-        chosen_adata = load_data('chosen_adata')
-        n_pcs = load_data('n_pcs')
-        phenotype_result(adata, chosen_adata, n_pcs)
+        chosen_adata = GetSteps(14)[0].input_values['chosen_adata']
+        n_pcs = GetSteps(7)[0].output_values['n_pcs']
 
+        phenotype_result(adata, chosen_adata, n_pcs)
+        SaveSteps(19, 'phenotyping', 'drop', {}, {})
         save_h5ad_file(adata, 'adata_phenotyping.h5ad')
         return Response({'message': 'drop phenotype successfully!'}, status=status.HTTP_201_CREATED)
   
@@ -726,7 +747,7 @@ class DropPhenotypeView(APIView):
 class PreloadSpatialAnalysisView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
-        chosen_adata = load_data('chosen_adata')
+        chosen_adata = GetSteps(14)[0].input_values['chosen_adata']
         n_obs, n_vars = adata.shape
         return Response({'preload_result': f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"}, status=status.HTTP_201_CREATED)
 class SpatialAnalysisView(APIView):
@@ -804,7 +825,7 @@ class PreloadNeighborView(APIView):
     def post(self, request):
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')
         n_obs, n_vars = adata.shape
-        chosen_adata = load_data('chosen_adata')
+        chosen_adata = GetSteps(14)[0].input_values['chosen_adata']
         return Response({"preload_result":f"{chosen_adata}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"}, status=status.HTTP_201_CREATED)
         
 class NeighborView(APIView):

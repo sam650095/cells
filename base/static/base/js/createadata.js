@@ -27,8 +27,7 @@ function banned_operations() {
   const delBtns = document.querySelectorAll(".delbtn");
 
   processBtn.disabled = true;
-  fileUploadLabel.disabled = true;
-
+  document.getElementById("file_upload").disabled = true;
   fileUploadLabel.classList.remove("bg-sky-700", "hover:bg-sky-600");
   fileUploadLabel.classList.add("bg-sky-700/50", "cursor-not-allowed");
 

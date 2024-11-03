@@ -6,8 +6,9 @@
     <div>
       <label
         for="file_upload"
-        class="rounded-md bg-sky-950 py-2 px-4 text-white text-sm font-semibold my-3"
-        style="display: inline-block; cursor: pointer"
+        id="file_upload_l"
+        class="rounded-md bg-sky-950 py-2 px-4 text-white text-sm font-semibold my-3 cursor-pointer"
+        style="display: inline-block"
       >
         +Upload File
       </label>
@@ -29,7 +30,7 @@
 </form>
 <div class="text-end py-5">
   <button
-    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
     id="processbutton"
     onclick="processbtn(event)"
   >
@@ -162,7 +163,7 @@
                 type="button"
                 id="Addphenotypes"
                 name="Addphenotypes"
-                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
                 onclick="addphenotypes()"
               >
                 Add
@@ -176,7 +177,7 @@
                 name="phenotype_markers"
                 id="phenotype_markers"
                 data-dropdown-toggle="dropdownmarkers"
-                class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+                class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
               >
                 Select All
                 <svg
@@ -219,7 +220,7 @@
                 type="button"
                 id="Addedmarkers"
                 name="Addedmarkers"
-                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+                class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
                 onclick="addmarkers()"
               >
                 Add

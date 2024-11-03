@@ -10,7 +10,7 @@
       name="phenotyping_data"
       id="phenotyping_data"
       data-dropdown-toggle="data_dropdown"
-      class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+      class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
       type="button"
     >
       <span id="selected"></span>
@@ -45,7 +45,7 @@
   <div id="chosen_results" class="text-gray-500 text-bold"></div>
   <div class="text-end py-5">
     <button
-      class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hidden"
+      class="hidden rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
       id="processbutton"
       onclick="processbtn(event)"
     >
@@ -75,13 +75,7 @@
 </table>
 <div class="text-right hidden" id="btnchanges">
   <button
-    class="rounded-md bg-red-500 py-2 px-4 text-white text-sm font-semibold my-3"
-    id="clearbtn"
-  >
-    Clear Changes
-  </button>
-  <button
-    class="rounded-md bg-emerald-600 py-2 px-4 text-white text-sm font-semibold my-3"
+    class="rounded-md bg-emerald-600 py-2 px-4 text-white text-sm font-semibold my-3 disabled:bg-emerald-600/50 disabled:cursor-not-allowed"
     id="confirmbtn"
     onclick="confirmbtn()"
   >

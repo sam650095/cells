@@ -195,6 +195,7 @@ async function preload_subset() {
     0,
     csrftoken
   );
+  console.log(preload_subset_result);
   // data text
   let available_files_result = document.getElementById(
     "available_files_result"

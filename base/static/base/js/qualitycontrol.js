@@ -1,5 +1,5 @@
 const f_sampleSelect = document.getElementById("f_sampleSelect");
-let marker_list = []
+let marker_list = [];
 // check if the step is proccessed
 document.addEventListener("DOMContentLoaded", async function () {
   const grabstep_rslt = await grabsteps(`/getSteps/qualitycontrol/process/`);
@@ -78,8 +78,8 @@ async function processbtn(event) {
     toggleLoading(false, "processbutton");
     // next page btn
     document.getElementById("nextbtn").classList.remove("hidden");
-    marker_list = process_result.data.marker_list
-    console.log(marker_list)
+    marker_list = process_result.data.marker_list;
+    console.log(marker_list);
   } catch (error) {
     toggleLoading(false, "processbutton");
   }
@@ -108,7 +108,7 @@ function showimage(result) {
   );
 
   const sample_ul = document.getElementById("sampleul");
-  sample_ul.textContent = '';
+  sample_ul.textContent = "";
   defaultsample = result["adata_results"][0].substring(
     0,
     result["adata_results"][0].indexOf(":")
@@ -187,8 +187,8 @@ function select_method(method) {
 function select(s_ul, selected) {
   document.getElementById(s_ul + "_select").textContent = selected;
   document.getElementById(s_ul + "_input").value = selected;
-  if(s_ul == 'v_sampleul'){
-    console.log('test');
+  if (s_ul == "v_sampleul") {
+    console.log("test");
   }
 }
 // preview

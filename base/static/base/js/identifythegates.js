@@ -7,12 +7,41 @@ document.addEventListener("DOMContentLoaded", async function () {
     0,
     csrftoken
   );
-  console.log(preload_results);
   showdropdown(preload_results.data.adata_list);
   // grab step
+  const grabstep_chosen_rslt = await grabsteps(
+    `/getSteps/identifythegates/chosen/`
+  );
   const grabstep_rslt = await grabsteps(`/getSteps/identifythegates/process/`);
-  console.log(grabstep_rslt);
+
+  if (
+    (grabstep_chosen_rslt.message != "notfound") &
+    (grabstep_rslt.message != "notfound")
+  ) {
+    stepped = true;
+    document.getElementById("watchonly").classList.remove("hidden");
+    document.getElementById("processbutton").classList.remove("hidden");
+    document.getElementById("btnchanges").classList.remove("hidden");
+    document.getElementById("nextbtn").classList.remove("hidden");
+    const datatype = JSON.parse(grabstep_rslt.input_values["gate_df"]);
+    console.log(datatype);
+    // datatype.forEach((item, index) => {
+    //   console.log(`**${index}**: ${JSON.stringify(item).replace(/"/g, "'")}`);
+    // });
+    createTable(datatype);
+
+    document.getElementById("selected").textContent =
+      grabstep_chosen_rslt.input_values["chosen_adata"];
+    banned_operations();
+  }
 });
+// banned operation
+function banned_operations() {
+  const processBtn = document.getElementById("processbutton");
+  processBtn.disabled = true;
+  document.getElementById("phenotyping_data").disabled = true;
+  document.getElementById("confirmbtn").disabled = true;
+}
 function showdropdown(adata_list) {
   const preloadul = document.getElementById("preloadul");
 
@@ -49,13 +78,11 @@ async function processbtn(event) {
     0,
     csrftoken
   );
-  console.log(identifythegates_result);
   createTable(identifythegates_result.data.gate_df);
   toggleLoading(false, "processbutton");
 
   document.getElementById("btnbox").classList.remove("hidden");
   document.getElementById("btnchanges").classList.remove("hidden");
-  document.getElementById("nextbtn").classList.remove("hidden");
 }
 function createTable(data) {
   const table = document.getElementById("nametable");
@@ -104,16 +131,18 @@ function handleClick(td, rowIndex, columnName) {
   const currentValue = td.textContent;
   td.textContent = "";
   const input = document.createElement("input");
+
   input.type = "number";
   input.value = currentValue === "N/A" ? "" : currentValue;
   input.className =
-    "my-2 w-3/4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900";
+    "disabled:bg-gray-300 disabled:cursor-not-allowed my-2 w-3/4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900";
 
   div.appendChild(input);
   const btn = document.createElement("button");
   btn.textContent = "V";
+
   btn.className =
-    "text-cyan-700 border border-sky-700 rounded-md hover:bg-sky-700 hover:text-white py-2 px-4 text-white text-sm font-semibold my-3";
+    "disabled:bg-sky-700/50 disabled:border-sky-700/50 disabled:cursor-not-allowed disabled:text-white text-cyan-700 border border-sky-700 rounded-md hover:bg-sky-700 hover:text-white py-2 px-4 text-white text-sm font-semibold my-3";
   btn.onclick = function (event) {
     event.stopPropagation();
     saveEdit(rowIndex, columnName, input.value);
@@ -123,6 +152,9 @@ function handleClick(td, rowIndex, columnName) {
   div.appendChild(btn);
   td.appendChild(div);
   input.focus();
+  if (stepped) {
+    input.disabled = true;
+  }
 }
 function saveEdit(rowIndex, columnName, newValue) {
   editdata[rowIndex][columnName] = newValue;
@@ -134,4 +166,5 @@ async function confirmbtn() {
   formData.append("editdata", JSON.stringify(editdata));
   const addvalueresult = await fetchAPI("/api/addvalue", formData, csrftoken);
   console.log(addvalueresult);
+  document.getElementById("nextbtn").classList.remove("hidden");
 }

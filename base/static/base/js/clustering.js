@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (grabstep_rslt.message != "notfound") {
     stepped = true;
     document.getElementById("watchonly").classList.remove("hidden");
+    document.getElementById("nextbtn").classList.remove("hidden");
     // clustering process
     document.getElementById("preloadul_input").value =
       grabstep_rslt.input_values["chosen_method"];

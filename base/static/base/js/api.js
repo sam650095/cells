@@ -57,7 +57,8 @@ async function deleteSteps() {
     normalizationmerge: 5,
     pca: 7,
     clustering: 8,
-    identifythegates: 13,
+    identifythegates: 14,
+    phenotyping: 16,
   };
   let url = `/delSteps/${steps[step]}/`;
   try {
