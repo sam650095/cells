@@ -1,6 +1,7 @@
 let new_rename_df;
 // renameing
 async function grabnames() {
+  show_modal("rename-modal");
   const csrftoken = getCookie("csrftoken");
   const grabname_result = await fetchAPI(
     "/api/grabphenotypesnames",
@@ -42,9 +43,17 @@ function show_name_table(rename_df) {
 function editname(index) {
   const newname_td = document.getElementById("newname_" + index);
   const old_name = newname_td.textContent;
-  newname_td.innerHTML = `
-    <input type="text" id="input_${index}" value="${old_name}" class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900">
+  console.log(stepped);
+  if (stepped) {
+    newname_td.innerHTML = `
+    <input type="text" id="input_${index}" value="${old_name}" class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
     `;
+  } else {
+    newname_td.innerHTML = `
+      <input type="text" id="input_${index}" value="${old_name}" class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 disabled:bg-gray-300 disabled:cursor-not-allowed">
+      `;
+  }
+
   document.getElementById("editbtn_" + index).classList.add("hidden");
   document.getElementById("confirmbtn_" + index).classList.remove("hidden");
 }
@@ -59,6 +68,7 @@ function confirmname(index) {
   document.getElementById("confirmbtn_" + index).classList.add("hidden");
 }
 async function rename_confirmbtn() {
+  toggleLoading(true, "renameconfirmbtn");
   console.log(new_rename_df);
   const csrftoken = getCookie("csrftoken");
   const jsonData = JSON.stringify(new_rename_df);
@@ -84,8 +94,11 @@ async function rename_confirmbtn() {
     "phenotyping_ranking.png",
     "p-ranking-container"
   );
+  toggleLoading(false, "renameconfirmbtn");
+  close_modal("rename-modal");
 }
 async function grabdropphenotype() {
+  show_modal("dropphenotype-modal");
   const csrftoken = getCookie("csrftoken");
   const grab_drop_phenotype_result = await fetchAPI(
     "/api/grabdropphenotype",
@@ -126,7 +139,7 @@ function insert_dreop_list(drop_list) {
 }
 async function dropphenotype_confirmbtn() {
   const csrftoken = getCookie("csrftoken");
-
+  toggleLoading(true, "drop_confirmbtn");
   const form = document.getElementById("dropphenotypeform");
 
   const formData = new FormData(form);
@@ -159,4 +172,6 @@ async function dropphenotype_confirmbtn() {
     "phenotyping_ranking.png",
     "p-ranking-container"
   );
+  toggleLoading(false, "drop_confirmbtn");
+  close_modal("dropphenotype-modal");
 }

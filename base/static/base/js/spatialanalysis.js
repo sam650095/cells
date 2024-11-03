@@ -10,7 +10,34 @@ document.addEventListener("DOMContentLoaded", async function () {
   document.getElementById("preloadresult").textContent =
     preload_spatialanalysis_results.data.preload_result;
   console.log(preload_spatialanalysis_results);
+  const grabstep_rslt = await grabsteps(`/getSteps/spatialanalysis/process/`);
+  console.log(grabstep_rslt);
+  if (grabstep_rslt.message != "notfound") {
+    stepped = true;
+    document.getElementById("watchonly").classList.remove("hidden");
+    document.getElementById("imgbox").classList.remove("hidden");
+    document.getElementById("nextbtn").classList.remove("hidden");
+
+    addimg(grabstep_rslt.output_values["filename"]);
+    banned_operations();
+  }
 });
+// banned operation
+function banned_operations() {
+  const processBtn = document.getElementById("processbutton");
+  processBtn.disabled = true;
+
+  document.getElementById("DH_dp_btn").disabled = true;
+  document.getElementById("DH_btn").disabled = true;
+  document.getElementById("NP_dp_btn").disabled = true;
+  document.getElementById("NPD_dp_btn").disabled = true;
+  document.getElementById("NP_btn").disabled = true;
+  document.getElementById("IH_dp_btn").disabled = true;
+  document.getElementById("IHM_dp_btn").disabled = true;
+  document.getElementById("IH_btn").disabled = true;
+  document.getElementById("VP_dp_btn").disabled = true;
+  document.getElementById("VP_btn").disabled = true;
+}
 async function processbtn(event) {
   event.preventDefault();
   const csrftoken = getCookie("csrftoken");
@@ -79,5 +106,5 @@ async function addbtn(m) {
   );
   console.log(rslt);
   toggleLoading(false, m + "_btn");
-  loadImage("spatial_result", rslt["filename"], container, false);
+  loadImage("spatial_result", rslt.data["filename"], container, false);
 }

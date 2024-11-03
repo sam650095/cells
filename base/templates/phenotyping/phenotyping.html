@@ -279,6 +279,7 @@
           type="button"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
           data-modal-hide="rename-modal"
+          onclick="close_modal('rename-modal')"
         >
           <svg
             class="w-3 h-3"
@@ -337,9 +338,8 @@
           <button
             type="button"
             onclick="rename_confirmbtn()"
-            id="confirmbtn"
-            data-modal-hide="rename-modal"
-            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+            id="renameconfirmbtn"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
           >
             Confirm
           </button>
@@ -365,6 +365,7 @@
           type="button"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
           data-modal-hide="dropphenotype-modal"
+          onclick="close_modal('dropphenotype-modal')"
         >
           <svg
             class="w-3 h-3"
@@ -399,7 +400,7 @@
               name="divide_dropphenotype"
               id="divide_dropphenotype"
               data-dropdown-toggle="divide_dropphenotype_dropdown"
-              class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+              class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
               type="button"
             >
               <span id="_"></span>
@@ -435,9 +436,8 @@
           <button
             type="button"
             onclick="dropphenotype_confirmbtn()"
-            id="confirmbtn"
-            data-modal-hide="dropphenotype-modal"
-            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+            id="drop_confirmbtn"
+            class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
           >
             Drop
           </button>

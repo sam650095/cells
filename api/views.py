@@ -754,7 +754,7 @@ class SpatialAnalysisView(APIView):
     def post(self, request):
         self.calculate_spatial()
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')
-
+        
         columns_list = [col for col in adata.obs.columns if col.startswith(("leiden_R", "phenotype"))]
         default_chosen_column = 'phenotype'
         cluster_list = adata.obs[default_chosen_column].unique()
@@ -773,7 +773,7 @@ class SpatialAnalysisView(APIView):
         filename.append(IH)
         filename.append(IV)
         print(adata.shape)
-        
+        SaveSteps(22, 'spatialanalysis', 'process', {}, {"filename":filename})
         return Response({'columns_list': columns_list,'cluster_list':cluster_list, 'cluster_list_L':cluster_list_L, 'method_list':method_list, "filename":filename}, status=status.HTTP_201_CREATED)
     def calculate_spatial(self):
         adata = read_h5ad_file('adata_phenotyping.h5ad')
@@ -805,19 +805,19 @@ class AddSpatial(APIView):
         return Response({"filename":filename}, status=status.HTTP_201_CREATED)
     def post_dh(self, request):
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')
-        filename = distances_heatmap(adata, json.loads(request.body).get('dh_ul_input'))
+        filename = distances_heatmap(json.loads(request.body).get('dh_ul_input'))
         return filename
     def post_np(self, request):
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')
-        filename = distances_numeric_plot(adata, json.loads(request.body).get('np_ul_input'), json.loads(request.body).get('npd_ul_input'))
+        filename = distances_numeric_plot(json.loads(request.body).get('np_ul_input'), json.loads(request.body).get('npd_ul_input'))
         return filename
     def post_ih(self, request):
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')
-        filename = interactions_heatmap(adata, json.loads(request.body).get('ih_ul_input'), json.loads(request.body).get('ihm_ul_input'))
+        filename = interactions_heatmap(json.loads(request.body).get('ih_ul_input'), json.loads(request.body).get('ihm_ul_input'))
         return filename
     def post_vp(self, request):
         adata = read_h5ad_file('adata_spatial_analysis.h5ad')
-        filename = interactions_voronoi(adata, json.loads(request.body).get('vp_ul_input'))
+        filename = interactions_voronoi(json.loads(request.body).get('vp_ul_input'))
         return filename
 
 # Neighborhood
@@ -835,4 +835,6 @@ class NeighborView(APIView):
         k = json.loads(request.body).get('k_neighbor')
         n_neighborhoods =json.loads(request.body).get('n_neighbor')
         perform_neighborhoods(adata, chosen_column, k, n_neighborhoods)
+        SaveSteps(23, 'neighborhood', 'process', {'chosen_column':chosen_column,'k':k,'n_neighborhoods':n_neighborhoods}, {})
+        print(True)
         return Response({"test":"test"}, status=status.HTTP_201_CREATED)

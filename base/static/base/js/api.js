@@ -59,6 +59,8 @@ async function deleteSteps() {
     clustering: 8,
     identifythegates: 14,
     phenotyping: 16,
+    spatialanalysis: 22,
+    neighborhood: 23,
   };
   let url = `/delSteps/${steps[step]}/`;
   try {

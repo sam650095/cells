@@ -11,7 +11,7 @@
     name="neighbor_method"
     id="neighbor_method"
     data-dropdown-toggle="dropdown"
-    class="p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
+    class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-36 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900 justify-between inline-flex items-center"
     type="button"
   >
     <span id="n_select">phenotype</span>
@@ -67,7 +67,7 @@
     <input
       type="number"
       id="k_neighbor"
-      class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+      class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
     />
   </div>
   <ul class="space-y-1 text-gray-500 list-disc list-outside p-4">
@@ -79,12 +79,12 @@
   <input
     type="number"
     id="n_neighbor"
-    class="p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
+    class="disabled:bg-gray-300 disabled:cursor-not-allowed p-3 w-24 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-900 focus:border-sky-900"
   />
 </div>
 <div class="text-end py-5">
   <button
-    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
+    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3 hover:bg-sky-600 disabled:bg-sky-700/50 disabled:cursor-not-allowed"
     id="processbutton"
     onclick="processbtn(event)"
   >
@@ -94,15 +94,6 @@
 <div id="imgbox" class="flex gap-5">
   <div id="neighborhood_lmplot_container"></div>
   <div id="neighborhood_heatmap_container"></div>
-</div>
-
-<!-- button -->
-<div class="text-end py-5">
-  <a
-    class="rounded-md bg-sky-700 py-2 px-4 text-white text-sm font-semibold my-3"
-  >
-    Finished
-  </a>
 </div>
 
 <script src="{% static 'base/js/neighbor.js'%}"></script>

@@ -94,6 +94,10 @@ function banned_operations() {
   document.getElementById("Addedmarkers").disabled = true;
   document.getElementById("Addphenotypes").disabled = true;
   document.getElementById("phenotype_markers").disabled = true;
+
+  document.getElementById("renameconfirmbtn").disabled = true;
+  document.getElementById("drop_confirmbtn").disabled = true;
+  document.getElementById("divide_dropphenotype").disabled = true;
 }
 async function processbtn(event) {
   event.preventDefault();
