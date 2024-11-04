@@ -95,7 +95,7 @@ function downloadImages(folder) {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-          }, index * 1000);
+          }, index * 5000);
         });
       }
     })
