@@ -47,7 +47,6 @@ def replaceimage():
 def plot_clustering_pca(adata):
     pca_dir = os.path.join(settings.MEDIA_ROOT, 'pca_img')
     os.makedirs(pca_dir, exist_ok=True)
-
     sc.pp.highly_variable_genes(adata, n_top_genes=2000)
     sc.pp.regress_out(adata, ['total_counts'])
     sc.pp.scale(adata, max_value=10)

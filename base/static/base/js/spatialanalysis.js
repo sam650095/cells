@@ -106,5 +106,5 @@ async function addbtn(m) {
   );
   console.log(rslt);
   toggleLoading(false, m + "_btn");
-  loadImage("spatial_result", rslt.data["filename"], container, false);
+  loadImage("spatial_result", rslt.data["filename"], container);
 }

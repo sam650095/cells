@@ -124,32 +124,13 @@ async function processbtn(event) {
 function show_result() {
   document.getElementById("btnbox").classList.remove("hidden");
   document.getElementById("imgbox").classList.remove("hidden");
-  loadImage(
-    "cluster_result",
-    "clustering_summary.png",
-    "summary-container",
-    false
-  );
-  loadImage(
-    "cluster_result",
-    "clustering_heatmap.png",
-    "heatmap-container",
-    false
-  );
-  loadImage(
-    "cluster_result",
-    "clustering_leidens.png",
-    "umap-container",
-    false
-  );
-  loadImage(
-    "cluster_result",
-    "clustering_ranking.png",
-    "ranking-container",
-    false
-  );
+  loadImage("cluster_result", "clustering_summary.png", "summary-container");
+  loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
+  loadImage("cluster_result", "clustering_leidens.png", "umap-container");
+  loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
 }
 async function addleidens() {
+  toggleLoading(true, "Addleidens");
   const csrftoken = getCookie("csrftoken");
   const addleidensresult = await fetchAPI(
     "/api/addumapcluster/leidens",
@@ -162,10 +143,11 @@ async function addleidens() {
     "clustering_leidens_bysample.png",
     "addleidens-container"
   );
+  toggleLoading(false, "Addleidens");
 }
 async function addmarkers() {
   const csrftoken = getCookie("csrftoken");
-
+  toggleLoading(true, "Addedmarkers");
   const form = document.getElementById("markerform");
 
   const formData = new FormData(form);
@@ -186,6 +168,7 @@ async function addmarkers() {
     csrftoken
   );
   loadImage("umap_cluster", "clustering_markers.png", "addmarkers-container");
+  toggleLoading(false, "Addedmarkers");
 }
 async function prenext(event) {
   event.preventDefault();

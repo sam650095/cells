@@ -68,24 +68,14 @@ async function rename_confirmbtn() {
     jsonData,
     csrftoken
   );
-  await loadImage(
-    "cluster_result",
-    "clustering_summary.png",
-    "summary-container"
-  );
-  await loadImage(
-    "cluster_result",
-    "clustering_heatmap.png",
-    "heatmap-container"
-  );
-  await loadImage("cluster_result", "clustering_leidens.png", "umap-container");
-  await loadImage(
-    "cluster_result",
-    "clustering_ranking.png",
-    "ranking-container"
-  );
-  close_modal("rename-modal");
+  // document.getElementById("summary-container").innerHTML = "";
+  console.log(document.getElementById("summary-container"));
+  loadImage("cluster_result", "clustering_summary.png", "summary-container");
+  loadImage("cluster_result", "clustering_heatmap.png", "heatmap-container");
+  loadImage("cluster_result", "clustering_leidens.png", "umap-container");
+  loadImage("cluster_result", "clustering_ranking.png", "ranking-container");
   toggleLoading(false, "confirmbtn");
+  close_modal("rename-modal");
 }
 // subclustering
 async function grabclusters() {

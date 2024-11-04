@@ -102,9 +102,9 @@ function downloadImages(folder) {
     .catch((error) => console.error("Error:", error));
 }
 // fetching image
-async function loadImage(folder, filename, containerId, refresh = true) {
-  console.log(folder, filename);
+async function loadImage(folder, filename, containerId) {
   const csrftoken = getCookie("csrftoken");
+
   await fetch("/get_image/", {
     method: "POST",
     headers: {
@@ -118,7 +118,6 @@ async function loadImage(folder, filename, containerId, refresh = true) {
     .then((response) => response.json())
     .then((data) => {
       let container = document.getElementById(containerId);
-
       if (container) {
         if (data.image_path) {
           if (document.getElementById(filename)) {
@@ -137,7 +136,6 @@ async function loadImage(folder, filename, containerId, refresh = true) {
     })
     .catch((error) => {
       console.error("Error:", error);
-      let container = document.getElementById(containerId);
     });
 }
 // marker option
