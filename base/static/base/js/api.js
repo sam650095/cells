@@ -124,7 +124,7 @@ async function loadImage(folder, filename, containerId) {
             document.getElementById(filename).remove();
           }
           let img = document.createElement("img");
-          img.src = data.image_path;
+          img.src = data.image_path + `?t=${Date.now()}`;
           img.alt = filename;
           img.id = filename;
           img.classList.add("h-auto", "max-w-full", "mx-auto");
