@@ -115,8 +115,6 @@ function showimage(result) {
   );
   document.getElementById("sampleul_select").textContent = defaultsample;
   document.getElementById("sampleul_input").value = defaultsample;
-  document.getElementById("v_sampleul_select").textContent = defaultsample;
-  document.getElementById("v_sampleul_input").value = defaultsample;
   for (let i = 0; i < result.adata_results.length; i++) {
     const li = document.createElement("li");
     li.textContent = result["adata_results"][i];
@@ -142,18 +140,6 @@ function showimage(result) {
       `;
 
     sample_ul.appendChild(sample_li);
-
-    const v_sample_ul = document.getElementById("v_sampleul");
-    // selection add data
-
-    const v_sample_li = document.createElement("li");
-    v_sample_li.innerHTML = `
-              <a onclick="select('v_sampleul','${sample}')"
-              class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white m-2 cursor-pointer"
-          >${sample}</a>
-      `;
-
-    v_sample_ul.appendChild(v_sample_li);
   }
   imgbox.appendChild(ul);
 }
@@ -187,9 +173,6 @@ function select_method(method) {
 function select(s_ul, selected) {
   document.getElementById(s_ul + "_select").textContent = selected;
   document.getElementById(s_ul + "_input").value = selected;
-  if (s_ul == "v_sampleul") {
-    console.log("test");
-  }
 }
 // preview
 async function preview() {

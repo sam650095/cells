@@ -270,6 +270,7 @@ class NormalizationView(APIView):
         # save anndata
         for i, adata in enumerate(norm_adata_objects):
             save_h5ad_file(adata, f'norm_adata_objects_{i}')
+            print(f'{adata.shape[0]} × {adata.shape[1]}')
         SaveSteps(5, 'normalization', 'process', {}, {"adata_results": norm_adata_results})
         
         return Response({"adata_results": norm_adata_results}, status=status.HTTP_201_CREATED)
