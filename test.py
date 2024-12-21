@@ -1,48 +1,38 @@
-import matplotlib.pyplot as plt
-import scimap as sm 
-import matplotlib
-import anndata as ad
-import time
-start = time.time()
-# 設置
-chosen_column = 'phenotype'
-matplotlib.use('Agg')
-adata = ad.read_h5ad('adata_phenotyping.h5ad')
-plt.rcParams['figure.figsize'] = [15, 10]
+import scanpy as sc
+import bbknn
+import logging
 
-# 清除任何現有的圖形
-plt.clf()
+logging.basicConfig(level=logging.INFO)
 
-print('plot start')
-# 創建 Voronoi 圖
-sm.pl.voronoi(adata, 
-              color_by=chosen_column, 
-              voronoi_edge_color='black', 
-              voronoi_line_width=0.3, 
-              voronoi_alpha=0.8, 
-              size_max=5000, 
-              overlay_points=None, 
-              plot_legend=True, 
-              legend_size=6)
+# 加載示例數據集
+adata = sc.datasets.pbmc3k()  # 這是一個 PBMC (外周血單核細胞) 的小型數據集
 
-# 保存圖形
-plt.savefig(f'interactions_voronoi_{chosen_column}.png')
-plt.close()  # 關閉圖形以釋放內存
-end = time.time()
+# 篩選和標準化數據
+sc.pp.filter_genes(adata, min_cells=3)
+sc.pp.normalize_total(adata, target_sum=1e4)
+sc.pp.log1p(adata)
 
-# 檢查數據
-print(f"Data shape: {adata.shape}")
-print(f"Available columns: {adata.obs.columns}")
-print(f"Unique values in {chosen_column}: {adata.obs[chosen_column].unique()}")
-print(format(end - start)+'秒')
-# # 如果還是不行，嘗試使用 scatter plot
-# plt.figure(figsize=(15, 10))
-# sc = plt.scatter(adata.obsm['spatial'][:, 0], 
-#                  adata.obsm['spatial'][:, 1], 
-#                  c=adata.obs[chosen_column].astype('category').cat.codes, 
-#                  s=1, 
-#                  alpha=0.8)
-# plt.colorbar(sc)
-# plt.title(f'Scatter plot of {chosen_column}')
-# plt.savefig(f'scatter_{chosen_column}.png')
-# plt.close()
+# 計算高變基因
+sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+adata = adata[:, adata.var['highly_variable']].copy()  # 顯式轉換為副本
+
+# 標準化高變基因
+sc.pp.scale(adata, max_value=10)
+
+# PCA 降維
+sc.tl.pca(adata, svd_solver='arpack')
+
+# 使用 bbknn 替代標準最近鄰搜尋（適用於批次效應校正）
+adata.obs['batch'] = ['batch1'] * (adata.n_obs // 2) + ['batch2'] * (adata.n_obs // 2)
+print("Batch labels set successfully.")
+print(f"adata shape: {adata.shape}")
+# 確保 BBKNN 正常運行
+try:
+    bbknn.bbknn(adata, batch_key='batch')
+    print("BBKNN completed successfully.")
+except Exception as e:
+    print("Error during BBKNN execution:", e)
+
+# UMAP 可視化
+sc.tl.umap(adata)
+sc.pl.umap(adata, color='batch')

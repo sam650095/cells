@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const grabstep_filter_rslt = await grabsteps(
     `/getSteps/qualitycontrol/filter/`
   );
+  console.log(grabstep_rslt);
   console.log(grabstep_filter_rslt);
   if (
     grabstep_rslt.message != "notfound" ||
@@ -13,9 +14,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   ) {
     stepped = true;
     document.getElementById("watchonly").classList.remove("hidden");
-    showimage(grabstep_rslt.output_values);
     document.getElementById("btnbox").classList.remove("hidden");
     document.getElementById("nextbtn").classList.remove("hidden");
+    showimage(grabstep_rslt.output_values);
     if (grabstep_filter_rslt.message != "notfound") {
       document.getElementById("sampleul_select").textContent =
         grabstep_filter_rslt.input_values["f_sampleSelect"];

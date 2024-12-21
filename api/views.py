@@ -215,13 +215,15 @@ class ReplaceView(APIView):
         filter_method = request.data.get('filter_sampleul_input')
         lowerlimit = float(request.data.get('lowerlimit')) if request.data.get('lowerlimit') else None
         upperlimit = float(request.data.get('upperlimit')) if request.data.get('upperlimit') else None
-        update_adata_objects, filtered_adata_objects, adata_results, changed_adata_result = self.perform_filter()
-
+        filtered_adata_objects, adata_results, changed_adata_result = self.perform_filter()
+        print(adata_results)
         # save anndata
         for i, adata in enumerate(filtered_adata_objects):
             save_h5ad_file(adata, f'filtered_adata_objects_{i}')
-        for i, adata in enumerate(update_adata_objects):
-            save_h5ad_file(adata, f'update_adata_objects_{i}')
+        # update steps
+        operation_step = OperationStep.objects.get(session_id=2)
+        SaveSteps(2, 'qualitycontrol', 'process', {}, {'adata_results': adata_results,'save_image_names': operation_step.output_values.get('save_image_names'), 'marker_list':operation_step.output_values.get('marker_list')})
+       
         SaveSteps(3, 'qualitycontrol', 'filter', {"f_sampleSelect":f_sampleSelect, "minGenes":minGenes, "filter_method":filter_method, "lowerlimit":lowerlimit, "upperlimit":upperlimit}, {'adata_result':changed_adata_result, 'save_image_names':f_sampleSelect+"_previewimage.png"})
         
         return Response({'adata_results':adata_results,'save_image_names':image_names}, status=status.HTTP_201_CREATED)
@@ -251,17 +253,19 @@ class ReplaceView(APIView):
             adata_results.append(f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
             
 
-        return updated_adata_objects, filtered_adata_objects, adata_results, changed_adata_result
+        return filtered_adata_objects, adata_results, changed_adata_result
 class ConfirmView(APIView):
     def post(self, request):
         # read anndata
         files = os.listdir(settings.H5AD_STORAGE_PATH)
         adata_files = [file for file in files if file.startswith('preview_adata_objects')]
         adata_objects = [read_h5ad_file(file) for file in adata_files]
-
-        filtered_adata_objects = adata_objects.copy()
-        for i, adata in enumerate(filtered_adata_objects):
-            save_h5ad_file(adata, f'filtered_adata_objects_{i}')
+        f_adata_files = [file for file in files if file.startswith('filtered_adata_objects')]
+        # print(f_adata_files)
+        if(len(f_adata_files) == 0):
+            filtered_adata_objects = adata_objects.copy()
+            for i, adata in enumerate(filtered_adata_objects):
+                save_h5ad_file(adata, f'filtered_adata_objects_{i}')
         return Response({}, status=status.HTTP_201_CREATED)
 class NormalizationView(APIView):
     def post(self, request):
@@ -286,6 +290,7 @@ class NormalizationView(APIView):
                 sc.pp.normalize_total(adata, target_sum=1e6)
                 sc.pp.log1p(adata)
                 norm_adata_result.append(f"Normalization completed for {adata.uns['prefix']}")
+                print(f"{adata.shape[0]} × {adata.shape[1]}")
                 norm_adata_objects.append(adata.copy())
         elif chosen_method == 'CLR':
             for adata in adata_objects:
@@ -407,9 +412,8 @@ class CLusteringView(APIView):
         elif chosen_method == 'combat':
             sc.pp.combat(adata, key='Sample')
             sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pcs, random_state=42)
-            
         sc.tl.umap(adata, random_state=42)
-        sc.tl.leiden(adata, resolution=resolution, random_state=42)        
+        sc.tl.leiden(adata, resolution=resolution, random_state=42)   
         adata = clustering_result(adata, n_pcs)
         
         save_h5ad_file(adata, 'adata_clustering.h5ad')
