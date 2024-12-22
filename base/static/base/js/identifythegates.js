@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     0,
     csrftoken
   );
+  console.log(preload_results);
   showdropdown(preload_results.data.adata_list);
   // grab step
   const grabstep_chosen_rslt = await grabsteps(

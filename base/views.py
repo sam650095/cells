@@ -15,7 +15,8 @@ def index(request):
 def page(request, process, method):
     context = {'process': process, 'method': method}
     return render(request, f"{process}/{method}.html", context)
-
+def max_step(request):
+    return Response({'message': 'notfound'}, status=status.HTTP_200_OK)
 def get_image(request):
     if request.method == 'POST':
         folder = request.POST.get('folder', '')

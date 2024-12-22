@@ -7,6 +7,22 @@ document.addEventListener(
   },
   false
 );
+document.querySelectorAll('[data-check="true"]').forEach((link) => {
+  link.addEventListener("click", function (event) {
+    event.preventDefault(); // 阻止預設行為
+
+    // 根據條件判斷是否跳轉
+    const shouldProceed = confirm(`確定要前往 ${this.textContent.trim()} 嗎？`);
+
+    if (shouldProceed) {
+      // 如果符合條件，進行跳轉
+      window.location.href = this.href;
+    } else {
+      console.log(`取消跳轉到: ${this.href}`);
+    }
+  });
+});
+
 let stepped = false;
 // navbar styling
 let pathSegments = window.location.pathname.split("/");
