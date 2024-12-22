@@ -216,12 +216,13 @@ class ReplaceView(APIView):
         lowerlimit = float(request.data.get('lowerlimit')) if request.data.get('lowerlimit') else None
         upperlimit = float(request.data.get('upperlimit')) if request.data.get('upperlimit') else None
         filtered_adata_objects, adata_results, changed_adata_result = self.perform_filter()
-        print(adata_results)
+        
         # save anndata
         for i, adata in enumerate(filtered_adata_objects):
             save_h5ad_file(adata, f'filtered_adata_objects_{i}')
         # update steps
         operation_step = OperationStep.objects.get(session_id=2)
+        print(operation_step.output_values.get('adata_results'))
         SaveSteps(2, 'qualitycontrol', 'process', {}, {'adata_results': adata_results,'save_image_names': operation_step.output_values.get('save_image_names'), 'marker_list':operation_step.output_values.get('marker_list')})
        
         SaveSteps(3, 'qualitycontrol', 'filter', {"f_sampleSelect":f_sampleSelect, "minGenes":minGenes, "filter_method":filter_method, "lowerlimit":lowerlimit, "upperlimit":upperlimit}, {'adata_result':changed_adata_result, 'save_image_names':f_sampleSelect+"_previewimage.png"})
@@ -251,7 +252,7 @@ class ReplaceView(APIView):
             if adata.uns['prefix'] == preview_adata.uns['prefix']:
                 changed_adata_result = f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}"
             adata_results.append(f"{adata.uns['prefix']}: AnnData object with n_obs × n_vars = {n_obs} × {n_vars}")
-            
+        print(adata_results)
 
         return filtered_adata_objects, adata_results, changed_adata_result
 class ConfirmView(APIView):
