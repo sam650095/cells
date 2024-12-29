@@ -329,16 +329,38 @@ def distances_heatmap(chosen_column):
     save_dir = os.path.join(settings.MEDIA_ROOT, 'spatial_result')
     os.makedirs(save_dir, exist_ok=True)
 
-    if(chosen_column == "leiden_R"):
-        sm.pl.spatial_distance(adata, spatial_distance='spatial_distance_leiden_R', phenotype='leiden_R', imageid='Sample', heatmap_summarize=False)
-        plt.savefig(os.path.join(save_dir, 'distances_heatmap_leiden_R.png'))
+    groups = adata.obs['Sample'].unique()  # 提取所有分組，例如 D0, D1, D2
+
+    filenames = []  # 存放生成的檔案名稱
+    for group in groups:
+        # 篩選出對應分組的資料
+        adata_group = adata[adata.obs['Sample'] == group]
+        if chosen_column == "leiden_R":
+            sm.pl.spatial_distance(
+                adata_group,
+                spatial_distance='spatial_distance_leiden_R',
+                phenotype='leiden_R',
+                imageid='Sample',
+                heatmap_summarize=False
+            )
+            filename = f'distances_heatmap_leiden_R_{group}.png'
+        else:
+            sm.pl.spatial_distance(
+                adata_group,
+                spatial_distance='spatial_distance_phenotype',
+                phenotype='phenotype',
+                imageid='Sample',
+                heatmap_summarize=False
+            )
+            filename = f'distances_heatmap_phenotype_{group}.png'
+        
+        # 儲存熱圖
+        plt.savefig(os.path.join(save_dir, filename))
         plt.close()
-        return 'distances_heatmap_leiden_R.png'
-    else:
-        sm.pl.spatial_distance(adata, spatial_distance='spatial_distance_phenotype', phenotype='phenotype', imageid='Sample', heatmap_summarize=False)
-        plt.savefig(os.path.join(save_dir,'distances_heatmap_phenotype.png'))
-        plt.close()
-        return 'distances_heatmap_phenotype.png'
+        filenames.append(filename)
+
+    return filenames  # 回傳所有生成的檔案名稱
+
             
 def distances_numeric_plot(chosen_column, chosen_cluster): 
     adata = read_h5ad_file('adata_spatial_analysis.h5ad')
