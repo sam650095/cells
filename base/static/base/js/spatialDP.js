@@ -7,7 +7,9 @@ function adddp(columns_list, cluster_list, method_list) {
   dp("vp_ul", columns_list);
 }
 function addimg(filename) {
-  loadImage("spatial_result", filename[0], "distances-heatmap-container");
+  for (let i = 0; i < filename[0].length; i++) {
+    loadImage("spatial_result", filename[0][i], "distances-heatmap-container");
+  }
   loadImage("spatial_result", filename[1], "numeric-plot-container");
   loadImage("spatial_result", filename[2], "interactions-heatmap-container");
   loadImage("spatial_result", filename[3], "voronoi-plot-container");
